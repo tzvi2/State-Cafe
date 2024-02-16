@@ -2,10 +2,10 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
@@ -24,7 +24,6 @@
     "stripe": "^14.12.0",
     "ws": "^8.16.0"
   },
-  "proxy": "<http://localhost:8000>",
   "devDependencies": {
     "express-rate-limit": "^7.1.5",
     "helmet": "^7.1.0",
