@@ -1,0 +1,62 @@
+.categoryBar {
+	display: flex;
+	border: 1px solid #B5C38A;
+	font-size: 5.5vw;
+	font-weight: 500;
+	overflow: auto;
+	align-items: stretch;
+	position: sticky;
+	top: 15vw;
+	background-color: white;
+	margin-top: 2vw;
+	height: 14vw;
+}
+
+.categoryBar a {
+	padding: 3% 5%;
+	white-space: nowrap;
+	color: #768745;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.categoryBar a:not(:last-child) {
+	border-right: 2px solid #B5C38A;
+
+}
+
+@media (min-width: 550px) {
+	.categoryBar {
+		height: 5rem;
+		top: 5rem;
+	}
+
+	.categoryBar a {
+		font-size: 1.25rem;
+		cursor: pointer;
+		padding: 0;
+		flex-grow: 1;
+		text-align: center;
+	}
+}
+
+
+@media (min-width: 1024px) {
+	.categoryBar {
+		top: 3rem;
+		height: 4rem;
+		margin: 2vw auto;
+		justify-content: space-between;
+		width: 62%;
+		border-radius: 15px;
+	}
+
+	.categoryBar a {
+		font-size: 1.25rem;
+		cursor: pointer;
+		padding: 0;
+		flex-grow: 1;
+		text-align: center;
+	}
+}

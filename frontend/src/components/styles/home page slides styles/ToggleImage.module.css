@@ -1,0 +1,125 @@
+.imageCard {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  margin: 0;
+	padding: 0;
+  cursor: pointer; 
+  margin-bottom: 10%;
+}
+
+.category {
+  text-align: center;
+  margin-bottom: 0;
+  margin: 0;
+}
+
+.imageCard img {
+  width: 80vw; 
+  height: auto;
+  object-fit: cover;
+  border-radius: 8px;
+	margin: 0;
+	padding: 0;
+  box-shadow: 1.3px 2.6px 2.6px hsla(0, 4%, 42%, 0.66);
+  /* animation: pulse 2s; */
+}
+
+
+@keyframes fillOverlay {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* In ToggleImage.module.css */
+@keyframes showOverlay {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes hideOverlay {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    scale: 1;
+  }
+  50% {
+    scale: 1.1;
+  }
+  100% {
+    scale: 1;
+  }
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  border-radius: 8px;
+  box-sizing: border-box;
+	padding: 5%;
+	font-size: large;
+}
+
+.show {
+  animation: showOverlay 0.5s forwards;
+}
+
+.hide {
+  animation: hideOverlay 0.5s forwards;
+}
+
+@media (min-width: 550px) {
+
+	.imageCard img {
+    width: 50vw;
+    height: auto;
+  }
+}
+
+
+@media (min-width: 1024px) {
+
+  .imageCard {
+    margin: 0;
+  }
+
+	.imageCard img {
+    width: 22vw;
+    height: auto;
+
+  }
+
+
+  .imageCard img:hover {
+    box-shadow: 2.3px 3.6px 9.6px hsla(0, 4%, 12%, 0.66);
+  }
+}

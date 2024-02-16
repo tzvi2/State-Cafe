@@ -1,0 +1,91 @@
+.slide {
+	padding: 2rem .75rem;
+	background: #D3DBBA;
+}
+
+.slide h2 {
+	font-size: 8vw;
+	text-align: start;
+}
+
+.phoneLine {
+	display: flex;
+	column-gap: 4%;
+	align-items: center;
+	margin: 1rem 0;
+}
+
+.phoneLine a {
+	font-size: 5vw;
+	color: black;
+	text-decoration: underline;
+}
+
+.hours {
+	margin-top: 10%;
+}
+
+.hours h4, .hours p {
+	margin: 3% 0;
+	font-size: 5vw;
+}
+
+@media (min-width: 550px) {
+
+	.slide h2 {
+		font-size: 5vw;
+	}
+
+	.phoneLine a {
+		font-size: 4vw;
+	}
+
+	.hours h4, .hours p {
+		font-size: 4vw;
+	}
+}
+
+@media (min-width: 1024px) {
+
+	.slide {
+		display: flex;
+		flex-direction: column;
+		row-gap: 5vw;
+		align-items: flex-start;
+	}
+
+	.slide h2 {
+		font-size: 2rem;
+		margin-bottom: 0;
+	}
+
+	.contact {
+		display: flex;
+		flex-direction: column;
+		width: 30%;
+		row-gap: 1vw;
+	}
+
+	.phoneLine {
+		display: flex;
+		margin: 0;
+		
+	}
+
+	.hours {
+		display: flex;
+		flex-direction: column;
+		margin: 0;
+		row-gap: 1vw;
+	}
+
+	.phoneLine a {
+		font-size: 2rem;
+	}
+
+	.hours h4, .hours p {
+		font-size: 2rem;
+		margin: 0;
+	}
+
+}

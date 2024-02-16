@@ -1,0 +1,75 @@
+.deliveryPage {
+	margin: .75rem;
+	padding: .75rem;
+	border: solid 1px black;
+	max-width: 420px;
+	border-radius: 5px;
+	box-shadow: 2px 2px 4px rgba(181, 178, 178, 0.5);
+	display: flex;
+	flex-direction: column;
+	align-content: space-between;
+	row-gap: 1.25rem;
+	align-self: center;
+	width: 86%;
+}
+
+.deliveryPage h2 {
+	align-self: center;
+}
+
+.flexRow {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
+	font-size: 1.2rem;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.flexRow label, .flexRow input, .flexRow button {
+	width: 48%;
+}
+
+.day {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: .5rem;
+	row-gap: .5rem;
+}
+
+
+.flexRow input {
+	text-align: center;
+}
+
+.wideBtn {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: .5rem;
+	height: 2.5rem;
+}
+
+.selected {
+	border: 2px solid rgb(76, 76, 241);
+}
+
+.morningHours {
+	color: blue;
+}
+
+.eveningHours {
+
+}
+
+@media (min-width: 550px) {
+	
+}
+
+@media (min-width: 1024px) {
+	
+}

@@ -1,0 +1,126 @@
+nav {
+    background: #D3DBBA;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    min-width: 260px;
+
+}
+
+.topBar {
+    display: flex;
+    justify-content: space-between;
+    padding: 1.5rem .75rem;
+    align-items: center;
+    height: 15vw;
+    box-sizing: border-box;
+    transform: translateX(-.8%);
+}
+
+.hamburgerReact {
+    z-index: 5;
+    
+}
+
+.topBar > .logo {
+    transform: translate(-7px, 0);
+}
+
+.logo {
+    text-decoration: none;
+    color: black;
+    font-size: x-large;
+}
+
+.cart {
+	align-self: center;
+	transform: translateY(2px);
+}
+
+.cartIcon {
+	width: 30px;
+	height: 30px;
+	color: black;
+}
+
+.cartItemCount {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: rgb(216, 216, 232);
+    font-size: 0.8rem;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .desktopHeader {
+    display: none;
+  }
+
+  .menu {
+    position: absolute;
+    top: 15vw;
+    width: 100%;
+    padding-left: 1rem;  
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 7% 0;
+}
+
+li > a {
+    color: black;
+    text-decoration: none;
+    font-size: 5.5vw;
+}
+
+@media (min-width: 550px) {
+    .topBar {
+        height: 5rem;
+    }
+}
+
+
+@media (min-width: 1024px) {
+
+    .mobileHeader {
+        display: none;
+    }
+
+    .desktopHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 3rem;
+        padding: 0 2%;
+    }
+
+    .desktopHeader .links {
+        display: flex;
+        justify-content: flex-end;
+        width: 50%;
+        margin: 0;
+        column-gap: 5%;
+    }
+
+    .links li {
+        margin: 0;
+    }
+
+    .logoSection a, .links li a {
+        font-size: 1.5vw;
+    } 
+
+    .links li a:hover {
+        color: white;
+    }
+  }

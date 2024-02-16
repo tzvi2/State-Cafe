@@ -1,0 +1,16 @@
+.checkoutForm {
+	margin: 1rem;
+	max-width: 800px;
+	align-self: center;
+	text-align: center;
+}
+
+.payButton {
+	margin-top: 1rem;
+	width: 70%;
+	border: 1px solid -apple-system-blue;
+	border-radius: 5px;
+	padding: .4rem;
+	font-size: 1.25rem;
+	box-shadow: 2px 2px 3px rgba(57, 56, 56, .3);
+}

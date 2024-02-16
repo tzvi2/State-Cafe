@@ -1,0 +1,138 @@
+.menuItemExpanded {
+	margin: 2%;
+	display: flex;
+	flex-direction: column;
+	border: 1px solid black;
+	border-radius: 15px;
+	width: 80%;
+	align-self: center;
+	padding-bottom: .75rem;
+}
+
+.title {
+	margin-bottom: 0;
+	font-weight: 600;
+	margin: 0;
+	margin-bottom: 4%;
+	align-self: center;
+}
+
+img {
+	border-radius: 15px;
+	margin: 2vw;
+	width: 60%;
+	align-self: center;
+}
+
+.description {
+	font-size: 5vw;
+	margin: 2vw;
+	white-space: pre-line;
+}
+
+.optionsList {
+	display: flex;
+	flex-direction: column;
+	font-size: 5vw;
+}
+
+.optionRow {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin: 3vw 2vw;
+}
+
+.optionRow p {
+	margin: 0;
+}
+
+.checkbox_and_option {
+	display: flex;
+	align-items: center;
+	flex-grow: 2;
+}
+
+.checkbox_and_option input[type="checkbox"] {
+	width: 7vw;
+	height: 7vw;
+	margin: 0;
+	margin-right: 3%;
+}
+
+.footer {
+	position: sticky;
+	bottom: 0px;
+	display: flex;
+	justify-content: space-between;
+	column-gap: 2%;
+	background: white;
+	padding: 1% 0;
+	border-top: 1px solid black;
+	padding-top: .75rem;
+}
+
+.footer select, .footer button {
+
+	font-size: 5.5svw;
+	border-radius: 10px;
+	background: #ffffff;
+	border: 1px solid #616E38;
+	color: #616E38;
+	margin: 2vw;
+	-webkit-filter: drop-shadow(1px 1px 2px rgb(155, 148, 148, .5));
+}
+
+.footer .addToCart {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-grow: 2;
+	padding: 2%;
+}
+
+
+@media (min-width: 1024px) {
+	.title, .description, .checkbox_and_option label, .optionPrice {
+		font-size: 1.25rem
+	}
+
+	.menuItemExpanded {
+		width: 30%;
+	}
+
+	.description {
+		text-align: justify;
+		margin: .5rem;
+	}
+
+	.title {
+		margin: .5rem;
+	}
+	
+	img {
+		height: 12rem;
+		width: 12rem;
+		margin: 0;
+	}
+
+	.optionRow {
+		margin: .5rem;
+	}
+
+	.checkbox_and_option input[type="checkbox"] {
+		width: 2rem;
+		height: 2rem;
+		margin: 0;
+		margin-right: 3%;
+	}
+
+	.footer select, .footer button {
+
+		font-size: 1.5rem;
+		margin: .5rem;
+
+	}
+
+
+}

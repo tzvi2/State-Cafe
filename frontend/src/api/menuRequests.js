@@ -1,0 +1,126 @@
+export const getMenuItems = async (category = '') => {
+  // returns all items (in a specific category, if specified)
+  try {
+    // Encode the category to ensure it's a valid URL component
+    const categoryParam = category ? `?category=${encodeURIComponent(category)}` : '';
+    const res = await fetch(`http://${window.location.hostname}:8000/menu-data${categoryParam}`);
+
+    if (!res.ok) {
+        throw new Error('Couldn\'t retrieve menu data.');
+    }
+
+    const data = await res.json();
+    return data;
+    
+  } catch (err) {
+      console.error(err);
+      return []
+  }
+}
+
+
+export const getMenuItemByItemId = async (itemId) => {
+	try {
+			
+			const res = await fetch(`http://${window.location.hostname}:8000/menu-data/by-item-id/${itemId}`);
+			if (!res.ok) {
+					throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
+			}
+			const data = await res.json();
+			return data;
+	} catch (err) {
+			console.error('Error getting menu item by itemId:', err);
+			return null;
+	}
+}
+
+export const addMenuItem = async (menuItem) => {
+  try {
+    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/add-menu-item`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(menuItem),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error("Error adding menu item:", error);
+    throw error; 
+  }
+};
+
+export const updateMenuItemActiveStatus = async (itemId, isActive) => {
+  try {
+    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/update-status`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        itemId,
+        active: isActive,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error('Error updating menu item status:', error);
+    throw error; 
+  }
+};
+
+
+export const updateMenuItem = async (menuItemDetails) => {
+  try {
+    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/update-item`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(menuItemDetails),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const data = await response.json();
+    return data; 
+  } catch (error) {
+    console.error('Error updating menu item:', error);
+    throw error; 
+  }
+};
+
+export const deleteMenuItem = async (documentId) => {
+  try {
+    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/delete-menu-item`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ documentId }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to delete menu item');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting menu item:', error);
+    throw error;
+  }
+};

@@ -1,0 +1,34 @@
+.confirmationCard {
+	box-shadow: 1px 1px 3px black;
+	padding: 1em;
+	margin: .75em;
+	border-radius: 5px;
+}
+
+h2 {
+	margin: 0;
+	margin-bottom: .5em;
+}
+
+.animatedImage {
+	height: 4em;
+	width: 4em;
+  /* transition: transform 1s ease-in; */
+	animation: flyRight 1.8s ease-in forwards; /* Adjust duration as needed */
+
+}
+
+.orderDetailsRow {
+	display: flex;
+	justify-content: space-between;
+	margin: 3% 0;
+}
+
+@keyframes flyRight {
+  0% {
+    transform: translateX(-10vw) translateY(0);
+  }
+  100% {
+    transform: translateX(100vw) translateY(20%);
+  }
+}
