@@ -63,7 +63,7 @@ function DeliveryPage() {
   
     const fetchTimeSlots = async () => {
         try {
-            const response = await fetch(`http://${window.location.hostname}:8000/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
+            const response = await fetch(`https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
             if (!response.ok) throw new Error('Network response was not ok');
     
             const { availableTimeSlots } = await response.json();

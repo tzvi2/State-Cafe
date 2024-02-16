@@ -1,6 +1,6 @@
 export const getLastFourDigits = async (paymentIntentId) => {
 	try {
-			const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/api/payment/get-last-four`, { 
+			const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app/api/payment/get-last-four`, { 
 					method: 'POST',
 					headers: {
 							'Content-Type': 'application/json',

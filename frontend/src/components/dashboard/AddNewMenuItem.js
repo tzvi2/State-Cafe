@@ -11,7 +11,7 @@ function AddNewMenuItem() {
     formData.append('image', file);
   
     try {
-      const response = await fetch('http://localhost:8000/upload', {
+      const response = await fetch('https://state-cafe.vercel.app/upload', {
         method: 'POST',
         body: formData,
       });
@@ -71,7 +71,7 @@ function AddNewMenuItem() {
 
         try {
             // Send the image to your backend
-            const uploadResponse = await fetch('http://localhost:8000/upload', {
+            const uploadResponse = await fetch('https://state-cafe.vercel.app/upload', {
                 method: 'POST',
                 body: formData,
             });
