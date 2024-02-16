@@ -3,7 +3,7 @@ export const getMenuItems = async (category = '') => {
   try {
     // Encode the category to ensure it's a valid URL component
     const categoryParam = category ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`http://${window.location.hostname}:8000/menu-data${categoryParam}`);
+    const res = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/menu-data${categoryParam}`);
 
     if (!res.ok) {
         throw new Error('Couldn\'t retrieve menu data.');
@@ -22,7 +22,7 @@ export const getMenuItems = async (category = '') => {
 export const getMenuItemByItemId = async (itemId) => {
 	try {
 			
-			const res = await fetch(`http://${window.location.hostname}:8000/menu-data/by-item-id/${itemId}`);
+			const res = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/menu-data/by-item-id/${itemId}`);
 			if (!res.ok) {
 					throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
 			}
@@ -36,7 +36,7 @@ export const getMenuItemByItemId = async (itemId) => {
 
 export const addMenuItem = async (menuItem) => {
   try {
-    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/add-menu-item`, {
+    const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/edit-menu/add-menu-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const addMenuItem = async (menuItem) => {
 
 export const updateMenuItemActiveStatus = async (itemId, isActive) => {
   try {
-    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/update-status`, {
+    const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/edit-menu/update-status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
 
 export const updateMenuItem = async (menuItemDetails) => {
   try {
-    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/update-item`, {
+    const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/edit-menu/update-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export const updateMenuItem = async (menuItemDetails) => {
 
 export const deleteMenuItem = async (documentId) => {
   try {
-    const response = await fetch(`http://${window.location.hostname}:8000/edit-menu/delete-menu-item`, {
+    const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/edit-menu/delete-menu-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

@@ -1,6 +1,6 @@
 export const saveOrder = async (order) => {
   try {
-    const response = await fetch(`http://${window.location.hostname}:8000/api/orders`, {
+    const response = await fetch(`https://state-cafe-qfb19b9yi-tzvi2.vercel.app:8000/api/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
