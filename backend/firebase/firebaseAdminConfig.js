@@ -1,13 +1,4 @@
 require('dotenv').config(); 
-const { onRequest } = require('firebase-functions/v2/https');
-const { defineInt, defineString } = require('firebase-functions/params');
-
-// const projectId = defineString("FIREBASE_PROJECT_ID")
-// const privateKeyId = defineString('FIREBASE_PRIVATE_KEY_ID')
-// const privateKey = defineString("FIREBASE_PRIVATE_KEY")
-// const clientEmail = defineString("FIREBASE_CLIENT_EMAIL")
-// const clientId = defineString("FIREBASE_CLIENT_ID")
-// const clientX509 = defineString("FIREBASE_CLIENT_X509_CERT_URL")
 
 const admin = require('firebase-admin');
 
