@@ -42,9 +42,13 @@ function AddNewMenuItem() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    // if field is one that should be a number, convert it
+    const isNumberField = ['pieces', 'price', 'timeToCook'].includes(name);
+    const convertedValue = isNumberField ? parseFloat(value) : value;
+    
     setMenuItem((prevMenuItem) => ({
       ...prevMenuItem,
-      [name]: value,
+      [name]: convertedValue,
     }));
   };
 
@@ -107,18 +111,23 @@ function AddNewMenuItem() {
   };
 
   const handleOptionChange = (index, e) => {
+    const { name, value } = e.target;
+    const isNumberField = ['price', 'timeToCook'].includes(name);
+    const convertedValue = isNumberField ? parseFloat(value) : value;
+  
     const updatedOptions = menuItem.options.map((option, idx) => {
       if (idx === index) {
-        return { ...option, [e.target.name]: e.target.value };
+        return { ...option, [name]: convertedValue };
       }
       return option;
     });
-
+  
     setMenuItem((prevMenuItem) => ({
       ...prevMenuItem,
       options: updatedOptions,
     }));
   };
+  
 
   return (
     <form onSubmit={handleSubmit} className={styles.menuItemUploadForm}>
@@ -130,7 +139,7 @@ function AddNewMenuItem() {
           name="description" 
           value={menuItem.description} 
           onChange={handleChange}
-          rows="4" // You can adjust the number of rows as needed
+          rows="4"
         />
       </label>
       <label>Price: <input type="number" name="price" value={menuItem.price} onChange={handleChange} /></label>

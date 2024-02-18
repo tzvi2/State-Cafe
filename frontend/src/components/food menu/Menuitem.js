@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from '../styles/food menu styles/Menuitem.module.css';
 import { Link } from 'react-router-dom';
+import { centsToFormattedPrice } from '../../utils/priceUtilities';
 
 const Menuitem = React.memo(function Menuitem({ item }) {
     return (
@@ -8,7 +9,7 @@ const Menuitem = React.memo(function Menuitem({ item }) {
             <img className={styles.menuPhoto} src={item.img} alt={item.title} />
             <div className={styles.textBox}>
                 <h2>{item.title}</h2>
-                <h4>${item.price / 100}</h4>
+                <h4>{centsToFormattedPrice(item.price)}</h4>
             </div>
         </Link>
     );
