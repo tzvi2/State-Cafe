@@ -1,7 +1,4 @@
 export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
-	console.log("totalCookTime: ", totalCookTime)
-	console.log("date: ", date)
-	console.log("time: ", time)
 	
 	try {
 			const response = await fetch(`https://state-cafe.vercel.app/timeslots/book-timeslot`, {

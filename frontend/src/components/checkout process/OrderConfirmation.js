@@ -54,7 +54,6 @@ const OrderConfirmation = () => {
             date: deliveryDate,
             time: deliverySlot,
           });
-          console.log('Delivery time slot booked successfully.');
 
           // Mark the order as saved in localStorage to prevent duplicates
           localStorage.setItem(`orderSaved_${paymentIntentId}`, 'true');

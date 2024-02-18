@@ -71,13 +71,12 @@ export default function CartProvider({children}) {
 
 
 const addToCart = (newMenuItem) => {
-	console.log("newMenuItem: ", newMenuItem)
   // Finding if the item exists in the cart with the exact same options
   const existingItem = cartItems.find(item => 
     item.firestoreId === newMenuItem.firestoreId && 
     arraysAreTheSame(item.options.map(opt => opt.title), newMenuItem.options.map(opt => opt.title))
   );
-	console.log("existingItem: ", existingItem)
+
 
   // Calculate the total time to cook considering the selected options
   const optionsTimeToCook = newMenuItem.options.reduce((total, option) => total + option.timeToCook, 0);

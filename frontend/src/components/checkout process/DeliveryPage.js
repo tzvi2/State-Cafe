@@ -53,12 +53,11 @@ function DeliveryPage() {
     const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
     useEffect(() => {
-        console.log('delivery date: ', deliveryDate)
         if (deliveryDate !== "" && cart.totalCookTime > 0) {
             fetchTimeSlots(deliveryDate);
         }
         
-    }, [deliveryDate, cart.totalCookTime]); // Dependency array includes selectedDate to re-fetch when it changes. // Do not Re-fetch when totalCookTime changes, because any time this page reloads (which would have to happen for there to be a new totalCookTime), this useEffect runs again.
+    }, [deliveryDate, cart.totalCookTime]); 
 
   
     const fetchTimeSlots = async () => {

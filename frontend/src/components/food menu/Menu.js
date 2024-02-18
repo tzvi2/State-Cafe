@@ -23,12 +23,6 @@ export default function Menu() {
         fetchAllMenuItems();
     }, []);
 
-    // This effect might log a large amount of data if menuItems is a large array.
-    // Consider removing it once you've confirmed your data fetching works as expected.
-    useEffect(() => {
-        console.log(menuItems);
-    }, [menuItems]);
-
     const handleScroll = () => {
         const halfwayPoint = window.innerHeight / 2 + window.scrollY;
         let newActiveCategory = null;
