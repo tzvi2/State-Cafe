@@ -27,7 +27,8 @@ const getItemByDocumentId = async (req, res) => {
 }
 
 const getItemByItemId = async (req, res) => {
-  const { itemId } = req.params; // This is the 'itemId' like 'sushi'
+  
+  const { itemId } = req.params;
   try {
       const menuItemsRef = db.collection('menuItems');
       const snapshot = await menuItemsRef.where('itemId', '==', itemId).limit(1).get();

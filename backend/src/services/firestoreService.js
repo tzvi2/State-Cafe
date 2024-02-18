@@ -46,6 +46,22 @@ const saveOrder = async (orderData) => {
 
 const addMenuItemToFirestore = async (menuItem) => {
   try {
+    let newItem = { ...menuItem };
+
+    // Convert pieces, price, and timeToCook to numbers
+    if (newItem.pieces) newItem.pieces = parseInt(newItem.pieces, 10);
+    if (newItem.price) newItem.price = parseFloat(newItem.price);
+    if (newItem.timeToCook) newItem.timeToCook = parseInt(newItem.timeToCook, 10);
+
+    // Convert options' price and timeToCook to numbers
+    if (newItem.options && Array.isArray(newItem.options)) {
+      newItem.options = newItem.options.map(option => ({
+        ...option,
+        price: option.price ? parseFloat(option.price) : option.price,
+        timeToCook: option.timeToCook ? parseInt(option.timeToCook, 10) : option.timeToCook,
+      }));
+    }
+    
     const docRef = await db.collection('menuItems').add(menuItem);
     return { id: docRef.id, ...menuItem };
   } catch (error) {
