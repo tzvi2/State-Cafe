@@ -12,6 +12,31 @@ const fetchMenuData = async (req, res) => {
   }
 };
 
+const fetchQuickView = async (req, res) => {
+
+  try {
+    const menuItemsRef = db.collection('menuItems');
+    const snapshot = await menuItemsRef.get();
+    const quickViewMenu = [];
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      quickViewMenu.push({
+        title: data.title,
+        img: data.img,
+        price: data.price,
+        itemId: data.itemId,
+        category: data.category
+      });
+    });
+
+    res.json(quickViewMenu);
+  } catch (err) {
+    console.error("Error fetching quick view menu:", err);
+    res.status(500).send("Error fetching quick view menu");
+  }
+};
+
 const getItemByDocumentId = async (req, res) => {
   const { documentId } = req.params
   try {
@@ -67,5 +92,6 @@ module.exports = {
   fetchMenuData,
   getItemByDocumentId,
   getItemByItemId,
-  getItemPrice
+  getItemPrice,
+  fetchQuickView
 };

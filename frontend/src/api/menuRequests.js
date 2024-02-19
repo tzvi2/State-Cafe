@@ -17,7 +17,17 @@ export const getMenuItems = async (category = '') => {
       return []
   }
 }
-
+export const getQuickViewMenu = async () => {
+  try {
+    const response = await fetch(`http://localhost:8000/menu-data/quickView`)
+    const data = await response.json()
+    return data
+  } catch (err) {
+    console.error(err)
+    return []
+  }
+  
+}
 
 export const getMenuItemByItemId = async (itemId) => {
 	try {

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Menuitem from "./Menuitem";
 import CategoryBar from "./CategoryBar";
 import styles from '../styles/food menu styles/Menu.module.css';
-import { getMenuItems } from "../../api/menuRequests";
+import { getQuickViewMenu } from "../../api/menuRequests";
 
 const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", "soup", "coffee"];
 
@@ -14,13 +14,13 @@ export default function Menu() {
 
     useEffect(() => {
         setIsLoading(true);
-        const fetchAllMenuItems = async () => {
-            const items = await getMenuItems();
+        const fetchQuickView = async () => {
+            const items = await getQuickViewMenu();
             setMenuItems(items);
             setIsLoading(false);
         };
 
-        fetchAllMenuItems();
+        fetchQuickView();
     }, []);
 
     const handleScroll = () => {
@@ -43,11 +43,11 @@ export default function Menu() {
         }
     };
 
-    // Attach the scroll event listener
+
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [activeCategory]); // Reacting to changes in activeCategory
+    }, [activeCategory]); 
 
     return (
         <>

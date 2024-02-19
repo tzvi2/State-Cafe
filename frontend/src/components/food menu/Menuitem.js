@@ -6,7 +6,7 @@ import { centsToFormattedPrice } from '../../utils/priceUtilities';
 const Menuitem = React.memo(function Menuitem({ item }) {
     return (
         <Link className={styles.menuItem} to={`/menu/${item.itemId}`}>
-            <img className={styles.menuPhoto} src={item.img} alt={item.title} />
+            <img loading='lazy' className={styles.menuPhoto} src={item.img} alt={item.title} />
             <div className={styles.textBox}>
                 <h2>{item.title}</h2>
                 <h4>{centsToFormattedPrice(item.price)}</h4>
