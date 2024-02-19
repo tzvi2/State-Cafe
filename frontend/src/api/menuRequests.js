@@ -19,7 +19,7 @@ export const getMenuItems = async (category = '') => {
 }
 export const getQuickViewMenu = async () => {
   try {
-    const response = await fetch(`http://state-cafe.vercel.app/menu-data/quickView`)
+    const response = await fetch(`https://state-cafe.vercel.app/menu-data/quickView`)
     const data = await response.json()
     return data
   } catch (err) {
