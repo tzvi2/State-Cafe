@@ -115,6 +115,7 @@ export const updateMenuItem = async (menuItemDetails) => {
 };
 
 export const deleteMenuItem = async (documentId) => {
+  console.log('deleting menu item with id: ', documentId)
   try {
     const response = await fetch(`https://state-cafe.vercel.app/edit-menu/delete-menu-item`, {
       method: 'POST',
@@ -128,9 +129,14 @@ export const deleteMenuItem = async (documentId) => {
       throw new Error('Failed to delete menu item');
     }
 
-    return await response.json();
+    // Check if the response has content before parsing it as JSON
+    const text = await response.text(); // Get the response body as text
+    const data = text ? JSON.parse(text) : {}; // Parse text as JSON if not empty, otherwise return an empty object
+
+    return data;
   } catch (error) {
     console.error('Error deleting menu item:', error);
     throw error;
   }
 };
+

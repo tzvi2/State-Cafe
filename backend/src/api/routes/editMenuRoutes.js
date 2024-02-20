@@ -37,8 +37,8 @@ router.post('/update-item', async (req, res) => {
 
 router.post('/delete-menu-item', async (req, res) => {
 	try {
-		const {itemId} = req.body
-		const response = await deleteMenuItem(itemId)
+		const {documentId} = req.body
+		const response = await deleteMenuItem(documentId)
 		res.json(response)
 	} catch (error) {
 		console.error('Error deleting menu item:', error);

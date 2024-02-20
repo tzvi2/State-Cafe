@@ -24,7 +24,21 @@ const EditMenuItem = () => {
   useEffect(() => {
     const fetchMenuItem = async () => {
       const item = await getMenuItemByItemId(itemId);
-      setMenuItem(item || {});
+      if (item) {
+        // Provide defaults for potentially missing fields
+        setMenuItem({
+          title: item.title || '',
+          pieces: item.pieces || '',
+          description: item.description || '',
+          price: item.price || '',
+          category: item.category || '',
+          tags: item.tags || '',
+          timeToCook: item.timeToCook || '',
+          options: item.options || [],
+          active: item.active !== undefined ? item.active : false,
+          // Other fields...
+        });
+      }
     };
     fetchMenuItem();
   }, [itemId]);
@@ -34,13 +48,35 @@ const EditMenuItem = () => {
     setMenuItem(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleOptionChange = (optionIndex, e) => {
+  const handleOptionChange = (index, e, optionType = 'individual', subIndex = null) => {
     const { name, value } = e.target;
-    const updatedOptions = menuItem.options.map((option, index) =>
-      index === optionIndex ? { ...option, [name]: value } : option
-    );
-    setMenuItem(prev => ({ ...prev, options: updatedOptions }));
+    setMenuItem(prevState => {
+      const newOptions = [...prevState.options];
+      if (optionType === 'individual') {
+        newOptions[index] = { ...newOptions[index], [name]: value };
+      } else if (optionType === 'group' && subIndex !== null) {
+        newOptions[index].options[subIndex] = { ...newOptions[index].options[subIndex], [name]: value };
+      }
+      return { ...prevState, options: newOptions };
+    });
   };
+
+  const deleteOption = (index) => {
+    setMenuItem(prevState => ({
+      ...prevState,
+      options: prevState.options.filter((_, optionIndex) => optionIndex !== index),
+    }));
+  };
+  
+  const deleteSubOption = (groupIndex, subOptionIndex) => {
+    setMenuItem(prevState => {
+      const newOptions = [...prevState.options];
+      newOptions[groupIndex].options = newOptions[groupIndex].options.filter((_, index) => index !== subOptionIndex);
+      return { ...prevState, options: newOptions };
+    });
+  };
+  
+  
 
   const handleAddOption = () => {
     setMenuItem(prev => ({
@@ -71,7 +107,7 @@ const EditMenuItem = () => {
           <input
             type="text"
             name="title"
-            value={menuItem.title}
+            value={menuItem.title || ''}
             onChange={handleChange}
           />
         </label>
@@ -80,7 +116,7 @@ const EditMenuItem = () => {
           <input
             type="text"
             name="itemId"
-            value={menuItem.itemId}
+            value={menuItem.itemId || ''}
             onChange={handleChange}
           />
         </label>
@@ -89,7 +125,7 @@ const EditMenuItem = () => {
           <input
             type="number"
             name="pieces"
-            value={menuItem.pieces}
+            value={menuItem.pieces || ''}
             onChange={handleChange}
           />
         </label>
@@ -97,7 +133,7 @@ const EditMenuItem = () => {
         <label>Description: 
           <textarea 
             name="description" 
-            value={menuItem.description} 
+            value={menuItem.description || ''} 
             onChange={handleChange}
             rows="4" // Adjust the number of rows according to your design needs
           />
@@ -108,7 +144,7 @@ const EditMenuItem = () => {
           <input
             type="text"
             name="category"
-            value={menuItem.category}
+            value={menuItem.category || ''}
             onChange={handleChange}
           />
         </label>
@@ -117,7 +153,7 @@ const EditMenuItem = () => {
           <input
             type="text"
             name="img"
-            value={menuItem.img}
+            value={menuItem.img || ''}
             onChange={handleChange}
           />
         </label>
@@ -128,7 +164,7 @@ const EditMenuItem = () => {
           <input
             type="number"
             name="price"
-            value={menuItem.price}
+            value={menuItem.price || ''}
             onChange={handleChange}
           />
         </label>
@@ -137,7 +173,7 @@ const EditMenuItem = () => {
           <input
             type="text"
             name="tags"
-            value={menuItem.tags}
+            value={menuItem.tags || ''}
             onChange={handleChange}
           />
         </label>
@@ -146,42 +182,82 @@ const EditMenuItem = () => {
           <input
             type="number"
             name="timeToCook"
-            value={menuItem.timeToCook}
+            value={menuItem.timeToCook || ''}
             onChange={handleChange}
           />
         </label>
        
         {menuItem.options.map((option, index) => (
-          <div key={index} className={styles.optionGroup}>
-            <h4>Option {index + 1}</h4>
-            <label>
-              Option Title:
-              <input
-                type="text"
-                name="title"
-                value={option.title}
-                onChange={(e) => handleOptionChange(index, e)}
-              />
-            </label>
-            <label>
-              Option Price:
-              <input
-                type="number"
-                name="price"
-                value={option.price}
-                onChange={(e) => handleOptionChange(index, e)}
-              />
-            </label>
-            <label>
-              Option Time to Cook:
-              <input
-                type="number"
-                name="timeToCook"
-                value={option.timeToCook}
-                onChange={(e) => handleOptionChange(index, e)}
-              />
-            </label>
-          </div>
+          option.type === 'group' ? (
+            <div key={index} className={styles.optionGroup}>
+              <h3>Group: {option.group}</h3>
+              <p>Min Selection: {option.selectionMin}</p>
+              <p>Max Selection: {option.selectionMax}</p>
+              <button type="button" onClick={() => deleteOption(index)}>Delete Group</button>
+              {option.options.map((subOption, subIndex) => (
+                <div key={subIndex} className={styles.subOption}>
+                  <h4>Sub Option {subIndex + 1}</h4>
+                  <label>
+                    Title:
+                    <input
+                      type="text"
+                      value={subOption.title || ''}
+                      onChange={(e) => handleOptionChange(index, e, 'group', subIndex)}
+                    />
+                  </label>
+                  <label>
+                    Price:
+                    <input
+                      type="number"
+                      value={subOption.price || ''}
+                      onChange={(e) => handleOptionChange(index, e, 'group', subIndex)}
+                    />
+                  </label>
+                  <label>
+                    Time to Cook:
+                    <input
+                      type="number"
+                      value={subOption.timeToCook || ''}
+                      onChange={(e) => handleOptionChange(index, e, 'group', subIndex)}
+                    />
+                  </label>
+                  <button type="button" onClick={() => deleteSubOption(index, subIndex)}>Delete Sub-Option</button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div key={index} className={styles.individualOption}>
+              <h4>Individual Option {index + 1}</h4>
+              <label>
+                Title:
+                <input
+                  type="text"
+                  name="title"
+                  value={option.title || ''}
+                  onChange={(e) => handleOptionChange(index, e)}
+                />
+              </label>
+              <label>
+                Price:
+                <input
+                  type="number"
+                  name="price"
+                  value={option.price || ''}
+                  onChange={(e) => handleOptionChange(index, e)}
+                />
+              </label>
+              <label>
+                Time to Cook:
+                <input
+                  type="number"
+                  name="timeToCook"
+                  value={option.timeToCook || ''}
+                  onChange={(e) => handleOptionChange(index, e)}
+                />
+              </label>
+              <button type="button" onClick={() => deleteOption(index)}>Delete Option</button>
+            </div>
+          )
         ))}
         <button type="button" onClick={handleAddOption} className={styles.addButton}>
           Add Option

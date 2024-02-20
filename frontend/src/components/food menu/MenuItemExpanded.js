@@ -25,7 +25,6 @@ function MenuItemExpanded() {
   const timeoutId2Ref = useRef();
 
 
-
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
@@ -33,6 +32,10 @@ function MenuItemExpanded() {
     };
     fetchData();
   }, [itemId]);
+
+  useEffect(() => {
+    console.log(menuItem)
+  }, [menuItem])
 
   const handleOptionChange = (option, event, group = null) => {
     const isChecked = event.target.checked;
@@ -69,6 +72,7 @@ function MenuItemExpanded() {
     }
     
   }, [selectedOptions, quantity, menuItem]);
+  
 
   const handleAddToCart = () => {
     if (buttonLocked || !menuItem) return;

@@ -75,7 +75,7 @@ const MenuDashboard = () => {
             />
             <span className={`${styles.activeStatusIndicator} ${item.active ? styles.isActive : styles.isInactive}`} />
           </label>
-					<button onClick={() => handleDeleteMenuItem(item.documentId)} className={styles.deleteButton}>X</button>
+					<button onClick={() => handleDeleteMenuItem(item.id)} className={styles.deleteButton}>X</button>
         </div>
       ))}
     </div>
