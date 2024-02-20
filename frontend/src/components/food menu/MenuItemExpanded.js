@@ -17,7 +17,7 @@ function MenuItemExpanded() {
   const [quantity, setQuantity] = useState(1);
   
   const [buttonContent, setButtonContent] = useState({
-    text: "",
+    text: "Add to Order",
     amount: ""
   })
 
@@ -36,6 +36,12 @@ function MenuItemExpanded() {
   useEffect(() => {
     console.log(menuItem)
   }, [menuItem])
+
+  const totalItemPrice = useMemo(() => {
+    if (menuItem.price === undefined) return 0;
+    const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
+    return (menuItem.price + optionsPrice) * quantity;
+  }, [selectedOptions, quantity, menuItem]);
 
   const handleOptionChange = (option, event, group = null) => {
     const isChecked = event.target.checked;
@@ -60,10 +66,7 @@ function MenuItemExpanded() {
   };
 
   useEffect(() => {
-    if (menuItem.options && menuItem.price !== undefined) {
-      const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
-      const basePrice = menuItem.price;
-      const totalPrice = (basePrice + optionsPrice) * quantity;
+    if (menuItem.price !== undefined) {
       let newButtonContent = {
         text: "Add to Order ",
         amount: centsToFormattedPrice(totalItemPrice)
@@ -121,14 +124,6 @@ function MenuItemExpanded() {
     };
   }, []); 
   
-  
-
-
-  const totalItemPrice = useMemo(() => {
-    if (!menuItem.options || menuItem.price === undefined) return 0;
-    const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
-    return (menuItem.price + optionsPrice) * quantity;
-  }, [selectedOptions, quantity, menuItem]);
 
   const validateOptionSelections = () => {
     const validationErrors = [];
