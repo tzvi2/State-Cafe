@@ -2,6 +2,7 @@ import React from 'react'
 import { useCart } from '../../hooks/useCart'
 import { Trash2 } from 'lucide-react'
 import styles from '../styles/cart styles/CartPage.module.css'
+import { centsToFormattedPrice } from '../../utils/priceUtilities'
 
 function CartItem({item}) {
 	const {cart, removeFromCart, updateItemQuantity} = useCart()
@@ -46,7 +47,7 @@ return (
 		</div>
 		<div className={styles.col2}>
 			<Trash2 className={styles.deleteBtn} onClick={() => handleDeleteItem(item.cartItemId)} />
-			<p className={styles.itemTotal}>${item.total / 100}</p>
+			<p className={styles.itemTotal}>{centsToFormattedPrice(item.total)}</p>
 		</div>
 		
 	</div>

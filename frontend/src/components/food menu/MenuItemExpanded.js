@@ -85,11 +85,11 @@ function MenuItemExpanded() {
       alert(validationErrors.join("\n"));
       return; // Prevent adding to cart if validation fails
     }
-    // Continue with adding the item to the cart if validation passes
+    
     const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
     const itemTotalPrice = (menuItem.price + optionsPrice) * quantity;
     
-    const filteredOptions = selectedOptions; // Assuming selectedOptions already contains only the selected ones
+    const filteredOptions = selectedOptions;
   
     const itemDetails = {
       ...menuItem, 
