@@ -1,83 +1,66 @@
-import React from 'react'
-import { useState, useRef, useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import Hamburger from 'hamburger-react'
-import { ShoppingCart } from 'lucide-react'
-import '../styles/header styles/Header.css'
-import { useCart } from '../../hooks/useCart'
+import React from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
+import Hamburger from 'hamburger-react';
+import { ShoppingCart } from 'lucide-react';
+import styles from '../styles/header styles/Header.module.css';
+import { useCart } from '../../hooks/useCart';
 
 function Header() {
-
-  const [isOpen, setIsOpen] = useState(false)
-  const wrapper = useRef(null)
+  const [isOpen, setIsOpen] = useState(false);
+  const wrapper = useRef(null);
   const { cart } = useCart(); 
-
 
   useEffect(() => {
     const handleClickOutside = e => {
       if (wrapper.current && !wrapper.current.contains(e.target)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [wrapper])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [wrapper]);
+
+  // Dynamically generate class name for NavLink
+  const getNavLinkClass = (isActive, baseClass) => 
+    isActive ? `${baseClass} ${styles.activeLink}` : baseClass;
 
   return (
     <>
-    <nav className='mobileHeader' ref={wrapper}>
-      <div className='topBar'>
-        <Hamburger className="hamburgerReact" toggled={isOpen} toggle={() => setIsOpen(!isOpen)}/>
-        <Link onClick={() => setIsOpen(false)} className='logo' to="/">State Cafe</Link>
-        {/* CLOSE menu on cart icon click */}
-        <Link to="cart" className='cart'>
-          <ShoppingCart onClick={() => setIsOpen(false)} className="cartIcon"/>
-          {cart.totalCount > 0 && <span className="cartItemCount">{cart.totalCount}</span>}
-        </Link>
-      </div>
-      {isOpen && <>
-        <nav className='menu'>
-        <ul onClick={() => setIsOpen(false)}>
-            <li>
-                <Link to={'/'}>Home</Link>
-            </li>
-            <li>
-                <Link to={'menu'}>Order Online</Link>
-            </li>
-            
-            <li>
-                <Link to={'cart'}>Cart</Link>
-            </li>
-            <li>
-                <Link to={'about'}>About</Link>
-            </li>
-        </ul>
-    </nav>
-      </>}
-    </nav>
+      <nav className={styles.mobileHeader} ref={wrapper}>
+        <div className={styles.topBar}>
+          <Hamburger className={styles.hamburgerReact} toggled={isOpen} toggle={() => setIsOpen(!isOpen)}/>
+          <NavLink onClick={() => setIsOpen(false)} className={styles.logo} to="/">State Cafe</NavLink>
+          <NavLink to="cart" className={({ isActive }) => getNavLinkClass(isActive, styles.cart)}>
+            <ShoppingCart onClick={() => setIsOpen(false)} className={styles.cartIcon}/>
+            {cart.totalCount > 0 && <span className={styles.cartItemCount}>{cart.totalCount}</span>}
+          </NavLink>
+        </div>
+        {isOpen && (
+          <nav className={styles.menu}>
+            <ul onClick={() => setIsOpen(false)}>
+              <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
+              <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
+              <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart</NavLink></li>
+              <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
+            </ul>
+          </nav>
+        )}
+      </nav>
 
-    <nav className='desktopHeader'>
-      <div className='logoSection'>
-        <Link className='logo' to="/">State Cafe</Link>
-      </div>
-      <ul className='links'>
-        <li>
-            <Link to={'/'}>Home</Link>
-        </li>
-        <li>
-            <Link to={'menu'}>Order Online</Link>
-        </li>
-        
-        <li>
-            <Link to={'cart'}>Cart</Link>
-        </li>
-        <li>
-            <Link to={'about'}>About</Link>
-        </li>
-      </ul>
-    </nav>
+      <nav className={styles.desktopHeader}>
+        <div className={styles.logoSection}>
+          <NavLink className={styles.logo} to="/">State Cafe</NavLink>
+        </div>
+        <ul className={styles.links}>
+          <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
+          <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
+          <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart</NavLink></li>
+          <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
+        </ul>
+      </nav>
     </>
-  )
+  );
 }
 
-export default Header
+export default Header;

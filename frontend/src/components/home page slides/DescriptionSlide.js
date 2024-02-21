@@ -4,7 +4,7 @@ import { MoveRight } from 'lucide-react';
 import styles from '../styles/home page slides styles/DescriptionSlide.module.css';
 
 function DescriptionSlide() {
-    const words = ["Delicious", "Kosher", "Fresh", "High quality", "Satisfying", "Hot", "Special" ];
+    const words = ["Delicious", "Kosher", "Fresh", "High quality", "Satisfying", "Hot", "Amazing" ];
     const [currentWord, setCurrentWord] = useState(words[0]);
     const [fade, setFade] = useState(false); // Start with fade set to false
 
