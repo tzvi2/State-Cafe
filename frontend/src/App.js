@@ -16,6 +16,9 @@ import OrdersDashboard from './components/dashboard/OrdersDashboard';
 import AddNewMenuItem from './components/dashboard/AddNewMenuItem';
 import MenuDashboard from './components/dashboard/MenuDashboard';
 import EditMenuItem from './components/dashboard/EditMenuItem'
+import { inject } from '@vercel/analytics';
+ 
+inject();
 
 function App() {
   return (
