@@ -16,10 +16,8 @@ import OrdersDashboard from './components/dashboard/OrdersDashboard';
 import AddNewMenuItem from './components/dashboard/AddNewMenuItem';
 import MenuDashboard from './components/dashboard/MenuDashboard';
 import EditMenuItem from './components/dashboard/EditMenuItem'
-import { inject } from '@vercel/analytics';
 import { SpeedInsights } from '@vercel/speed-insights/react';
- 
-inject();
+import { Analytics } from '@vercel/analytics/react'
 
 function App() {
   return (
@@ -27,6 +25,8 @@ function App() {
       <BrowserRouter>
         <CartProvider>
           <DeliveryDetailsProvider> 
+            <Analytics />
+            <SpeedInsights />
             <Header />
             <div className='App'>
               <Routes>
@@ -47,7 +47,6 @@ function App() {
           </DeliveryDetailsProvider>
         </CartProvider>
       </BrowserRouter>
-      <SpeedInsights />
     </>
   );
 }
