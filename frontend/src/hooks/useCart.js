@@ -111,13 +111,6 @@ export default function CartProvider({children}) {
 		return true
 	};
 
-	useEffect(() => {
-		console.log('cart items ', cartItems)
-	}, [cartItems])
-	
-
-	
-
 	const removeFromCart = (cartItemId) => {
 		let newCartItems = cartItems.filter(item => item.cartItemId !== cartItemId)
 		setCartItems(newCartItems)
