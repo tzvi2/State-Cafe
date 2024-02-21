@@ -17,6 +17,7 @@ import AddNewMenuItem from './components/dashboard/AddNewMenuItem';
 import MenuDashboard from './components/dashboard/MenuDashboard';
 import EditMenuItem from './components/dashboard/EditMenuItem'
 import { inject } from '@vercel/analytics';
+import { SpeedInsights } from '@vercel/speed-insights/react';
  
 inject();
 
@@ -46,6 +47,7 @@ function App() {
           </DeliveryDetailsProvider>
         </CartProvider>
       </BrowserRouter>
+      <SpeedInsights />
     </>
   );
 }
