@@ -82,7 +82,6 @@ export default function CartProvider({children}) {
 		const itemTotalTimeToCook = newMenuItem.timeToCook + optionsTimeToCook * newMenuItem.quantity;
 	
 		if (existingItem) {
-			console.log('existing item', existingItem)
 			const combinedQuantity = existingItem.quantity + newMenuItem.quantity;
 			if (combinedQuantity > 10) {
 				// If combined quantity exceeds 10, do not add to cart
@@ -117,7 +116,6 @@ export default function CartProvider({children}) {
 	}
 
 	const updateItemQuantity = (cartItemId, newQuantity) => {
-		console.log("updating quantity")
     const updatedItems = cartItems.map((item) => {
         if (item.cartItemId === cartItemId) {
             // Calculate the total price for the new quantity
