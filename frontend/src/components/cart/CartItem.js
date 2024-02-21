@@ -14,7 +14,6 @@ function CartItem({item}) {
 	const handleQuantityChange = (event) => {
 		const newQuantity = parseInt(event.target.value, 10);
 		if (!isNaN(newQuantity) && newQuantity >= 0) {
-			const timePerItem = item.totalTimeToCook / item.quantity;
 			updateItemQuantity(item.cartItemId, newQuantity);
 		} else {
 				return;

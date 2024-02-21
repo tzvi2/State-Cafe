@@ -84,9 +84,6 @@ function AddNewMenuItem() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //console.log("menu item: ", menuItem)
-    //console.log("menu item options: ", menuItem.options)
-
     // Convert price to cents
     const priceInCents = Math.round(menuItem.price * 100);
     // convert minutes to seconds

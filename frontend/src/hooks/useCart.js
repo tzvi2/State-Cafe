@@ -70,37 +70,53 @@ export default function CartProvider({children}) {
 	}, [cartItems, totalPrice, totalCount, totalCookTime]);
 
 
-const addToCart = (newMenuItem) => {
-  // Finding if the item exists in the cart with the exact same options
-  const existingItem = cartItems.find(item => 
-    item.firestoreId === newMenuItem.firestoreId && 
-    arraysAreTheSame(item.options.map(opt => opt.title), newMenuItem.options.map(opt => opt.title))
-  );
+	const addToCart = (newMenuItem) => {
+		// Finding if the item exists in the cart with the exact same options
+		const existingItem = cartItems.find(item => 
+			item.firestoreId === newMenuItem.firestoreId && 
+			arraysAreTheSame(item.options.map(opt => opt.title), newMenuItem.options.map(opt => opt.title))
+		);
+	
+		// Calculate the total time to cook considering the selected options
+		const optionsTimeToCook = newMenuItem.options.reduce((total, option) => total + option.timeToCook, 0);
+		const itemTotalTimeToCook = newMenuItem.timeToCook + optionsTimeToCook * newMenuItem.quantity;
+	
+		if (existingItem) {
+			console.log('existing item', existingItem)
+			const combinedQuantity = existingItem.quantity + newMenuItem.quantity;
+			if (combinedQuantity > 10) {
+				// If combined quantity exceeds 10, do not add to cart
+			
+				return false
+			}
+	
+			// If the item exists and combined quantity is 10 or less, update the item in the cart
+			updateItemQuantity(existingItem.cartItemId, combinedQuantity)
+			//setCartItems(updatedItems);
+		} else {
+			// If the total quantity being added is more than 10
+			if (newMenuItem.quantity > 10) {
+				alert("You cannot add more than 10 of the same item at once.");
+				return false
+			}
+	
+			// If the item does not exist and the desired quantity is 10 or less, add a new item to the cart
+			const newItem = {
+				...newMenuItem,
+				totalTimeToCook: itemTotalTimeToCook,
+				cartItemId: generateCartItemId()
+			};
+			setCartItems([...cartItems, newItem]);
+		}
+		return true
+	};
 
+	useEffect(() => {
+		console.log('cart items ', cartItems)
+	}, [cartItems])
+	
 
-  // Calculate the total time to cook considering the selected options
-  const optionsTimeToCook = newMenuItem.options.reduce((total, option) => total + option.timeToCook, 0);
-  const itemTotalTimeToCook = newMenuItem.timeToCook + optionsTimeToCook * newMenuItem.quantity;
-
-  if (existingItem) {
-    // If the item exists, update quantity and totalTimeToCook
-    const updatedItems = cartItems.map(item => 
-      item.cartItemId === existingItem.cartItemId 
-        ? { ...item, quantity: item.quantity + newMenuItem.quantity, totalTimeToCook: item.totalTimeToCook + itemTotalTimeToCook } 
-        : item
-    );
-    setCartItems(updatedItems);
-  } else {
-    // If the item does not exist, add a new item to the cart
-    const newItem = {
-      ...newMenuItem,
-      totalTimeToCook: itemTotalTimeToCook,
-      cartItemId: generateCartItemId()
-    };
-    setCartItems([...cartItems, newItem]);
-  }
-};
-
+	
 
 	const removeFromCart = (cartItemId) => {
 		let newCartItems = cartItems.filter(item => item.cartItemId !== cartItemId)
@@ -108,6 +124,7 @@ const addToCart = (newMenuItem) => {
 	}
 
 	const updateItemQuantity = (cartItemId, newQuantity) => {
+		console.log("updating quantity")
     const updatedItems = cartItems.map((item) => {
         if (item.cartItemId === cartItemId) {
             // Calculate the total price for the new quantity

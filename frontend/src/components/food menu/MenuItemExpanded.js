@@ -33,10 +33,6 @@ function MenuItemExpanded() {
     fetchData();
   }, [itemId]);
 
-  useEffect(() => {
-    console.log(menuItem)
-  }, [menuItem])
-
   const totalItemPrice = useMemo(() => {
     if (menuItem.price === undefined) return 0;
     const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
@@ -75,9 +71,11 @@ function MenuItemExpanded() {
     }
     
   }, [selectedOptions, quantity, menuItem]);
+
+  
   
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (buttonLocked || !menuItem) return;
   
     const validationErrors = validateOptionSelections();
@@ -85,35 +83,38 @@ function MenuItemExpanded() {
       alert(validationErrors.join("\n"));
       return; // Prevent adding to cart if validation fails
     }
-    
-    const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
-    const itemTotalPrice = (menuItem.price + optionsPrice) * quantity;
-    
-    const filteredOptions = selectedOptions;
-  
-    const itemDetails = {
-      ...menuItem, 
-      options: filteredOptions,
-      quantity, 
-      total: itemTotalPrice,
-    };
   
     setButtonLocked(true);
-    addToCart(itemDetails);
-    setSelectedOptions([]);
   
-    timeoutId1Ref.current = setTimeout(() => {
-      setButtonContent({ text: "Added.", amount: "" });
-    }, 100);
+    // Attempt to add the item to the cart and wait for the operation's success status
+    const wasAdded = addToCart({
+      ...menuItem,
+      options: selectedOptions,
+      quantity,
+      total: totalItemPrice, // Assuming totalItemPrice is calculated correctly
+    });
   
-    timeoutId2Ref.current = setTimeout(() => {
-      setButtonContent({
-        text: "Add to Order ",
-        amount: centsToFormattedPrice(menuItem.price * quantity),
-      });
+    // Only show "Added" and reset the button if wasAdded is true
+    if (wasAdded) {
+      timeoutId1Ref.current = setTimeout(() => {
+        setButtonContent({ text: "Added.", amount: "" });
+      }, 100);
+  
+      timeoutId2Ref.current = setTimeout(() => {
+        setButtonContent({
+          text: "Add to Order ",
+          amount: centsToFormattedPrice(totalItemPrice),
+        });
+        setButtonLocked(false);
+      }, 2000);
+    } else {
+
+      alert("We currently accpeting a maximum of 10 of any item.");
       setButtonLocked(false);
-    }, 2000);
+    }
+
   };
+  
   
   
   
