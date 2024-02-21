@@ -117,6 +117,7 @@ li > a {
         width: 50%;
         margin: 0;
         column-gap: 5%;
+        align-items: center;
     }
 
     .links li {
@@ -129,5 +130,15 @@ li > a {
 
     .links li a:hover {
         color: white;
+    }
+
+    .cartIcon {
+        width: 1.8rem;
+        height: 1.8rem;
+        stroke-width: 1.7px;
+    }
+
+    .cartItemCount {
+       
     }
   }

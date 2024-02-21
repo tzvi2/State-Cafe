@@ -41,7 +41,8 @@ function Header() {
             <ul onClick={() => setIsOpen(false)}>
               <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
               <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
-              <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart</NavLink></li>
+              <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart
+              </NavLink></li>
               <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
             </ul>
           </nav>
@@ -55,8 +56,12 @@ function Header() {
         <ul className={styles.links}>
           <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
           <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
-          <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart</NavLink></li>
+          
           <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
+          <NavLink to="cart" className={({ isActive }) => getNavLinkClass(isActive, styles.cart)}>
+            <ShoppingCart onClick={() => setIsOpen(false)} className={styles.cartIcon}/>
+            {cart.totalCount > 0 && <span className={styles.cartItemCount}>{cart.totalCount}</span>}
+          </NavLink>
         </ul>
       </nav>
     </>
