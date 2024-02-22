@@ -21,8 +21,6 @@ const {populateTwoDays, populateThisWeeksTimeSlots} = require('./src/api/control
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-
-
 const app = express();
 app.use(cors())
 app.use(express.json())
@@ -50,11 +48,6 @@ app.use('/timeslots', timeslotRoutes)
 app.get('/populate-timeslots', populateTwoDays);
 
 app.post('/upload', upload.single('image'), handleFileUpload);
-
-cron.schedule('0 13 * * 5', () => {
-  console.log('Running a task every Friday at 1pm');
-  populateThisWeeksTimeSlots();
-});
 
 app.listen(8000, () => {
   console.log('Server started on port 8000');
