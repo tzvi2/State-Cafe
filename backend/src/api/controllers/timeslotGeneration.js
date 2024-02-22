@@ -62,7 +62,7 @@ function generateTimeSlots(date) {
 
   hours.forEach((period) => {
     for (let hour = period.start; hour < period.end; hour++) {
-      for (let minute = 0; minute < 60; minute += 30) { // Adjust as needed for slot frequency
+      for (let minute = 0; minute < 60; minute++) { // Adjust as needed for slot frequency
         const time = new Date(date);
         // Adjust for Eastern Time (taking into account daylight saving time)
         const offset = isEDT(time) ? 4 : 5; // EDT is UTC-4, EST is UTC-5

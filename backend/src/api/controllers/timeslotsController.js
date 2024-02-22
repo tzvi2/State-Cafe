@@ -7,6 +7,7 @@ const handle_get_available_timeslots = async (req, res) => {
 	try {
 
 			const date = req.query.date; // Expecting date in YYYY-MM-DD format
+			console.log('date ', date)
 
 			if (!date) {
 					return res.status(400).json({ error: 'Date query parameter is required.' });
