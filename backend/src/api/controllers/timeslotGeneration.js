@@ -1,4 +1,4 @@
-const {db} = require('../../../firebase/firebaseAdminConfig') 
+const {db, admin} = require('../../../firebase/firebaseAdminConfig') 
 
 const populateTwoDays = async (req, res) => {
   try {
