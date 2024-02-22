@@ -49,25 +49,36 @@ async function populateSlotsForDate(date) {
 function generateTimeSlots(date) {
   let slots = [];
   const hours = [
-      { start: 7, end: 9 }, // Morning hours from 7 AM to 9 AM
-      { start: 18, end: 20 } // Evening hours from 6 PM to 8 PM
+    { start: 7, end: 9 }, // Morning hours from 7 AM to 9 AM
+    { start: 18, end: 20 } // Evening hours from 6 PM to 8 PM
   ];
 
+  // Function to determine if a given date is in daylight saving time for the Eastern Time Zone
+  function isEDT(date) {
+    const march = new Date(date.getFullYear(), 2, 14); // March 14th will always be in DST for EDT zones
+    const november = new Date(date.getFullYear(), 10, 7); // November 7th will always be out of DST for EDT zones
+    return date >= march && date < november;
+  }
+
   hours.forEach((period) => {
-      for (let hour = period.start; hour < period.end; hour++) {
-          for (let minute = 0; minute < 60; minute++) { 
-              const time = new Date(date);
-              time.setHours(hour, minute, 0, 0); 
-              slots.push({
-                  time: admin.firestore.Timestamp.fromDate(time),
-                  isAvailable: true
-              });
-          }
+    for (let hour = period.start; hour < period.end; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) { // Adjust as needed for slot frequency
+        const time = new Date(date);
+        // Adjust for Eastern Time (taking into account daylight saving time)
+        const offset = isEDT(time) ? 4 : 5; // EDT is UTC-4, EST is UTC-5
+        time.setUTCHours(hour + offset, minute, 0, 0);
+
+        slots.push({
+          time: admin.firestore.Timestamp.fromDate(time),
+          isAvailable: true
+        });
       }
+    }
   });
 
   return slots;
 }
+
 
 module.exports = {
 	populateTwoDays,
