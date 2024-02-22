@@ -1,3 +1,5 @@
+const {db} = require('../../../firebase/firebaseAdminConfig') 
+
 const populateTwoDays = async (req, res) => {
   try {
     const today = new Date();
