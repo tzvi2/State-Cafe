@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import RenderOptions from './RenderOptions';
 import BackArrow from '../BackArrow';
 import styles from '../styles/food menu styles/MenuItemExpanded.module.css';
@@ -148,6 +148,7 @@ function MenuItemExpanded() {
   
 
   return (
+    <div className={styles.expandedContainer}> 
     <div className={styles.menuItemExpanded}>
       <BackArrow className={styles.arrow} />
       <h2 className={styles.title}>{menuItem.title}</h2>
@@ -171,6 +172,8 @@ function MenuItemExpanded() {
           <span>{buttonContent.amount}</span>
         </button>
       </div>
+    </div>
+    <Link className={styles.checkoutButton} to={"/cart"}>Checkout</Link>
     </div>
   );
 }

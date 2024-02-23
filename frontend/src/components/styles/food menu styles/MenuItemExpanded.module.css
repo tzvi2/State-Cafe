@@ -1,3 +1,9 @@
+.expandedContainer {
+	display: flex;
+	flex-direction: column;
+	padding-bottom: 2rem;
+}
+
 .menuItemExpanded {
 	margin: 2%;
 	display: flex;
@@ -88,7 +94,7 @@ img {
 
 .footer select, .footer button {
 
-	font-size: 5.5svw;
+	font-size: 5.5vw;
 	border-radius: 10px;
 	background: #ffffff;
 	border: 1px solid #616E38;
@@ -103,8 +109,34 @@ img {
 	justify-content: space-between;
 	flex-grow: 2;
 	padding: 2%;
+	cursor: pointer;
 }
 
+.footer .addToCart:hover {
+	box-shadow: 1.4px 1.6px 3px rgba(128, 128, 128, 0.498);
+}
+
+.checkoutButton {
+	border: 1px solid black;
+	width: 60%;
+	align-self: center;
+	border-radius: 10px;
+	padding: .5rem;
+	font-weight: 500;
+	text-align: center;
+	text-decoration: none;
+	color: #616E38;
+	font-size: 5.5vw;
+}
+
+.checkoutButton:hover {
+	box-shadow: 1.4px 1.6px 3px rgba(128, 128, 128, 0.498);
+
+}
+
+.checkoutButton a {
+
+}
 
 @media (min-width: 1024px) {
 	.title, .description, .checkbox_and_label label, .price {
@@ -152,5 +184,10 @@ img {
 
 	}
 
+	.checkoutButton {
+		width: auto;
+		padding: 0 5%;
+		font-size: 1.75rem;
+	}
 
 }
