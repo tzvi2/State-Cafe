@@ -2,11 +2,12 @@
 	padding: 0;
 	display: flex;
 	flex-direction: column;
+	align-items: center;
+	background: linear-gradient(to bottom, #F8F9F3, #F0F3E8, #E9EDDC);
 }
 
 .aboutPage h1 {
 	text-align: center;
-	margin-bottom: 0;
 }
 
 .aboutPage p {
@@ -14,14 +15,16 @@
 	line-height: 1.4;
 	padding: 5%;
 	margin: 0;
+	max-width: 600px;
 }
 
 .aboutPage p:nth-child(2) {
 	margin-top: 0;
 }
 
-.aboutPage p:nth-child(odd) {
-	background: #E9EDDC;
+p.disclaimer {
+	align-self: flex-start;
+	font-size: 1rem;
 }
 
 @media (min-width: 550px) {
@@ -36,9 +39,19 @@
 
 
 	.aboutPage p {
-		font-size: 1.5rem;
-		padding: 5% 20%;
+		font-size: 1.2rem;
+		padding: 5%;
 		margin: 0;
+	}
+
+	.paragraphs {
+		display: flex;
+		flex-direction: column;
+	}
+
+	p.disclaimer {
+		align-self: start;
+		font-size: 1rem;
 	}
 
 
