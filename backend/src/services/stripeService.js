@@ -32,6 +32,8 @@ const createPaymentIntent = async (items) => {
 	const paymentIntent = await stripe.paymentIntents.create({
 		amount: total,
 		currency: "usd",
+        allow_promotion_codes: true,
+
 	})
 	return paymentIntent.client_secret
 }
