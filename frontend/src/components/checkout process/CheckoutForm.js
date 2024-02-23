@@ -79,7 +79,7 @@ export default function CheckoutForm() {
         <PaymentElement />
         {!formLoading && <button className={styles.payButton} disabled={paymentLoading} id="submit">
           <span id="button-text">
-            {paymentLoading ? '...' : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
+            {paymentLoading ? 'In progress...' : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
           </span>
         </button>}
       </form>

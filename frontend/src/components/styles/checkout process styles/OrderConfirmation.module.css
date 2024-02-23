@@ -1,8 +1,17 @@
 .confirmationCard {
+	display: flex;
+	flex-direction: column;
 	box-shadow: 1px 1px 3px black;
 	padding: 1em;
 	margin: .75em;
 	border-radius: 5px;
+	max-width: 500px;
+	align-self: center;
+	row-gap: 2rem;
+}
+
+.confirmationCard p {
+
 }
 
 h2 {
@@ -22,6 +31,11 @@ h2 {
 	display: flex;
 	justify-content: space-between;
 	margin: 3% 0;
+
+}
+
+.orderDetailsRow span {
+
 }
 
 @keyframes flyRight {

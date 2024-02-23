@@ -84,13 +84,13 @@ const OrderConfirmation = () => {
   return (
     <div className={styles.confirmationCard}>
       <h2>Your order is complete!</h2>
-      {/* Render savedOrder details */}
-      <OrderDetailsRow label="Order ID" value={savedOrder.orderId || 'N/A'} />
-      <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} />
-      <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} />
-      <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} />
-      <OrderDetailsRow label="Delivery" value={`Unit ${unitNumber} by ${formatIsoToTime(deliverySlot)}`} />
-      
+      <div className={styles.rows}>
+        {/* <OrderDetailsRow label="Order ID" value={savedOrder.orderId || 'N/A'} /> */}
+        <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} />
+        <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} />
+        <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} />
+        <OrderDetailsRow label="Delivery" value={`Unit ${unitNumber} by ${formatIsoToTime(deliverySlot)}`} />
+      </div>
       <p>Something not right? <br/> Contact us: (551) 837-9907</p>
     </div>
   );
