@@ -14,3 +14,8 @@
 	font-size: 1.25rem;
 	box-shadow: 2px 2px 3px rgba(57, 56, 56, .3);
 }
+
+.message {
+	text-align: center;
+	color: chocolate;
+}

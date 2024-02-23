@@ -14,9 +14,9 @@ export default function CheckoutForm() {
 
   const {cart, clearCart} = useCart()
 
-  const [message, setMessage] = useState(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [paymentComplete, setPaymentComplete] = useState(false)
+  const [message, setMessage] = useState("")
+  const [formLoading, setFormLoading] = useState(true)
+  const [paymentLoading, setPaymentLoading] = useState(false)
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -24,8 +24,8 @@ export default function CheckoutForm() {
       // Stripe has not yet loaded. Prevent form submission until fully loaded.
       return;
     }
-    setIsLoading(true);
-  
+
+    setPaymentLoading(true)
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -35,29 +35,56 @@ export default function CheckoutForm() {
   
     if (error) {
       setMessage(error.message);
-      setIsLoading(false); 
+      setPaymentLoading(false)
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      setMessage('Payment succeeded!');
-      setPaymentComplete(true); 
       clearCart(); 
-      setIsLoading(false);
+      setPaymentLoading(false)
     }
   };
+
+  useEffect(() => {
+    if (!stripe || !elements) {
+      return;
+    }
+  
+    let buttonPause
+
+    const handleReady = () => {
+      buttonPause = setTimeout(() => {
+        setFormLoading(false)
+      }, 250)
+    };
+  
+    const paymentElement = elements.getElement(PaymentElement);
+  
+    if (paymentElement) {
+      paymentElement.on('ready', handleReady);
+    }
+  
+    return () => {
+      if (paymentElement) {
+        paymentElement.off('ready', handleReady);
+      }
+      if (buttonPause) {
+        clearTimeout(buttonPause)
+      }
+    };
+  }, [stripe, elements]);
   
 
   return (
     <>
-      {!paymentComplete && (
-        <form className={styles.checkoutForm} id="payment-form" onSubmit={handleSubmit}>
-          <PaymentElement />
-          <button className={styles.payButton} disabled={isLoading} id="submit">
-            <span id="button-text">
-              {isLoading ? <div className="spinner" id="spinner"></div> : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
-            </span>
-          </button>
-        </form>
-      )}
-      {paymentComplete && <div>{message}</div>}
+    <p className={styles.message}>{message}</p>
+      <form className={styles.checkoutForm} id="payment-form" onSubmit={handleSubmit}>
+        <PaymentElement />
+        {!formLoading && <button className={styles.payButton} disabled={paymentLoading} id="submit">
+          <span id="button-text">
+            {paymentLoading ? '...' : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
+          </span>
+        </button>}
+      </form>
+    
+      
     </>
   );
 }
