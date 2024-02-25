@@ -24,7 +24,6 @@ function MenuItemExpanded() {
   const timeoutId1Ref = useRef();
   const timeoutId2Ref = useRef();
 
-
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
@@ -72,8 +71,6 @@ function MenuItemExpanded() {
     
   }, [selectedOptions, quantity, menuItem]);
 
-  
-  
 
   const handleAddToCart = async () => {
     if (buttonLocked || !menuItem) return;
@@ -115,9 +112,6 @@ function MenuItemExpanded() {
 
   };
   
-  
-  
-  
   useEffect(() => {
     return () => {
       if (timeoutId1Ref.current) clearTimeout(timeoutId1Ref.current);
@@ -125,7 +119,6 @@ function MenuItemExpanded() {
     };
   }, []); 
   
-
   const validateOptionSelections = () => {
     const validationErrors = [];
   
@@ -146,7 +139,6 @@ function MenuItemExpanded() {
     return validationErrors;
   };
   
-
   return (
     <div className={styles.expandedContainer}> 
     <div className={styles.menuItemExpanded}>

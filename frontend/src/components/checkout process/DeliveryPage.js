@@ -125,10 +125,10 @@ function DeliveryPage() {
 
             <div className={styles.flexRow}>
                 <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
-                    <span>Today</span> {formatDateToMDYYYY(todayEST)}
+                    <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
                 </button>
                 <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(tomorrowFormatted)}>
-                    <span>Tomorrow</span> {formatDateToMDYYYY(tomorrowEST)}
+                    <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
                 </button>
             </div>
 
