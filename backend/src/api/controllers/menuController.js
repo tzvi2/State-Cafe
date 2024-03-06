@@ -26,7 +26,8 @@ const fetchQuickView = async (req, res) => {
         img: data.img,
         price: data.price,
         itemId: data.itemId,
-        category: data.category
+        category: data.category,
+        active: data.active || false
       });
     });
 
