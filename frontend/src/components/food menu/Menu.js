@@ -23,10 +23,6 @@ export default function Menu() {
         fetchQuickView();
     }, []);
 
-    useEffect(() => {
-        console.log('menu items ', menuItems)
-    }, [menuItems])
-
     const handleScroll = () => {
         const halfwayPoint = window.innerHeight / 2 + window.scrollY;
         let newActiveCategory = null;

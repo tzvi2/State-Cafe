@@ -70,7 +70,7 @@ const MenuDashboard = () => {
             <input
               type="checkbox"
               checked={item.active}
-              onChange={() => handleToggleActiveStatus(item.documentId, item.active)}
+              onChange={() => handleToggleActiveStatus(item.id, item.active)}
               className={styles.toggleInput}
             />
             <span className={`${styles.activeStatusIndicator} ${item.active ? styles.isActive : styles.isInactive}`} />

@@ -6,11 +6,16 @@
     padding: .75rem;
     margin: 3% 0;
     width: 80%;
-    box-shadow: 1px 1px 3px rgba(81, 91, 47, .4)
-    ;
+    box-shadow: 1px 1px 3px rgba(81, 91, 47, .4);
     color: black;
 }
 
+.menuItem.inactiveItem {
+    opacity: 0.5; /* Make the item appear faded */
+    pointer-events: none; /* Disable interactions */
+    color: #a0a0a0; /* Change the text color to a lighter shade */
+    background-color: #f0f0f0; /* Optional: change background to indicate inactive state */
+}
 
 .menuPhoto {
     height: 15vh;

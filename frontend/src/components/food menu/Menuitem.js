@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 
 const Menuitem = React.memo(function Menuitem({ item }) {
+    const itemClass = item.active ? styles.activeItem : styles.inactiveItem;
     return (
-        <Link className={styles.menuItem} to={`/menu/${item.itemId}`}>
+        <Link className={`${styles.menuItem} ${itemClass}`} to={`/menu/${item.itemId}`}>
             <img loading='lazy' className={styles.menuPhoto} src={item.img} alt={item.title} />
             <div className={styles.textBox}>
                 <h2>{item.title}</h2>

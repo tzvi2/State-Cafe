@@ -67,6 +67,7 @@ export const addMenuItem = async (menuItem) => {
 };
 
 export const updateMenuItemActiveStatus = async (itemId, isActive) => {
+  console.log('updating ', itemId, "new status: ", isActive)
   try {
     const response = await fetch(`https://state-cafe.vercel.app/edit-menu/update-status`, {
       method: 'POST',

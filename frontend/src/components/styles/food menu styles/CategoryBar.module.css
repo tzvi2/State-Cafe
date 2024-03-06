@@ -10,6 +10,7 @@
 	background-color: white;
 	margin-top: 2vw;
 	height: 14vw;
+	z-index: 2;
 }
 
 .categoryBar a {
