@@ -49,8 +49,8 @@ async function populateSlotsForDate(date) {
 function generateTimeSlots(date) {
   let slots = [];
   const hours = [
-    { start: 7, end: 9 }, // Morning hours from 7 AM to 9 AM
-    { start: 18, end: 20 } // Evening hours from 6 PM to 8 PM
+    //{ start: 7, end: 9 }, // Morning hours from 7 AM to 9 AM
+    { start: 17, end: 19 } // Evening hours from 6 PM to 8 PM
   ];
 
   // Function to determine if a given date is in daylight saving time for the Eastern Time Zone
