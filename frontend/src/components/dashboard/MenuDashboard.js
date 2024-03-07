@@ -28,28 +28,28 @@ const MenuDashboard = () => {
     }
   };
 
-	const handleToggleActiveStatus = async (documentId, isActive) => {
-		try {
-			// Attempt to update the backend first
-			await updateMenuItemActiveStatus(documentId, !isActive);
-			console.log(`Successfully updated active status for item: ${documentId}`);
-			
-			// After successful backend update, reflect the change in the UI
-			const updatedMenuItems = menuItems.map((item) => {
-				if (item.documentId === documentId) {
-					// Toggle active status
-					return { ...item, active: !isActive };
-				}
-				return item;
-			});
-			setMenuItems(updatedMenuItems);
-		} catch (error) {
-			console.error(`Failed to update active status for item: ${documentId}`, error);
-			// Optionally, inform the user about the failure
-			alert(`Failed to update active status for ${documentId}. Please try again.`);
-		}
-	};
-	
+  const handleToggleActiveStatus = async (itemId, isActive) => {
+    try {
+      // Attempt to update the backend first
+      await updateMenuItemActiveStatus(itemId, !isActive);
+      console.log(`Successfully updated active status for item: ${itemId}`);
+      
+      // After successful backend update, reflect the change in the UI
+      const updatedMenuItems = menuItems.map((item) => {
+        if (item.id === itemId) { // Ensure this matches the case sensitivity of your property
+          // Toggle active status
+          return { ...item, active: !isActive };
+        }
+        return item;
+      });
+      setMenuItems(updatedMenuItems);
+    } catch (error) {
+      console.error(`Failed to update active status for item: ${itemId}`, error);
+      // Optionally, inform the user about the failure
+      alert(`Failed to update active status for ${itemId}. Please try again.`);
+    }
+  };
+  
 	
 
   return (
