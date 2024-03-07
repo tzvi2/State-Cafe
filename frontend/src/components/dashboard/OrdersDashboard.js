@@ -1,38 +1,42 @@
 import React, { useEffect, useState } from 'react';
+import { db } from '../../firebaseConfig';
+import { collection, orderBy, onSnapshot, query } from 'firebase/firestore';
 
 function Dashboard() {
   const [orders, setOrders] = useState([]);
 
-  function formatTime(dateString) {
-    const date = new Date(dateString);
+  function formatTime(firestoreTimestamp) {
+    if (!firestoreTimestamp) return '';
+
+    // Convert Firestore Timestamp to JavaScript Date object
+    const date = new Date(firestoreTimestamp.seconds * 1000 + firestoreTimestamp.nanoseconds / 1000000);
+
+    // Format the date as you wish
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-  }
+}
+
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:8080');
+    // Create a query against the collection
+    const ordersQuery = query(collection(db, 'orders'), orderBy('orderedAt', 'desc'));
 
-    ws.onopen = () => {
-      console.log('Connected to the WebSocket Server');
-    };
+    const unsubscribe = onSnapshot(ordersQuery, (snapshot) => {
+      const ordersData = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setOrders(ordersData);
+    });
 
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (Array.isArray(data)) {
-          console.log(data);
-          setOrders(data);
-        } else {
-          console.log("Received non-array message:", data);
-        }
-      } catch (error) {
-        console.error("Error parsing message:", error);
-      }
-    };
-
+    // Clean up the subscription
     return () => {
-      ws.close();
+      unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    console.log('orders: ', orders)
+  }, [orders])
 
   return (
     <div>
@@ -65,7 +69,7 @@ function Dashboard() {
                   </td>
                   <td>{item.quantity}</td>
                   <td rowSpan={order.items.length}>{order.deliveryAddress}</td>
-                  <td rowSpan={order.items.length}>{order.deliveryTime}</td>
+                  <td rowSpan={order.items.length}>{formatTime(order.deliveryTime)}</td>
                 </>
               ) : (
                 <>
