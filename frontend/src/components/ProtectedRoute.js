@@ -1,19 +1,18 @@
+// ProtectedRoute.js
 import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
-function ProtectedRoute({ component: Component, user, ...rest }) {
-  return (
-    <Route
-      {...rest}
-      render={props => {
-        if (user.isAuthenticated && user.isAdmin) {
-          return <Component {...props} />;
-        } else {
-          return <Redirect to="/login" />;
-        }
-      }}
-    />
-  );
-}
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
 
-export default ProtectedRoute;
+  if (!user) {
+    // Redirect to login or show login button
+    // For example, redirect to a "/login" route
+    return <h4>You need to sign in to view this page.</h4>;
+  }
+
+  return children;
+};
+
+export default ProtectedRoute

@@ -7,10 +7,13 @@ import {
 import styles from '../styles/checkout process styles/CheckoutForm.module.css'
 import { useCart } from "../../hooks/useCart";
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
+import { useNavigate } from 'react-router-dom';
+
 
 export default function CheckoutForm() {
   const stripe = useStripe()
   const elements = useElements()
+  const navigate = useNavigate();
 
   const {cart, clearCart} = useCart()
 
@@ -20,6 +23,7 @@ export default function CheckoutForm() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
     if (!stripe || !elements) {
       // Stripe has not yet loaded. Prevent form submission until fully loaded.
       return;
@@ -28,16 +32,15 @@ export default function CheckoutForm() {
     setPaymentLoading(true)
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/confirmation`,
-      },
     });
   
     if (error) {
       setMessage(error.message);
       setPaymentLoading(false)
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+      console.log('no error')
       clearCart(); 
+      navigate('/confirmation');
       setPaymentLoading(false)
     }
   };
