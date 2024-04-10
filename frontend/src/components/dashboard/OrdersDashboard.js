@@ -18,7 +18,11 @@ function Dashboard() {
 
     // Format the date as you wish
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
-}
+  }
+
+  useEffect(() => {
+    console.log('user change ', user)
+  }, [user])
 
 
   useEffect(() => {
@@ -43,13 +47,15 @@ function Dashboard() {
     console.log('orders: ', orders)
   }, [orders])
 
-  if (!user) {
-    console.log('no user')
+  if (user === undefined) { 
+    return <p>Checking authentication...</p>;
+  }
+  
+  if (!isAuthorized) {
     return (
       <p>You need to sign in to view this page</p>
-    )
+    );
   }
-
   return (
     <div className={styles.orders}>
       <h2>Orders Dashboard</h2>
