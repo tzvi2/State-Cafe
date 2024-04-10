@@ -11,7 +11,8 @@ export const saveOrder = async (order) => {
 				deliverySlot: order.deliverySlot,
 				unitNumber: order.unitNumber,
 				lastFourDigits: order.lastFourDigits,
-        cardBrand: order.cardBrand
+        cardBrand: order.cardBrand,
+        phoneNumber: order.phoneNumber
       }),
     });
 

@@ -17,121 +17,134 @@ const EditMenuItem = () => {
     timeToCook: '',
     title: '',
     options: [],
+    optionGroups: [],
     description: '',
     active: false,
   });
 
   useEffect(() => {
     const fetchMenuItem = async () => {
-      const item = await getMenuItemByItemId(itemId);
-      if (item) {
-        // Provide defaults for potentially missing fields
-        setMenuItem({
-          title: item.title || '',
-          pieces: item.pieces || '',
-          description: item.description || '',
-          price: item.price || '',
-          category: item.category || '',
-          tags: item.tags || '',
-          timeToCook: item.timeToCook || '',
-          options: item.options || [],
-          active: item.active !== undefined ? item.active : false,
-          itemId: itemId
-          // Other fields...
-        });
+      try {
+        const item = await getMenuItemByItemId(itemId);
+        if (item) {
+          setMenuItem({
+            ...item,
+            options: item.options || [],
+            optionGroups: item.optionGroups || [],
+            active: item.active !== undefined ? item.active : false
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching menu item:', error);
       }
     };
+  
     fetchMenuItem();
   }, [itemId]);
+  
+  const uploadImage = () => {}
+
+  const handleImageChange = async (e) => {
+    return
+    const file = e.target.files[0];
+    if (file) {
+      const imageUrl = await uploadImage(file); // Use your actual API call to upload the image
+      setMenuItem((prevState) => ({ ...prevState, img: imageUrl }));
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setMenuItem(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleGroupOptionChange = (groupIndex, e) => {
-    const { name, value } = e.target; // `name` could be 'group', 'selectionMin', or 'selectionMax'.
+  const handleOptionChange = (index, e, isGroup = false, groupIndex = null) => {
+    const { name, value } = e.target;
   
-    setMenuItem(prevState => {
-      // Create a deep copy of options to avoid direct state mutation
-      const updatedOptions = prevState.options.map((option, idx) =>
-        idx === groupIndex
-          ? { ...option, [name]: name === 'selectionMin' || name === 'selectionMax' ? parseInt(value, 10) : value }
-          : option
-      );
+    if (isGroup) {
+      setMenuItem(prevState => {
+        const updatedOptionGroups = prevState.optionGroups.map((group, idx) => {
+          if (idx === groupIndex) {
+            if (index === null) {
+              // Editing group-level properties
+              return { ...group, [name]: name.includes('Selection') ? parseInt(value, 10) : value };
+            } else {
+              // Editing sub-options within the group
+              const updatedSubOptions = group.options.map((subOption, subIdx) => {
+                if (subIdx === index) {
+                  return { ...subOption, [name]: value };
+                }
+                return subOption;
+              });
+              return { ...group, options: updatedSubOptions };
+            }
+          }
+          return group;
+        });
   
-      // Update the state with the modified options array
-      return { ...prevState, options: updatedOptions };
-    });
+        return { ...prevState, optionGroups: updatedOptionGroups };
+      });
+    } else {
+      // Handling changes to individual options
+      setMenuItem(prevState => ({
+        ...prevState,
+        options: prevState.options.map((option, optIdx) => optIdx === index ? { ...option, [name]: value } : option),
+      }));
+    }
   };
   
-  
-  
-  
-  
-  
-  
-
-  const addIndividualOption = () => {
-    setMenuItem(prev => ({
-      ...prev,
-      options: [...prev.options, { type: 'individual', title: '', price: '', timeToCook: '' }],
+  const addOptionGroup = () => {
+    setMenuItem(prevState => ({
+      ...prevState,
+      optionGroups: [...prevState.optionGroups, { title: '', minSelection: 1, maxSelection: 1, options: [] }],
     }));
   };
-
-  const addOptionGroup = () => {
-    setMenuItem(prev => ({
-      ...prev,
-      options: [
-        ...prev.options,
-        {
-          type: 'group',
-          group: '', // Group name
-          selectionMin: 1,
-          selectionMax: 1,
-          options: [], // Sub-options
-        },
-      ],
+  
+  const addIndividualOption = () => {
+    setMenuItem(prevState => ({
+      ...prevState,
+      options: [...prevState.options, { title: '', price: '', timeToCook: '' }],
     }));
   };
   
   const addSubOptionToGroup = (groupIndex) => {
-    setMenuItem(prevState => {
-      const newOptions = [...prevState.options];
-      newOptions[groupIndex].options.push({
-        title: '',
-        price: '',
-        timeToCook: '',
-      });
-      return { ...prevState, options: newOptions };
+    setMenuItem((prevState) => {
+      const newOptionGroups = [...prevState.optionGroups];
+      newOptionGroups[groupIndex].options = [
+        ...newOptionGroups[groupIndex].options,
+        { title: '', price: '', timeToCook: '' },
+      ];
+
+      return { ...prevState, optionGroups: newOptionGroups };
     });
   };
   
+  const deleteOption = (index, isGroup = false, groupIndex = null) => {
+    setMenuItem((prevState) => {
+      if (isGroup) {
+        const newOptionGroups = prevState.optionGroups.map((group, idx) => {
+          if (idx === groupIndex) {
+            const newOptions = group.options.filter((_, optionIdx) => optionIdx !== index);
+            return { ...group, options: newOptions };
+          }
+          return group;
+        });
 
-  const deleteOption = (index) => {
-    setMenuItem(prevState => ({
+        return { ...prevState, optionGroups: newOptionGroups };
+      } else {
+        const newOptions = prevState.options.filter((_, optionIdx) => optionIdx !== index);
+        return { ...prevState, options: newOptions };
+      }
+    });
+  };
+
+  const deleteGroup = (groupIndex) => {
+    setMenuItem((prevState) => ({
       ...prevState,
-      options: prevState.options.filter((_, optionIndex) => optionIndex !== index),
+      optionGroups: prevState.optionGroups.filter((_, idx) => idx !== groupIndex),
     }));
   };
   
-  const deleteSubOption = (groupIndex, subOptionIndex) => {
-    setMenuItem(prevState => {
-      const newOptions = [...prevState.options];
-      newOptions[groupIndex].options = newOptions[groupIndex].options.filter((_, index) => index !== subOptionIndex);
-      return { ...prevState, options: newOptions };
-    });
-  };
-  
-  
-
-  // const handleAddOption = () => {
-  //   setMenuItem(prev => ({
-  //     ...prev,
-  //     options: [...prev.options, { title: '', price: '', timeToCook: '' }],
-  //   }));
-  // };
-
   const handleSubmit = async (e) => {
     console.log('description: ', menuItem.description)
     e.preventDefault();
@@ -144,16 +157,6 @@ const EditMenuItem = () => {
       console.error('Update error:', error);
     }
   };
-
-  const handleIndividualOptionChange = (index, e) => {
-    const { name, value } = e.target;
-    setMenuItem(prevState => {
-      const updatedOptions = [...prevState.options];
-      updatedOptions[index] = { ...updatedOptions[index], [name]: value };
-      return { ...prevState, options: updatedOptions };
-    });
-  };
-  
 
   return (
     <div className={styles.editMenuItemContainer}>
@@ -185,8 +188,7 @@ const EditMenuItem = () => {
             value={menuItem.pieces || ''}
             onChange={handleChange}
           />
-        </label>
-        
+        </label>      
         <label>Description: 
           <textarea 
             name="description" 
@@ -195,7 +197,6 @@ const EditMenuItem = () => {
             rows="4" // Adjust the number of rows according to your design needs
           />
         </label>
-
         <label>
           Category:
           <input
@@ -213,9 +214,7 @@ const EditMenuItem = () => {
             value={menuItem.img || ''}
             onChange={handleChange}
           />
-        </label>
-        
-        
+        </label>     
         <label>
           Price:
           <input
@@ -243,78 +242,24 @@ const EditMenuItem = () => {
             onChange={handleChange}
           />
         </label>
-       
-        {menuItem.options.map((option, index) =>
-        option.type === 'group' ? (
-          <div key={index} className={styles.optionGroup}>
-            <label>
-              Group Name:
-              <input
-                name='group'
-                type="text"
-                value={option.group}
-                onChange={(e) => handleGroupOptionChange(index, e)}
-              />
-            </label>
-            <label>
-              Min Selection:
-              <input
-                name='selectionMin'
-                type="number"
-                value={option.selectionMin}
-                onChange={(e) => handleGroupOptionChange(index, e)}
-              />
-            </label>
-            <label>
-              Max Selection:
-              <input
-              name='selectionMax'
-                type="number"
-                value={option.selectionMax}
-                onChange={(e) => handleGroupOptionChange(index, e)}
-              />
-            </label>
-            <button type="button" onClick={() => deleteOption(index)}>Delete Group</button>
-            {option.options.map((subOption, subIndex) => (
-              <div key={subIndex} className={styles.subOption}>
-                <label>
-                  Sub Option Title:
-                  <input
-                    type="text"
-                    value={subOption.title}
-                    onChange={(e) => handleGroupOptionChange(index, e, subIndex)}
-                  />
-                </label>
-                <label>
-                  Price:
-                  <input
-                    type="number"
-                    value={subOption.price}
-                    onChange={(e) => handleGroupOptionChange(index, e, subIndex)}
-                  />
-                </label>
-                <label>
-                  Time to Cook:
-                  <input
-                    type="number"
-                    value={subOption.timeToCook}
-                    onChange={(e) => handleGroupOptionChange(index, e, subIndex)}
-                  />
-                </label>
-                <button type="button" onClick={() => deleteSubOption(index, subIndex)}>Delete Sub-Option</button>
-              </div>
-            ))}
-            <button type="button" onClick={() => addSubOptionToGroup(index)} className={styles.addSubOptionButton}>Add Sub-Option</button>
-          </div>
-        ) : (
-          <div key={index} className={styles.individualOption}>
-            <label>
+
+        {/* Image upload and preview */}
+        <label>
+          Image:
+          <input type="file" onChange={handleImageChange} />
+          {menuItem.img && <img src={menuItem.img} alt="Menu Item" style={{ width: '100px', height: '100px' }} />}
+        </label>
+
+        {/* Rendering and editing individual options */}
+        {menuItem.options.map((option, index) => (
+          <div key={index}>
+             <label>
               Option Title:
               <input
                 type="text"
                 name="title"
                 value={option.title}
-                onChange={(e) => handleIndividualOptionChange(index, e)}
+                onChange={(e) => handleOptionChange(index, e)}
               />
             </label>
             <label>
@@ -323,7 +268,7 @@ const EditMenuItem = () => {
                 type="number"
                 name="price"
                 value={option.price}
-                onChange={(e) => handleIndividualOptionChange(index, e)}
+                onChange={(e) => handleOptionChange(index, e)}
               />
             </label>
             <label>
@@ -332,16 +277,69 @@ const EditMenuItem = () => {
                 type="number"
                 name="timeToCook"
                 value={option.timeToCook}
-                onChange={(e) => handleIndividualOptionChange(index, e)}
+                onChange={(e) => handleOptionChange(index, e)}
               />
             </label>
-            <button type="button" onClick={() => deleteOption(index)}>Delete Option</button>
+            <button type="button" onClick={() => deleteOption(index, false)}>Delete Option</button>
           </div>
-        )
-      )}
+        ))}
+        <button type="button" onClick={addIndividualOption}>Add New Option</button>
 
-      <button type="button" onClick={addIndividualOption} className={styles.addButton}>Add Individual Option</button>
-      <button type="button" onClick={addOptionGroup} className={styles.addButton}>Add Option Group</button>
+        {/* Rendering and editing option groups */}
+        {menuItem.optionGroups.map((group, groupIndex) => (
+          <div key={groupIndex}>
+            <input
+              type="text"
+              name='title'
+              value={group.title}
+              onChange={(e) => handleOptionChange(null, e, true, groupIndex)}
+              placeholder="Group Title"
+            />
+            <input
+              type="number"
+              name="minSelection"
+              value={group.minSelection}
+              onChange={(e) => handleOptionChange(null, e, true, groupIndex)}
+              placeholder="Minimum Selection"
+            />
+            <input
+              type="number"
+              name="maxSelection"
+              value={group.maxSelection}
+              onChange={(e) => handleOptionChange(null, e, true, groupIndex)}
+              placeholder="Maximum Selection"
+            />
+
+            {group.options.map((subOption, subIndex) => (
+              <div key={subIndex}>
+                <input 
+                  name="title" 
+                  value={subOption.title} 
+                  onChange={(e) => handleOptionChange(subIndex, e, true, groupIndex)} 
+                  placeholder="Sub-Option Title" 
+                />
+                <input 
+                  name="price" 
+                  type="number" 
+                  value={subOption.price} 
+                  onChange={(e) => handleOptionChange(subIndex, e, true, groupIndex)} 
+                  placeholder="Sub-Option Price" 
+                />
+                <input 
+                  name="timeToCook" 
+                  type="number" 
+                  value={subOption.timeToCook} 
+                  onChange={(e) => handleOptionChange(subIndex, e, true, groupIndex)} 
+                  placeholder="Sub-Option Time to Cook" 
+                />
+                <button type="button" onClick={() => deleteOption(subIndex, true, groupIndex)}>Delete Sub-Option</button>
+              </div>
+            ))}
+            <button type="button" onClick={() => addSubOptionToGroup(groupIndex)}>Add Sub-Option</button>
+            <button type="button" onClick={() => deleteGroup(groupIndex)}>Delete Group</button>
+          </div>
+        ))}
+        <button type="button" onClick={addOptionGroup}>Add Option Group</button>
 
       <button type="submit" className={styles.saveButton}>Save Changes</button>
 

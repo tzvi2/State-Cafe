@@ -28,7 +28,8 @@ const saveOrder = async (orderData) => {
     deliveryTime, // same story as above
     deliveryAddress: orderData.unitNumber,
     lastFourDigits: orderData.lastFourDigits,
-    cardBrand: orderData.cardBrand
+    cardBrand: orderData.cardBrand,
+    phoneNumber: orderData.phoneNumber
   };
 
   try {

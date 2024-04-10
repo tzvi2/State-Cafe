@@ -2,9 +2,9 @@ const {saveOrder} = require('../../services/firestoreService')
 
 exports.handleSaveOrder = async (req, res) => {
   try {
-    const { items, totalPrice, deliverySlot, unitNumber, lastFourDigits, cardBrand } = req.body;
+    const { items, totalPrice, deliverySlot, unitNumber, lastFourDigits, cardBrand, phoneNumber } = req.body;
     
-    const savedOrder = await saveOrder({ items, totalPrice, deliverySlot, unitNumber, lastFourDigits, cardBrand });
+    const savedOrder = await saveOrder({ items, totalPrice, deliverySlot, unitNumber, lastFourDigits, cardBrand, phoneNumber });
 
     res.status(201).json(savedOrder);
   } catch (error) {

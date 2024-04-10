@@ -7,13 +7,10 @@ import {
 import styles from '../styles/checkout process styles/CheckoutForm.module.css'
 import { useCart } from "../../hooks/useCart";
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
-import { useNavigate } from 'react-router-dom';
-
 
 export default function CheckoutForm() {
   const stripe = useStripe()
   const elements = useElements()
-  const navigate = useNavigate();
 
   const {cart, clearCart} = useCart()
 
@@ -32,6 +29,9 @@ export default function CheckoutForm() {
     setPaymentLoading(true)
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/confirmation`,
+      },
     });
   
     if (error) {
@@ -40,7 +40,6 @@ export default function CheckoutForm() {
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       console.log('no error')
       clearCart(); 
-      navigate('/confirmation');
       setPaymentLoading(false)
     }
   };

@@ -20,6 +20,8 @@ export default function DeliverySlotProvider({ children }) {
     return savedDate || "";
   });
 
+  const [phoneNumber, setPhoneNumber] = useState(null)
+
   useEffect(() => {
     localStorage.setItem('unitNumber', unitNumber);
   }, [unitNumber]);
@@ -50,7 +52,9 @@ export default function DeliverySlotProvider({ children }) {
         setUnitNumber,
         deliveryDate, 
         setDeliveryDate, 
-        clearDeliveryDetails
+        clearDeliveryDetails,
+        phoneNumber,
+        setPhoneNumber
       }}>
       {children}
     </DeliveryDetailsContext.Provider>

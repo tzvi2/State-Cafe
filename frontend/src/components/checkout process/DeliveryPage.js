@@ -9,7 +9,7 @@ import styles from '../styles/checkout process styles/DeliveryPage.module.css'
 function DeliveryPage() {
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
     const {cart} = useCart()
-    const { setDeliverySlot, setUnitNumber, unitNumber, deliverySlot, setDeliveryDate, deliveryDate } = useDeliveryDetails();
+    const { setDeliverySlot, setUnitNumber, unitNumber, deliverySlot, setDeliveryDate, deliveryDate, phoneNumber, setPhoneNumber } = useDeliveryDetails();
     const navigate = useNavigate();
 
     const timeFormatter = new Intl.DateTimeFormat([], {
@@ -58,6 +58,10 @@ function DeliveryPage() {
         }
         
     }, [deliveryDate, cart.totalCookTime]); 
+
+    const handlePhoneNumberChange = (e) => {
+        setPhoneNumber(e.target.value);
+    };
 
   
     const fetchTimeSlots = async () => {
@@ -124,6 +128,19 @@ function DeliveryPage() {
             </div>
 
             <div className={styles.flexRow}>
+                <label htmlFor="phoneNumber">Phone Number:</label>
+                <input
+                    type="tel"
+                    id="phoneNumber"
+                    value={phoneNumber}
+                    onChange={handlePhoneNumberChange}
+                    placeholder="123-456-7890"
+                    pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                    required
+                />
+            </div>
+
+            <div className={styles.flexRow}>
                 <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
                     <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
                 </button>
@@ -146,6 +163,8 @@ function DeliveryPage() {
                             </option>
                         ))}
                     </select>
+
+                    
 
                     <button className={styles.wideBtn} onClick={handleSubmit}>Proceed to Checkout</button>
                 </>

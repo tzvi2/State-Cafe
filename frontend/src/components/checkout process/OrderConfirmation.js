@@ -19,7 +19,7 @@ const OrderDetailsRow = ({ label, value }) => {
 
 const OrderConfirmation = () => {
   const { cart, clearCart } = useCart();
-  const { deliverySlot, unitNumber, deliveryDate } = useDeliveryDetails();
+  const { deliverySlot, unitNumber, deliveryDate, phoneNumber } = useDeliveryDetails();
   const [savedOrder, setSavedOrder] = useState({});
   const navigate = useNavigate();
 
@@ -43,6 +43,7 @@ const OrderConfirmation = () => {
             lastFourDigits: cardDetails.lastFour,
             cardBrand: cardDetails.brand,
             paymentIntentId,
+            phoneNumber
           };
 
           const savedOrderResponse = await saveOrder(orderDetails);
@@ -72,6 +73,7 @@ const OrderConfirmation = () => {
     };
 
     processOrder();
+    return () => clearCart()
   }, [cart, deliverySlot, unitNumber, deliveryDate, clearCart]);
 
   // Helper function to convert integers to money format

@@ -2,9 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getMenuItems, updateMenuItemActiveStatus, deleteMenuItem } from '../../api/menuRequests';
 import styles from '../styles/dashboard/MenuDashboard.module.css'
+import { useAuth } from '../../hooks/useAuth';
 
 const MenuDashboard = () => {
   const [menuItems, setMenuItems] = useState([]);
+  const { user, signInWithGoogle } = useAuth(); 
+	const AUTHORIZED_EMAILS = ['tzvib8@gmail.com']; 
+	const isAuthorized = user && AUTHORIZED_EMAILS.includes(user.email);
 
 	const fetchMenuItems = async () => {
 		const items = await getMenuItems();
@@ -49,6 +53,12 @@ const MenuDashboard = () => {
       alert(`Failed to update active status for ${itemId}. Please try again.`);
     }
   };
+
+  if (!isAuthorized) {
+    return (
+      <p>You need so sign in to view this page.</p>
+    )
+  }
   
 	
 
