@@ -43,7 +43,8 @@ function Dashboard() {
     console.log('orders: ', orders)
   }, [orders])
 
-  if (!isAuthorized) {
+  if (!user) {
+    console.log('no user')
     return (
       <p>You need to sign in to view this page</p>
     )
