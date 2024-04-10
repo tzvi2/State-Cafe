@@ -20,11 +20,22 @@ export default function DeliverySlotProvider({ children }) {
     return savedDate || "";
   });
 
-  const [phoneNumber, setPhoneNumber] = useState(null)
+  const [phoneNumber, setPhoneNumber] = useState(() => {
+    const savedPhoneNumber = localStorage.getItem('phoneNumber');
+    return savedPhoneNumber || "";
+  });
 
   useEffect(() => {
     localStorage.setItem('unitNumber', unitNumber);
   }, [unitNumber]);
+
+  useEffect(() => {
+    localStorage.setItem('phoneNumber', phoneNumber);
+  }, [phoneNumber]);
+
+  useEffect(() => {
+    console.log('number', phoneNumber)
+  }, [phoneNumber])
 
   useEffect(() => {
     localStorage.setItem('deliverySlot', JSON.stringify(deliverySlot));
@@ -35,13 +46,16 @@ export default function DeliverySlotProvider({ children }) {
   }, [deliveryDate]);
 
   const clearDeliveryDetails = () => {
-    setDeliverySlot("")
-    setUnitNumber("")
-    setDeliveryDate("")
-    localStorage.removeItem('deliverySlot')
-    localStorage.removeItem('unitNumber')
-    localStorage.removeItem('deliveryDate')
-  }
+    setDeliverySlot("");
+    setUnitNumber("");
+    setDeliveryDate("");
+    setPhoneNumber(""); // Clear phone number as well
+    localStorage.removeItem('deliverySlot');
+    localStorage.removeItem('unitNumber');
+    localStorage.removeItem('deliveryDate');
+    localStorage.removeItem('phoneNumber'); // Don't forget to clear from localStorage
+};
+
 
   return (
     <DeliveryDetailsContext.Provider 

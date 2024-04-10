@@ -85,7 +85,6 @@ function Dashboard() {
                 <td>{item.quantity}</td>
                 <td rowSpan={order.items.length}>{order.deliveryAddress}</td>
                 <td rowSpan={order.items.length}>{formatTime(order.deliveryTime)}</td>
-                <td rowSpan={order.items.length}>{formatTime(order.deliveryTime)}</td>
                 <td rowSpan={order.items.length}> {order.phoneNumber}</td>
               </>
             ) : (
