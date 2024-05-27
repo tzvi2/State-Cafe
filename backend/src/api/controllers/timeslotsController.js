@@ -1,8 +1,6 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { addMinutes, isSameMinute } = require('date-fns');
-const dateFnsTz = require('date-fns-tz');
-const toZonedTime = dateFnsTz.toDate;
-const formatTz = dateFnsTz.format;
+const { format, toZonedTime } = require('date-fns-tz');
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
@@ -54,8 +52,8 @@ const handleGetOpenHours = async (req, res) => {
 
     // Format the ranges to the desired time format
     const formattedRanges = openRanges.map(range => ({
-      start: formatTz(range.start, 'hh:mm aa', { timeZone }),
-      end: formatTz(range.end, 'hh:mm aa', { timeZone })
+      start: format(range.start, 'hh:mm aa', { timeZone }),
+      end: format(range.end, 'hh:mm aa', { timeZone })
     }));
 
     return res.status(200).json(formattedRanges);
@@ -64,7 +62,6 @@ const handleGetOpenHours = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
-
 
 const handle_get_available_timeslots = async (req, res) => {
 	// return an array of utc strings
