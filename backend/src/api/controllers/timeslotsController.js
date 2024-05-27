@@ -1,6 +1,8 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { format, parseISO, addMinutes, isSameMinute } = require('date-fns');
-const { zonedTimeToUtc, utcToZonedTime, format: formatZonedTime } = require('date-fns-tz');
+const dateFnsTz = require('date-fns-tz');
+const toZonedTime = dateFnsTz.toZonedTime;
+const formatTz = dateFnsTz.format;
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
@@ -23,7 +25,7 @@ const handleGetOpenHours = async (req, res) => {
       return res.status(200).json([]);
     }
 
-    const timeZone = 'America/New_York'; // Adjust this to your desired time zone
+    const timeZone = 'America/New_York'; // Set your desired time zone here
     const openRanges = [];
     let start = null;
 
@@ -32,19 +34,18 @@ const handleGetOpenHours = async (req, res) => {
       if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
         continue; // Skip if the slot is not properly structured or not available
       }
-      const currentSlotTime = currentSlot.time.toDate();
-      const zonedCurrentSlotTime = utcToZonedTime(currentSlotTime, timeZone);
+      const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
 
       if (currentSlot.isAvailable) {
         if (!start) {
-          start = zonedCurrentSlotTime;
+          start = currentSlotTime;
         }
 
         const nextSlot = slots[i + 1];
-        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(zonedCurrentSlotTime, addMinutes(utcToZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
+        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
           openRanges.push({
             start: start,
-            end: zonedCurrentSlotTime
+            end: currentSlotTime
           });
           start = null;
         }
@@ -53,8 +54,8 @@ const handleGetOpenHours = async (req, res) => {
 
     // Format the ranges to the desired time format
     const formattedRanges = openRanges.map(range => ({
-      start: formatZonedTime(range.start, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone }),
-      end: formatZonedTime(range.end, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone })
+      start: formatTz(range.start, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone }),
+      end: formatTz(range.end, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone })
     }));
 
     return res.status(200).json(formattedRanges);
