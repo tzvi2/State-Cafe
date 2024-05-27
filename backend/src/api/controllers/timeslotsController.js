@@ -1,5 +1,68 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { format, parseISO, addMinutes, isSameMinute } = require('date-fns');
+const { zonedTimeToUtc, utcToZonedTime, format: formatZonedTime } = require('date-fns-tz');
+
+const handleGetOpenHours = async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: 'Date is required' });
+  }
+
+  try {
+    const docRef = db.collection('time_slots').doc(date);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'No open hours found for this date' });
+    }
+
+    const slots = doc.data().slots;
+
+    if (!slots || slots.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const timeZone = 'America/New_York'; // Adjust this to your desired time zone
+    const openRanges = [];
+    let start = null;
+
+    for (let i = 0; i < slots.length; i++) {
+      const currentSlot = slots[i];
+      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
+        continue; // Skip if the slot is not properly structured or not available
+      }
+      const currentSlotTime = currentSlot.time.toDate();
+      const zonedCurrentSlotTime = utcToZonedTime(currentSlotTime, timeZone);
+
+      if (currentSlot.isAvailable) {
+        if (!start) {
+          start = zonedCurrentSlotTime;
+        }
+
+        const nextSlot = slots[i + 1];
+        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(zonedCurrentSlotTime, addMinutes(utcToZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
+          openRanges.push({
+            start: start,
+            end: zonedCurrentSlotTime
+          });
+          start = null;
+        }
+      }
+    }
+
+    // Format the ranges to the desired time format
+    const formattedRanges = openRanges.map(range => ({
+      start: formatZonedTime(range.start, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone }),
+      end: formatZonedTime(range.end, 'yyyy-MM-dd\'T\'HH:mm:ssXXX', { timeZone })
+    }));
+
+    return res.status(200).json(formattedRanges);
+  } catch (error) {
+    console.error('Error fetching open hours:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 const handle_get_available_timeslots = async (req, res) => {
 	// return an array of utc strings
@@ -145,67 +208,6 @@ function parseTime(date, timeString) {
   return parsedDate;
 }
 
-
-const handleGetOpenHours = async (req, res) => {
-  const { date } = req.query;
-
-  console.log('date', date)
-  if (!date) {
-    return res.status(400).json({ error: 'Date is required' });
-  }
-
-  try {
-    const docRef = db.collection('time_slots').doc(date);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'No open hours found for this date' });
-    }
-
-    const slots = doc.data().slots;
-
-    if (!slots || slots.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const openRanges = [];
-    let start = null;
-
-    for (let i = 0; i < slots.length; i++) {
-      const currentSlot = slots[i];
-      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
-        continue; // Skip if the slot is not properly structured or not available
-      }
-      const currentSlotTime = currentSlot.time.toDate();
-
-      if (currentSlot.isAvailable) {
-        if (!start) {
-          start = currentSlotTime;
-        }
-
-        const nextSlot = slots[i + 1];
-        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(nextSlot.time.toDate(), -1))) {
-          openRanges.push({
-            start: start,
-            end: currentSlotTime
-          });
-          start = null;
-        }
-      }
-    }
-
-    // Format the ranges to the desired time format
-    const formattedRanges = openRanges.map(range => ({
-      start: range.start.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true }),
-      end: range.end.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true })
-    }));
-
-    return res.status(200).json(formattedRanges);
-  } catch (error) {
-    console.error('Error fetching open hours:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
 
 const handleAddTimeslot = async (req, res) => {
   const { date, startTime, endTime } = req.body;
