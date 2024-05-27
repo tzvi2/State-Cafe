@@ -38,27 +38,45 @@ function MenuItemExpanded() {
     return (menuItem.price + optionsPrice) * quantity;
   }, [selectedOptions, quantity, menuItem]);
 
-  const handleOptionChange = (option, event, group = null) => {
-    const isChecked = event.target.checked;
-  
-    if (group && group.selectionMax === 1 && group.selectionMin === 1) {
-      // For groups that allow only one selection, deselect others in the group when a new selection is made
-      if (isChecked) {
-        setSelectedOptions(prev => 
-          [...prev.filter(opt => opt.group !== group.group), { ...option, group: group.group }]);
-      } else {
-        // If somehow the checkbox is unchecked (which shouldn't happen in a single-selection scenario), remove the option
-        setSelectedOptions(prev => prev.filter(item => item.title !== option.title || item.group !== group.group));
-      }
-    } else {
-      // For individual options or groups that allow multiple selections
-      if (isChecked) {
-        setSelectedOptions(prev => [...prev, { ...option, group: group ? group.group : 'individual' }]);
-      } else {
-        setSelectedOptions(prev => prev.filter(item => !(item.title === option.title && (!group || item.group === group.group))));
-      }
+  // Inside MenuItemExpanded component
+const handleOptionChange = (option, isChecked, groupTitle = null) => {
+  setSelectedOptions(prev => {
+    // Remove the option if it's deselected
+    let updatedOptions = prev.filter(opt => !(opt.title === option.title && opt.group === groupTitle));
+
+    // Add the option if it's selected
+    if (isChecked) {
+      updatedOptions.push({ ...option, group: groupTitle });
     }
-  };
+
+    return updatedOptions;
+  });
+};
+
+const validateOptionSelections = () => {
+  const validationErrors = [];
+
+  // Validate options within each group
+  menuItem.optionGroups.forEach(group => {
+    const selectedInGroup = selectedOptions.filter(option => option.group === group.title);
+    if (selectedInGroup.length < group.minSelection) {
+      validationErrors.push(`Please select at least ${group.minSelection} option(s) for the group "${group.title}".`);
+    }
+    if (selectedInGroup.length > group.maxSelection) {
+      validationErrors.push(`Please select no more than ${group.maxSelection} option(s) for the group "${group.title}".`);
+    }
+  });
+
+  // Add additional validations as necessary
+
+  return validationErrors;
+};
+
+  
+  
+  useEffect(() => {
+    console.log('menu item ', menuItem)
+  }, [menuItem])
 
   useEffect(() => {
     if (menuItem.price !== undefined) {
@@ -118,26 +136,6 @@ function MenuItemExpanded() {
       if (timeoutId2Ref.current) clearTimeout(timeoutId2Ref.current);
     };
   }, []); 
-  
-  const validateOptionSelections = () => {
-    const validationErrors = [];
-  
-    // Derive groupedOptions here for clarity within this example
-    const groupedOptions = menuItem.options?.filter(option => option.group) || [];
-  
-    // Check grouped options
-    groupedOptions.forEach(group => {
-      const selectedInGroup = selectedOptions.filter(option => option.group === group.group).length;
-      if (group.selectionMin && selectedInGroup < group.selectionMin) {
-        validationErrors.push(`Please select at least ${group.selectionMin} option(s) for ${group.group}.`);
-      }
-      if (group.selectionMax && selectedInGroup > group.selectionMax) {
-        validationErrors.push(`Please select no more than ${group.selectionMax} option(s) for ${group.group}.`);
-      }
-    });
-  
-    return validationErrors;
-  };
   
   return (
     <div className={styles.expandedContainer}> 

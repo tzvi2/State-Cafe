@@ -1,128 +1,80 @@
 import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
-import TimePicker from 'react-time-picker';
-import "react-time-picker/dist/TimePicker.css";
-import { getMenuItems } from '../../api/menuRequests';
-import { useAuth } from '../../hooks/useAuth';
-
+import styles from '../styles/dashboard/Dashboard.module.css'
+import { getOpenHours, addTimeSlot, removeTimeSlot } from '../../api/timeslotRequests';
 
 const Dashboard = () => {
-  const [selectedDates, setSelectedDates] = useState([null, null]); // Initialize with null values for both start and end dates
-  const [openHours, setOpenHours] = useState({});
-  const [menuItems, setMenuItems] = useState([]);
-	const { user, signInWithGoogle } = useAuth(); 
-	const AUTHORIZED_EMAILS = ['tzvib8@gmail.com']; 
-	const isAuthorized = user && AUTHORIZED_EMAILS.includes(user.email);
 
-	useEffect(() => {
-		console.log('selected dates ', selectedDates)
-	}, [selectedDates])
-
-	useEffect(() => {
-		console.log('open hours ', openHours)
-	}, [openHours])
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [openHours, setOpenHours] = useState([])
+  const [showNewRange, setShowNewRange] = useState(false)
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
+  
 
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      const items = await getMenuItems(); 
-      setMenuItems(items.map(item => ({ ...item, isActive: false, quantity: 0 })));
-    };
-
-    fetchMenuItems();
-  }, []);
-
-  const addRange = (date) => {
-    const dateString = date.toISOString().split('T')[0];
-    const newRange = { start: '10:00', end: '12:00' }; // Default range values
-    const updatedOpenHours = { 
-      ...openHours, 
-      [dateString]: [...(openHours[dateString] || []), newRange] 
-    };
-    setOpenHours(updatedOpenHours);
-  };
-
-  const removeRange = (date, rangeIndex) => {
-    const dateString = date.toISOString().split('T')[0];
-    const ranges = [...openHours[dateString]];
-    ranges.splice(rangeIndex, 1);
-    setOpenHours({ ...openHours, [dateString]: ranges });
-  };
-
-  const handleTimeChange = (date, rangeIndex, type, value) => {
-    const dateString = date.toISOString().split('T')[0];
-    const ranges = [...openHours[dateString]];
-    ranges[rangeIndex] = { ...ranges[rangeIndex], [type]: value };
-    setOpenHours({ ...openHours, [dateString]: ranges });
-  };
-
-  const handleMenuItemChange = (index, key, value) => {
-    const updatedItems = [...menuItems];
-    updatedItems[index] = { ...updatedItems[index], [key]: value };
-    setMenuItems(updatedItems);
-  };
-
-	if (!user) {
-    // Redirects to the home page or shows a login button if the user is not authenticated
-    return (
-      <div>
-        <h2>You must be logged in to view this page.</h2>
-        <button onClick={signInWithGoogle}>Login with Google</button>
-      </div>
-    );
-  }
-
-	if (!isAuthorized) {
-    return <div>Sorry, you are not authorized to view this page 🤔</div>;
-  }
-
-
-	return (
-    <div>
-      <DatePicker
-        selected={selectedDates[0]}
-        onChange={(dates) => setSelectedDates(dates)}
-        startDate={selectedDates[0]}
-        endDate={selectedDates[1]}
-        selectsRange
-        inline
-      />
-      {selectedDates[0] && selectedDates[1] && // Ensure both dates are selected
-        Array.from(new Set([selectedDates[0].toISOString().split('T')[0], selectedDates[1].toISOString().split('T')[0]])).map((dateString, index) => {
-          const date = new Date(dateString);
-          return (
-            <div key={index}>
-              {/* <h3>{date.toDateString()}</h3> */}
-              {openHours[dateString] && openHours[dateString].map((range, rangeIndex) => (
-                <div key={rangeIndex}>
-                  <TimePicker value={range.start} onChange={(value) => handleTimeChange(date, rangeIndex, 'start', value)} />
-                  <TimePicker value={range.end} onChange={(value) => handleTimeChange(date, rangeIndex, 'end', value)} />
-                  <button onClick={() => removeRange(date, rangeIndex)}>Remove</button>
-                </div>
-              ))}
-              <button onClick={() => addRange(date)}>Add New Range</button>
-            </div>
-          );
-        })
+    //console.log('selected date', selectedDate)
+    
+    const fetchOpenHours = async () => {
+      try {
+        const openHours = await getOpenHours(selectedDate)
+        setOpenHours(openHours)
+        console.log("Open Hours: ", openHours)
+      } catch (error) {
+        console.error("Error fetching open hours:", error);
       }
-      {menuItems.map((item, index) => (
-        <div key={item.id || index}>
-          <span>{item.title}</span>
-          {/* <input
-            type="number"
-            value={item.quantity}
-            onChange={(e) => handleMenuItemChange(index, 'quantity', e.target.value)}
-          /> */}
-          <input
-            type="checkbox"
-            checked={item.isActive}
-            onChange={(e) => handleMenuItemChange(index, 'isActive', e.target.checked)}
-          />
-        </div>
-      ))}
-    </div>
-  );
-};
+    }
+    setOpenHours([])
+    fetchOpenHours()
+  }, [selectedDate])
 
-export default Dashboard;
+  const handleSaveRange = async () => {
+    try {
+      console.log("start", startTime, "end", endTime)
+      await addTimeSlot(selectedDate, startTime, endTime);
+      const openHours = await getOpenHours(selectedDate);
+      setOpenHours(openHours);
+      setStartTime('');
+      setEndTime('');
+      setShowNewRange(false)
+    } catch (error) {
+      console.error("Error saving time slot:", error);
+    }
+  };
 
+  const handleDeleteRange = async (start, end) => {
+    try {
+      await removeTimeSlot(selectedDate, start, end);
+      const openHours = await getOpenHours(selectedDate);
+      setOpenHours(openHours);
+    } catch (error) {
+      console.error("Error deleting time slot:", error);
+    }
+  };
+
+  return (
+    <>
+    <input type='date' value={selectedDate} onChange={e => setSelectedDate(e.target.value)}></input>
+    
+    {openHours.length > 0 ? (
+        openHours.map((range, index) => (
+          <div key={index} className={styles.range}>
+            <span>{range.start} - {range.end}</span>
+            <input className={styles.delete_range} type='button' value={"delete"} onClick={() => handleDeleteRange(range.start, range.end)} />
+          </div>
+        ))
+      ) : (
+        <p>No open times</p>
+      )}
+
+    {showNewRange && <div className={styles.range}>
+      <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)}></input>
+      <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)}></input>
+      <input className={styles.save_range} type='button' value={"save"} onClick={() => handleSaveRange()}></input>
+      <input className={styles.delete_range} type='button' value={"delete"}></input>
+    </div>}
+    <input type='button' value={"add range"} onClick={() => setShowNewRange(!showNewRange)}></input>
+    </> 
+  )
+}
+
+export default Dashboard

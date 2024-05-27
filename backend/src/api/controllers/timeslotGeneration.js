@@ -1,86 +1,74 @@
-const {db, admin} = require('../../../firebase/firebaseAdminConfig') 
+const { db, admin } = require('../../../firebase/firebaseAdminConfig');
 
-const populateTwoDays = async (req, res) => {
-  try {
-    const today = new Date();
-    await populateSlotsForDate(today); 
-
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    await populateSlotsForDate(tomorrow); 
-
-    res.json({ message: 'Successfully populated slots for today and tomorrow.' });
-  } catch (error) {
-    console.error('Error populating slots:', error);
-    res.status(500).send('Failed to populate slots.');
-  }
-};
-
-async function populateThisWeeksTimeSlots() {
-  const today = new Date();
-  const endDayOfWeek = 4; // Thursday, assuming Sunday is 0, Monday is 1, etc.
-  let datesToPopulate = [];
-
-  // Calculate dates from today through Thursday
-  for (let d = today; d.getDay() <= endDayOfWeek; d.setDate(d.getDate() + 1)) {
-      datesToPopulate.push(new Date(d));
-  }
-
-  // Iterate over each date and populate slots
-  for (let date of datesToPopulate) {
-      await populateSlotsForDate(date);
-  }
-}
-
-async function populateSlotsForDate(date) {
-  const dateId = date.toISOString().split('T')[0]; // Format date as YYYY-MM-DD
+async function populateSlotsForDate(date, startHour, endHour) {
+  const dateId = date.toISOString().split('T')[0];
   const docRef = db.collection('time_slots').doc(dateId);
   const doc = await docRef.get();
 
   if (!doc.exists) {
-      const slots = generateTimeSlots(date); 
-      await docRef.set({ slots });
-      console.log(`Populated slots for ${dateId}`);
+    const slots = generateTimeSlots(date, startHour, endHour);
+    await docRef.set({ slots });
+    console.log(`Populated slots for ${dateId}`);
   } else {
-      console.log(`Slots for ${dateId} already exist.`);
+    console.log(`Slots for ${dateId} already exist.`);
   }
 }
 
-function generateTimeSlots(date) {
+function generateTimeSlots(date, startHour, endHour) {
   let slots = [];
-  const hours = [
-    //{ start: 7, end: 9 }, // Morning hours from 7 AM to 9 AM
-    { start: 17, end: 19 } // Evening hours from 6 PM to 8 PM
-  ];
-
-  // Function to determine if a given date is in daylight saving time for the Eastern Time Zone
+  
   function isEDT(date) {
-    const march = new Date(date.getFullYear(), 2, 14); // March 14th will always be in DST for EDT zones
-    const november = new Date(date.getFullYear(), 10, 7); // November 7th will always be out of DST for EDT zones
+    const march = new Date(date.getFullYear(), 2, 14);
+    const november = new Date(date.getFullYear(), 10, 7);
     return date >= march && date < november;
   }
 
-  hours.forEach((period) => {
-    for (let hour = period.start; hour < period.end; hour++) {
-      for (let minute = 0; minute < 60; minute++) { // Adjust as needed for slot frequency
-        const time = new Date(date);
-        // Adjust for Eastern Time (taking into account daylight saving time)
-        const offset = isEDT(time) ? 4 : 5; // EDT is UTC-4, EST is UTC-5
-        time.setUTCHours(hour + offset, minute, 0, 0);
+  for (let hour = startHour; hour < endHour; hour++) {
+    for (let minute = 0; minute < 60; minute++) {
+      const time = new Date(date);
+      const offset = isEDT(time) ? 4 : 5;
+      time.setUTCHours(hour + offset, minute, 0, 0);
 
-        slots.push({
-          time: admin.firestore.Timestamp.fromDate(time),
-          isAvailable: true
-        });
-      }
+      slots.push({
+        time: admin.firestore.Timestamp.fromDate(time),
+        isAvailable: true
+      });
     }
-  });
+  }
 
   return slots;
 }
 
+async function addTimeSlot(date, startHour, endHour) {
+  const dateId = date.toISOString().split('T')[0];
+  const docRef = db.collection('time_slots').doc(dateId);
+  const newSlots = generateTimeSlots(date, startHour, endHour);
+
+  await docRef.set({
+    slots: admin.firestore.FieldValue.arrayUnion(...newSlots)
+  }, { merge: true });
+}
+
+async function removeTimeSlot(date, startTime, endTime) {
+  const dateId = date.toISOString().split('T')[0];
+  const docRef = db.collection('time_slots').doc(dateId);
+  const doc = await docRef.get();
+
+  if (doc.exists) {
+    const existingSlots = doc.data().slots;
+    const updatedSlots = existingSlots.filter(slot => {
+      const slotTime = slot.time.toDate().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+      return slotTime !== startTime && slotTime !== endTime;
+    });
+
+    await docRef.set({ slots: updatedSlots });
+  }
+}
+
 
 module.exports = {
-	populateTwoDays,
-	populateThisWeeksTimeSlots
-}
+  populateSlotsForDate,
+  generateTimeSlots,
+  addTimeSlot,
+  removeTimeSlot
+};

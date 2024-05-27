@@ -60,6 +60,8 @@ const EditMenuItem = () => {
 
   const handleOptionChange = (index, e, isGroup = false, groupIndex = null) => {
     const { name, value } = e.target;
+
+    const numericValue = name === 'price' || name === 'timeToCook' ? parseFloat(value) : value;
   
     if (isGroup) {
       setMenuItem(prevState => {
@@ -67,12 +69,12 @@ const EditMenuItem = () => {
           if (idx === groupIndex) {
             if (index === null) {
               // Editing group-level properties
-              return { ...group, [name]: name.includes('Selection') ? parseInt(value, 10) : value };
+              return { ...group, [name]: name.includes('Selection') ? parseInt(value, 10) : numericValue };
             } else {
               // Editing sub-options within the group
               const updatedSubOptions = group.options.map((subOption, subIdx) => {
                 if (subIdx === index) {
-                  return { ...subOption, [name]: value };
+                  return { ...subOption, [name]: numericValue };
                 }
                 return subOption;
               });
