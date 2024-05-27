@@ -13,8 +13,13 @@ const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandle
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
+const corsOptions = {
+  origin: 'https://statecafeteaneck.com', 
+  optionsSuccessStatus: 200
+};
+
 const app = express();
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(express.json())
 app.use(morgan('dev'));
 
