@@ -2,67 +2,6 @@ const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { addMinutes, isSameMinute } = require('date-fns');
 const { format, toZonedTime } = require('date-fns-tz');
 
-const handleGetOpenHours = async (req, res) => {
-  const { date } = req.query;
-
-  if (!date) {
-    return res.status(400).json({ error: 'Date is required' });
-  }
-
-  try {
-    const docRef = db.collection('time_slots').doc(date);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'No open hours found for this date' });
-    }
-
-    const slots = doc.data().slots;
-
-    if (!slots || slots.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const timeZone = 'America/New_York'; // Set your desired time zone here
-    const openRanges = [];
-    let start = null;
-
-    for (let i = 0; i < slots.length; i++) {
-      const currentSlot = slots[i];
-      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
-        continue; // Skip if the slot is not properly structured or not available
-      }
-      const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
-
-      if (currentSlot.isAvailable) {
-        if (!start) {
-          start = currentSlotTime;
-        }
-
-        const nextSlot = slots[i + 1];
-        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
-          openRanges.push({
-            start: start,
-            end: currentSlotTime
-          });
-          start = null;
-        }
-      }
-    }
-
-    // Format the ranges to the desired time format
-    const formattedRanges = openRanges.map(range => ({
-      start: format(range.start, 'hh:mm aa', { timeZone }),
-      end: format(range.end, 'hh:mm aa', { timeZone })
-    }));
-
-    return res.status(200).json(formattedRanges);
-  } catch (error) {
-    console.error('Error fetching open hours:', error);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
-};
-
 const handle_get_available_timeslots = async (req, res) => {
 	// return an array of utc strings
 	try {
@@ -207,6 +146,88 @@ function parseTime(date, timeString) {
   return parsedDate;
 }
 
+// Helper function to parse time with time zone
+function parseTimeWithTimezone(date, timeString, timeZone) {
+  const [time, modifier] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (isNaN(hours) || isNaN(minutes)) {
+    return null;
+  }
+
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  const parsedDate = new Date(date);
+  parsedDate.setHours(hours, minutes, 0, 0);
+
+  return toZonedTime(parsedDate, timeZone);
+}
+
+const handleGetOpenHours = async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: 'Date is required' });
+  }
+
+  try {
+    const docRef = db.collection('time_slots').doc(date);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'No open hours found for this date' });
+    }
+
+    const slots = doc.data().slots;
+
+    if (!slots || slots.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const timeZone = 'America/New_York'; // Set your desired time zone here
+    const openRanges = [];
+    let start = null;
+
+    for (let i = 0; i < slots.length; i++) {
+      const currentSlot = slots[i];
+      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
+        continue; // Skip if the slot is not properly structured or not available
+      }
+      const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
+
+      if (currentSlot.isAvailable) {
+        if (!start) {
+          start = currentSlotTime;
+        }
+
+        const nextSlot = slots[i + 1];
+        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
+          openRanges.push({
+            start: start,
+            end: currentSlotTime
+          });
+          start = null;
+        }
+      }
+    }
+
+    // Format the ranges to the desired time format
+    const formattedRanges = openRanges.map(range => ({
+      start: format(range.start, 'hh:mm aa', { timeZone }),
+      end: format(range.end, 'hh:mm aa', { timeZone })
+    }));
+
+    return res.status(200).json(formattedRanges);
+  } catch (error) {
+    console.error('Error fetching open hours:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
 
 const handleAddTimeslot = async (req, res) => {
   const { date, startTime, endTime } = req.body;
@@ -226,8 +247,9 @@ const handleAddTimeslot = async (req, res) => {
     const docRef = db.collection('time_slots').doc(dateId);
     const doc = await docRef.get();
 
+    const timeZone = 'America/New_York'; // Set your desired time zone here
     // Generate time slots for the given range
-    const newSlots = generateTimeSlots(dateObj, startTime, endTime);
+    const newSlots = generateTimeSlots(dateObj, startTime, endTime, timeZone);
 
     if (!doc.exists) {
       // If document does not exist, create it with the new slots
@@ -248,20 +270,13 @@ const handleAddTimeslot = async (req, res) => {
   }
 };
 
-// Ensure generateTimeSlots correctly handles both startTime and endTime
-function generateTimeSlots(date, startTime, endTime) {
+function generateTimeSlots(date, startTime, endTime, timeZone) {
   let slots = [];
   
-  const [startHour, startMinute] = startTime.split(':').map(Number);
-  const [endHour, endMinute] = endTime.split(':').map(Number);
-  
-  const startDate = new Date(date);
-  startDate.setHours(startHour, startMinute, 0, 0);
-  
-  const endDate = new Date(date);
-  endDate.setHours(endHour, endMinute, 0, 0);
+  const startDate = parseTimeWithTimezone(date, startTime, timeZone);
+  const endDate = parseTimeWithTimezone(date, endTime, timeZone);
 
-  for (let time = startDate; time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
+  for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
     slots.push({
       time: admin.firestore.Timestamp.fromDate(new Date(time)),
       isAvailable: true
@@ -272,8 +287,8 @@ function generateTimeSlots(date, startTime, endTime) {
 }
 
 const handleRemoveTimeslot = async (req, res) => {
-  const { date, startHour, endHour } = req.body;
-  console.log('Attempting to remove time slot for date:', date, 'start:', startHour, 'end:', endHour);
+  const { date, startTime, endTime } = req.body;
+  console.log('Attempting to remove time slot for date:', date, 'start:', startTime, 'end:', endTime);
 
   try {
     // Validate date format
@@ -292,8 +307,9 @@ const handleRemoveTimeslot = async (req, res) => {
     }
 
     // Parse start and end times to Date objects
-    const startDate = parseTime(date, startHour);
-    const endDate = parseTime(date, endHour);
+    const timeZone = 'America/New_York'; // Set your desired time zone here
+    const startDate = parseTimeWithTimezone(date, startTime, timeZone);
+    const endDate = parseTimeWithTimezone(date, endTime, timeZone);
 
     if (!startDate || !endDate) {
       return res.status(400).json({ error: 'Invalid start or end time format' });
@@ -329,18 +345,6 @@ const handleRemoveTimeslot = async (req, res) => {
 };
 
 
-const handleUpdateTimeslot = async (req, res) => {
-  const { date, oldStartHour, oldEndHour, newStartHour, newEndHour } = req.body;
-
-  try {
-    await handleRemoveTimeslot({ body: { date, startHour: oldStartHour, endHour: oldEndHour } }, res);
-    await handleAddTimeslot({ body: { date, startHour: newStartHour, endHour: newEndHour } }, res);
-    res.json({ message: 'Time slot updated successfully.' });
-  } catch (error) {
-    console.error('Error updating time slot:', error);
-    res.status(500).send('Failed to update time slot.');
-  }
-};
 
 module.exports = {
 	handle_get_available_timeslots,
@@ -348,5 +352,4 @@ module.exports = {
 	handleGetOpenHours,
 	handleAddTimeslot,
 	handleRemoveTimeslot,
-	handleUpdateTimeslot
 }
