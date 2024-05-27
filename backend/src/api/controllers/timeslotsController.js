@@ -1,6 +1,192 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { addMinutes, isSameMinute } = require('date-fns');
-const { format, toZonedTime } = require('date-fns-tz');
+const { format, toDate, fromZonedTime, toZonedTime } = require('date-fns-tz');
+
+const timeZone = 'America/New_York'; // Define your desired time zone here
+
+const handleGetOpenHours = async (req, res) => {
+  const { date } = req.query;
+
+  if (!date) {
+    return res.status(400).json({ error: 'Date is required' });
+  }
+
+  try {
+    const docRef = db.collection('time_slots').doc(date);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'No open hours found for this date' });
+    }
+
+    const slots = doc.data().slots;
+
+    if (!slots || slots.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const openRanges = [];
+    let start = null;
+
+    for (let i = 0; i < slots.length; i++) {
+      const currentSlot = slots[i];
+      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
+        continue; // Skip if the slot is not properly structured or not available
+      }
+      const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
+
+      if (currentSlot.isAvailable) {
+        if (!start) {
+          start = currentSlotTime;
+        }
+
+        const nextSlot = slots[i + 1];
+        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
+          openRanges.push({
+            start: start,
+            end: currentSlotTime
+          });
+          start = null;
+        }
+      }
+    }
+
+    // Format the ranges to the desired time format
+    const formattedRanges = openRanges.map(range => ({
+      start: format(range.start, 'hh:mm aa', { timeZone }),
+      end: format(range.end, 'hh:mm aa', { timeZone })
+    }));
+
+    return res.status(200).json(formattedRanges);
+  } catch (error) {
+    console.error('Error fetching open hours:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+const handleAddTimeslot = async (req, res) => {
+  const { date, startTime, endTime } = req.body;
+  console.log('Adding time slot for date:', date, 'start:', startTime, 'end:', endTime);
+
+  try {
+    if (!date || !startTime || !endTime) {
+      return res.status(400).json({ error: 'Date, start time, and end time are required' });
+    }
+
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return res.status(400).json({ error: 'Invalid date format' });
+    }
+
+    const dateId = dateObj.toISOString().split('T')[0];
+    const docRef = db.collection('time_slots').doc(dateId);
+    const doc = await docRef.get();
+
+    const newSlots = generateTimeSlots(dateObj, startTime, endTime, timeZone);
+
+    if (!doc.exists) {
+      await docRef.set({ slots: newSlots });
+      console.log(`Created new document and added slots for ${dateId}`);
+    } else {
+      await docRef.set({
+        slots: admin.firestore.FieldValue.arrayUnion(...newSlots)
+      }, { merge: true });
+      console.log(`Added new slots to existing document for ${dateId}`);
+    }
+
+    res.json({ message: 'Time slot added successfully.' });
+  } catch (error) {
+    console.error('Error adding time slot:', error);
+    res.status(500).send('Failed to add time slot.');
+  }
+};
+
+function generateTimeSlots(date, startTime, endTime, timeZone) {
+  let slots = [];
+
+  const startDate = fromZonedTime(parseTime(date, startTime), timeZone);
+  const endDate = fromZonedTime(parseTime(date, endTime), timeZone);
+
+  for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
+    slots.push({
+      time: admin.firestore.Timestamp.fromDate(new Date(time)),
+      isAvailable: true
+    });
+  }
+
+  return slots;
+}
+
+function parseTime(date, timeString) {
+  const [time, modifier] = timeString.split(' ');
+  let [hours, minutes] = time.split(':').map(Number);
+
+  if (isNaN(hours) || isNaN(minutes)) {
+    return null;
+  }
+
+  if (modifier === 'PM' && hours !== 12) {
+    hours += 12;
+  }
+  if (modifier === 'AM' && hours === 12) {
+    hours = 0;
+  }
+
+  const parsedDate = new Date(date);
+  parsedDate.setHours(hours, minutes, 0, 0);
+  return parsedDate;
+}
+
+const handleRemoveTimeslot = async (req, res) => {
+  const { date, startHour, endHour } = req.body;
+  console.log('Attempting to remove time slot for date:', date, 'start:', startHour, 'end:', endHour);
+
+  try {
+    const dateObj = new Date(date);
+    if (isNaN(dateObj.getTime())) {
+      return res.status(400).json({ error: 'Invalid date format' });
+    }
+
+    const dateId = dateObj.toISOString().split('T')[0];
+    const docRef = db.collection('time_slots').doc(dateId);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'No time slots found for this date' });
+    }
+
+    const startDate = fromZonedTime(parseTime(date, startHour), timeZone);
+    const endDate = fromZonedTime(parseTime(date, endHour), timeZone);
+
+    if (!startDate || !endDate) {
+      return res.status(400).json({ error: 'Invalid start or end time format' });
+    }
+
+    console.log('startDate:', startDate, 'endDate:', endDate);
+
+    const existingSlots = doc.data().slots;
+    const slotsToRemove = [];
+
+    for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
+      slotsToRemove.push(admin.firestore.Timestamp.fromDate(new Date(time)));
+    }
+
+    console.log('slotsToRemove:', slotsToRemove);
+
+    const updatedSlots = existingSlots.filter(slot => {
+      const slotTime = slot.time.toDate().getTime();
+      return !slotsToRemove.some(toRemove => toRemove.toDate().getTime() === slotTime);
+    });
+
+    console.log('updatedSlots:', updatedSlots);
+
+    await docRef.set({ slots: updatedSlots }, { merge: true });
+    res.json({ message: 'Time slot removed successfully.' });
+  } catch (error) {
+    console.error('Error removing time slot:', error);
+    res.status(500).send('Failed to remove time slot.');
+  }
+};
 
 const handle_get_available_timeslots = async (req, res) => {
 	// return an array of utc strings
@@ -126,225 +312,18 @@ async function populateSlotsForDate(date, startHour, endHour) {
   }
 }
 
-function parseTime(date, timeString) {
-  const [time, modifier] = timeString.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    return null;
-  }
-
-  if (modifier === 'PM' && hours !== 12) {
-    hours += 12;
-  }
-  if (modifier === 'AM' && hours === 12) {
-    hours = 0;
-  }
-
-  const parsedDate = new Date(date);
-  parsedDate.setHours(hours, minutes, 0, 0);
-  return parsedDate;
-}
-
-// Helper function to parse time with time zone
-function parseTimeWithTimezone(date, timeString, timeZone) {
-  const [time, modifier] = timeString.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    return null;
-  }
-
-  if (modifier === 'PM' && hours !== 12) {
-    hours += 12;
-  }
-  if (modifier === 'AM' && hours === 12) {
-    hours = 0;
-  }
-
-  const parsedDate = new Date(date);
-  parsedDate.setHours(hours, minutes, 0, 0);
-
-  return toZonedTime(parsedDate, timeZone);
-}
-
-const handleGetOpenHours = async (req, res) => {
-  const { date } = req.query;
-
-  if (!date) {
-    return res.status(400).json({ error: 'Date is required' });
-  }
+const handleUpdateTimeslot = async (req, res) => {
+  const { date, oldStartHour, oldEndHour, newStartHour, newEndHour } = req.body;
 
   try {
-    const docRef = db.collection('time_slots').doc(date);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'No open hours found for this date' });
-    }
-
-    const slots = doc.data().slots;
-
-    if (!slots || slots.length === 0) {
-      return res.status(200).json([]);
-    }
-
-    const timeZone = 'America/New_York'; // Set your desired time zone here
-    const openRanges = [];
-    let start = null;
-
-    for (let i = 0; i < slots.length; i++) {
-      const currentSlot = slots[i];
-      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
-        continue; // Skip if the slot is not properly structured or not available
-      }
-      const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
-
-      if (currentSlot.isAvailable) {
-        if (!start) {
-          start = currentSlotTime;
-        }
-
-        const nextSlot = slots[i + 1];
-        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
-          openRanges.push({
-            start: start,
-            end: currentSlotTime
-          });
-          start = null;
-        }
-      }
-    }
-
-    // Format the ranges to the desired time format
-    const formattedRanges = openRanges.map(range => ({
-      start: format(range.start, 'hh:mm aa', { timeZone }),
-      end: format(range.end, 'hh:mm aa', { timeZone })
-    }));
-
-    return res.status(200).json(formattedRanges);
+    await handleRemoveTimeslot({ body: { date, startHour: oldStartHour, endHour: oldEndHour } }, res);
+    await handleAddTimeslot({ body: { date, startHour: newStartHour, endHour: newEndHour } }, res);
+    res.json({ message: 'Time slot updated successfully.' });
   } catch (error) {
-    console.error('Error fetching open hours:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error('Error updating time slot:', error);
+    res.status(500).send('Failed to update time slot.');
   }
 };
-
-const handleAddTimeslot = async (req, res) => {
-  const { date, startTime, endTime } = req.body;
-  console.log('Adding time slot for date:', date, 'start:', startTime, 'end:', endTime);
-
-  try {
-    if (!date || !startTime || !endTime) {
-      return res.status(400).json({ error: 'Date, start time, and end time are required' });
-    }
-
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-      return res.status(400).json({ error: 'Invalid date format' });
-    }
-
-    const dateId = dateObj.toISOString().split('T')[0];
-    const docRef = db.collection('time_slots').doc(dateId);
-    const doc = await docRef.get();
-
-    const timeZone = 'America/New_York'; // Set your desired time zone here
-    // Generate time slots for the given range
-    const newSlots = generateTimeSlots(dateObj, startTime, endTime, timeZone);
-
-    if (!doc.exists) {
-      // If document does not exist, create it with the new slots
-      await docRef.set({ slots: newSlots });
-      console.log(`Created new document and added slots for ${dateId}`);
-    } else {
-      // If document exists, add the new slots to the existing ones
-      await docRef.set({
-        slots: admin.firestore.FieldValue.arrayUnion(...newSlots)
-      }, { merge: true });
-      console.log(`Added new slots to existing document for ${dateId}`);
-    }
-
-    res.json({ message: 'Time slot added successfully.' });
-  } catch (error) {
-    console.error('Error adding time slot:', error);
-    res.status(500).send('Failed to add time slot.');
-  }
-};
-
-function generateTimeSlots(date, startTime, endTime, timeZone) {
-  let slots = [];
-  
-  const startDate = parseTimeWithTimezone(date, startTime, timeZone);
-  const endDate = parseTimeWithTimezone(date, endTime, timeZone);
-
-  for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
-    slots.push({
-      time: admin.firestore.Timestamp.fromDate(new Date(time)),
-      isAvailable: true
-    });
-  }
-
-  return slots;
-}
-
-const handleRemoveTimeslot = async (req, res) => {
-  const { date, startTime, endTime } = req.body;
-  console.log('Attempting to remove time slot for date:', date, 'start:', startTime, 'end:', endTime);
-
-  try {
-    // Validate date format
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-      return res.status(400).json({ error: 'Invalid date format' });
-    }
-
-    // Convert date to Firestore document ID format (YYYY-MM-DD)
-    const dateId = dateObj.toISOString().split('T')[0];
-    const docRef = db.collection('time_slots').doc(dateId);
-    const doc = await docRef.get();
-
-    if (!doc.exists) {
-      return res.status(404).json({ error: 'No time slots found for this date' });
-    }
-
-    // Parse start and end times to Date objects
-    const timeZone = 'America/New_York'; // Set your desired time zone here
-    const startDate = parseTimeWithTimezone(date, startTime, timeZone);
-    const endDate = parseTimeWithTimezone(date, endTime, timeZone);
-
-    if (!startDate || !endDate) {
-      return res.status(400).json({ error: 'Invalid start or end time format' });
-    }
-
-    console.log('startDate:', startDate, 'endDate:', endDate);
-
-    const existingSlots = doc.data().slots;
-    const slotsToRemove = [];
-
-    // Generate list of timestamps to be removed
-    for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
-      slotsToRemove.push(admin.firestore.Timestamp.fromDate(new Date(time)));
-    }
-
-    console.log('slotsToRemove:', slotsToRemove);
-
-    // Filter out the slots to be removed
-    const updatedSlots = existingSlots.filter(slot => {
-      const slotTime = slot.time.toDate().getTime();
-      return !slotsToRemove.some(toRemove => toRemove.toDate().getTime() === slotTime);
-    });
-
-    console.log('updatedSlots:', updatedSlots);
-
-    // Update the Firestore document with the updated slots
-    await docRef.set({ slots: updatedSlots }, { merge: true });
-    res.json({ message: 'Time slot removed successfully.' });
-  } catch (error) {
-    console.error('Error removing time slot:', error);
-    res.status(500).send('Failed to remove time slot.');
-  }
-};
-
-
 
 module.exports = {
 	handle_get_available_timeslots,
@@ -352,4 +331,5 @@ module.exports = {
 	handleGetOpenHours,
 	handleAddTimeslot,
 	handleRemoveTimeslot,
+	handleUpdateTimeslot
 }
