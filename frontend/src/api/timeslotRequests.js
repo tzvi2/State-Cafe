@@ -37,7 +37,7 @@ export const formatLocalDate = (date) => {
 
 export const getOpenHours = async (date) => {
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/open-hours?date=${date}`, {
+    const response = await fetch(`http://state-cafe.vercel.app/timeslots/open-hours?date=${date}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -60,7 +60,7 @@ export const getOpenHours = async (date) => {
 export const addTimeSlot = async (date, startTime, endTime) => {
   console.log("sending new range to backend ", date, startTime, endTime)
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/add-time-slot`, {
+    const response = await fetch(`http://state-cafe.vercel.app/timeslots/add-time-slot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -82,7 +82,7 @@ export const addTimeSlot = async (date, startTime, endTime) => {
 export const removeTimeSlot = async (date, startHour, endHour) => {
  
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/remove-time-slot`, {
+    const response = await fetch(`http://state-cafe.vercel.app/timeslots/remove-time-slot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
