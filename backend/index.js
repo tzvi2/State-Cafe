@@ -1,7 +1,7 @@
 require('dotenv').config()
 
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 const menuRoutes = require('./src/api/routes/menuRoutes');
 const paymentRoutes = require('./src/api/routes/paymentRoutes');
 const orderRoutes = require('./src/api/routes/orderRoutes');
@@ -13,7 +13,11 @@ const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandle
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
-const allowedOrigins = ['https://statecafeteaneck.com', 'https://www.statecafeteaneck.com'];
+const allowedOrigins = [
+  'https://statecafeteaneck.com', 
+  'https://www.statecafeteaneck.com',
+  'http://localhost:3000' // Add this for local development, remove it in production
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -25,7 +29,9 @@ const corsOptions = {
     }
     return callback(null, true);
   },
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  preflightContinue: false
 };
 
 const app = express();
@@ -38,6 +44,8 @@ app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
 }));
+
+app.options('*', cors(corsOptions)); // Preflight handling
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
