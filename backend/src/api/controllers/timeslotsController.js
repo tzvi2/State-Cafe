@@ -204,11 +204,13 @@ const handle_get_available_timeslots = async (req, res) => {
     const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
     console.log('totalOrderExecutionInMinutes:', totalOrderExecutionTimeInMinutes);
 
-    // Start of the given date in UTC
-    const startOfDay = new Date(`${date}T00:00:00.000Z`);
     // Current time in UTC
     let now = new Date();
-    console.log('now:', now);
+    console.log('now (UTC):', now);
+
+    // Convert current time to local time for debugging purposes (optional)
+    let localNow = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+    console.log('now (Local):', localNow);
 
     const docRef = db.collection('time_slots').doc(date);
     const doc = await docRef.get();
