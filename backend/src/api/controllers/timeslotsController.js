@@ -224,10 +224,13 @@ const handle_get_available_timeslots = async (req, res) => {
       time: slot.time.toDate() // Convert Firestore timestamp to Date
     }));
 
+    console.log('slots:', slots);
+
     const availableTimeSlots = [];
 
     // Iterate through slots, checking for availability and sufficiency of consecutive slots
     for (let i = 0; i < slots.length; i++) {
+      console.log(`Checking slot ${i} at ${slots[i].time}`);
       if (slots[i].isAvailable && slots[i].time >= now) {
         let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
         if (sequenceEndIndex < slots.length) {
