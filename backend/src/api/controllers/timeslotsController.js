@@ -189,68 +189,69 @@ const handleRemoveTimeslot = async (req, res) => {
 };
 
 const handle_get_available_timeslots = async (req, res) => {
-	// return an array of utc strings
-	try {
+  try {
+    const date = req.query.date; // Expecting date in YYYY-MM-DD format
+    console.log('date:', date);
 
-			const date = req.query.date; // Expecting date in YYYY-MM-DD format
-			console.log('date ', date)
+    if (!date) {
+      return res.status(400).json({ error: 'Date query parameter is required.' });
+    }
 
-			if (!date) {
-					return res.status(400).json({ error: 'Date query parameter is required.' });
-			}
+    const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10); // Cook time in seconds
+    console.log('totalCookTimeInSeconds:', totalCookTimeInSeconds);
 
-			const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10); // Cook time in seconds
-			console.log('totalCookTimeInSeconds: ', totalCookTimeInSeconds)
-			const deliveryTimeInMinutes = 6; // Fixed delivery time in minutes
-			
-			const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
+    const deliveryTimeInMinutes = 6; // Fixed delivery time in minutes
+    const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
+    console.log('totalOrderExecutionInMinutes:', totalOrderExecutionTimeInMinutes);
 
-			let now = new Date()
-			console.log('now: ', now);
+    // Start of the given date in UTC
+    const startOfDay = new Date(`${date}T00:00:00.000Z`);
+    // Current time in UTC
+    let now = new Date();
+    console.log('now:', now);
 
-			console.log("totalOrderExecutionInMinutes: ", totalOrderExecutionTimeInMinutes)
+    const docRef = db.collection('time_slots').doc(date);
+    const doc = await docRef.get();
 
-			const docRef = db.collection('time_slots').doc(date);
-			const doc = await docRef.get();
+    if (!doc.exists) {
+      return res.status(404).json({ error: 'Daily slots document not found.' });
+    }
 
-			if (!doc.exists) {
-					return res.status(404).json({ error: 'Daily slots document not found.' });
-			}
+    const slots = doc.data().slots.map(slot => ({
+      ...slot,
+      time: slot.time.toDate() // Convert Firestore timestamp to Date
+    }));
 
-			const slots = doc.data().slots.map(slot => ({
-					...slot,
-					time: slot.time.toDate() // Convert timestamp to Date
-			}));
-			
-			const availableTimeSlots = [];
+    const availableTimeSlots = [];
 
-			// Iterate through slots, checking for availability and sufficiency of consecutive slots
-			for (let i = 0; i < slots.length; i++) {
-					if (slots[i].isAvailable && slots[i].time >= now) {
-							let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
-							if (sequenceEndIndex < slots.length) {
-									let allFollowingSlotsAvailable = true;
-									for (let j = 1; j < totalOrderExecutionTimeInMinutes; j++) {
-											if (!slots[i + j].isAvailable || slots[i + j].time - slots[i].time < j * 60000) {
-													allFollowingSlotsAvailable = false;
-													break;
-											}
-									}
-									if (allFollowingSlotsAvailable) {
-											// Add the ending slot's time as an available time slot
-											availableTimeSlots.push(slots[sequenceEndIndex].time);
-									}
-							}
-					}
-			}
-			console.log('availableTimeSlots: ', availableTimeSlots)
+    // Iterate through slots, checking for availability and sufficiency of consecutive slots
+    for (let i = 0; i < slots.length; i++) {
+      if (slots[i].isAvailable && slots[i].time >= now) {
+        let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
+        if (sequenceEndIndex < slots.length) {
+          let allFollowingSlotsAvailable = true;
+          for (let j = 1; j < totalOrderExecutionTimeInMinutes; j++) {
+            if (!slots[i + j].isAvailable || slots[i + j].time - slots[i].time < j * 60000) {
+              allFollowingSlotsAvailable = false;
+              break;
+            }
+          }
+          if (allFollowingSlotsAvailable) {
+            // Add the ending slot's time as an available time slot
+            availableTimeSlots.push(slots[sequenceEndIndex].time.toISOString());
+          }
+        }
+      }
+    }
 
-			res.json({ availableTimeSlots: availableTimeSlots });
-	} catch (error) {
-			console.error('Error fetching available time slots:', error);
-			res.status(500).json({ error: error.message });
-	}
+    console.log('availableTimeSlots:', availableTimeSlots);
+    res.json({ availableTimeSlots: availableTimeSlots });
+  } catch (error) {
+    console.error('Error fetching available time slots:', error);
+    res.status(500).json({ error: error.message });
+  }
 };
+
 
 async function bookSlots(date, startTime, endTime) {
 	const dateId = date; // Assuming date is already in YYYY-MM-DD format

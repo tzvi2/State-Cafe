@@ -8,19 +8,20 @@ import { bookTimeSlot } from '../../api/timeslotRequests';
 import { formatIsoToTime } from '../../utils/timeUtilities';
 import styles from '../styles/checkout process styles/OrderConfirmation.module.css';
 
-const OrderDetailsRow = ({ label, value }) => {
+const OrderDetailsRow = ({ label, value, isLoading }) => {
   return (
     <div className={styles.orderDetailsRow}>
       <span>{label}:</span>
-      <span>{value}</span>
+      <span>{isLoading ? <span className={styles.skeleton}></span> : value}</span>
     </div>
   );
 };
 
 const OrderConfirmation = () => {
   const { cart, clearCart } = useCart();
-  const { deliverySlot, unitNumber, deliveryDate, phoneNumber } = useDeliveryDetails();
+  const { deliverySlot, unitNumber, deliveryDate, phoneNumber, clearDeliveryDetails } = useDeliveryDetails();
   const [savedOrder, setSavedOrder] = useState({});
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,6 +59,10 @@ const OrderConfirmation = () => {
 
           // Mark the order as saved in localStorage to prevent duplicates
           localStorage.setItem(`orderSaved_${paymentIntentId}`, 'true');
+
+          // Clear the cart and delivery details after successful order processing
+          clearCart()
+          clearDeliveryDetails();
           
         } catch (error) {
           console.error('Error processing order:', error);
@@ -70,11 +75,12 @@ const OrderConfirmation = () => {
           setSavedOrder(existingOrders[paymentIntentId]);
         }
       }
+      setIsLoading(false); // Data has been loaded
     };
 
     processOrder();
-    return () => clearCart()
-  }, [cart, deliverySlot, unitNumber, deliveryDate, clearCart]);
+    
+  }, [cart, deliverySlot, unitNumber, deliveryDate, clearCart, clearDeliveryDetails]);
 
   // Helper function to convert integers to money format
   const intToMoneyString = (amount) => {
@@ -87,11 +93,11 @@ const OrderConfirmation = () => {
     <div className={styles.confirmationCard}>
       <h2>Your order is complete!</h2>
       <div className={styles.rows}>
-        {/* <OrderDetailsRow label="Order ID" value={savedOrder.orderId || 'N/A'} /> */}
-        <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} />
-        <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} />
-        <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} />
-        <OrderDetailsRow label="Delivery" value={`Unit ${unitNumber} by ${formatIsoToTime(deliverySlot)}`} />
+        {/* <OrderDetailsRow label="Order ID" value={savedOrder.orderId || 'N/A'} isLoading={isLoading} /> */}
+        <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} isLoading={isLoading} />
+        <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} isLoading={isLoading} />
+        <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} isLoading={isLoading} />
+        <OrderDetailsRow label="Delivery" value={`Unit ${unitNumber} by ${formatIsoToTime(deliverySlot)}`} isLoading={isLoading} />
       </div>
       <p>Something not right? <br/> Contact us: (551) 837-9907</p>
     </div>

@@ -77,6 +77,7 @@ function DeliveryPage() {
                 displayTime: timeFormatter.format(new Date(slot))
             }));
     
+            console.log('fetched slots', fetchedSlots)
             // Apply the filterTimeSlots function to narrow down to 5-minute intervals
             fetchedSlots = filterTimeSlots(fetchedSlots);
     

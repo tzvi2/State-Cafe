@@ -2,6 +2,7 @@ import { format } from 'date-fns';
 import { db } from '../firebaseConfig';
 
 export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
+  console.log("totalCookTime", totalCookTime, "date", date, "time", time)
 	
 	try {
 			const response = await fetch(`https://state-cafe.vercel.app/timeslots/book-timeslot`, {
