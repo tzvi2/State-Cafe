@@ -23,6 +23,18 @@
 	align-items: flex-end;
 }
 
+.errorRow {
+	display: flex;
+	justify-content: end;
+}
+
+.error {
+	color: red;
+	margin: 0;
+	text-align: end;
+	width: 50%;
+}
+
 .deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
 	font-size: 1.2rem;
 	border-radius: 5px;
@@ -62,6 +74,11 @@
 	height: 2.5rem;
 }
 
+.wideBtn:hover {
+	box-shadow: 1px 2px 2px rgb(208, 196, 196);
+	cursor: pointer;
+}
+
 .selected {
 	border: 2px solid #82924B;
 	box-shadow: 1px 1px 3px rgba(96, 95, 95, 0.089);
@@ -81,8 +98,10 @@
 	color: rgb(79, 13, 79);
 }
 
-@media (min-width: 550px) {
-	
+@media (max-width: 550px) {
+	.error {
+		width: 70%;
+	}
 }
 
 @media (min-width: 1024px) {
