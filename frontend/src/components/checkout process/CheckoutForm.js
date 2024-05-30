@@ -27,6 +27,7 @@ export default function CheckoutForm() {
     }
 
     setPaymentLoading(true)
+    
     const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -39,7 +40,6 @@ export default function CheckoutForm() {
       setPaymentLoading(false)
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
       console.log('no error')
-      clearCart(); 
       setPaymentLoading(false)
     }
   };

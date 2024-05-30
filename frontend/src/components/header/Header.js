@@ -40,7 +40,7 @@ function Header() {
           <nav className={styles.menu}>
             <ul onClick={() => setIsOpen(false)}>
               <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
-              <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
+              <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Menu</NavLink></li>
               <li><NavLink to={'cart'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Cart
               </NavLink></li>
               <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
@@ -55,7 +55,7 @@ function Header() {
         </div>
         <ul className={styles.links}>
           <li><NavLink to={'/'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Home</NavLink></li>
-          <li><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Order Online</NavLink></li>
+          <li className={`${styles.menuLink} ${styles.isActive}`}><NavLink to={'menu'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>Menu</NavLink></li>
           
           <li><NavLink to={'about'} className={({ isActive }) => getNavLinkClass(isActive, styles.link)}>About</NavLink></li>
           <NavLink to="cart" className={({ isActive }) => getNavLinkClass(isActive, styles.cart)}>

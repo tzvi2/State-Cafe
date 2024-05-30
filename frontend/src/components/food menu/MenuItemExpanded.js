@@ -102,7 +102,7 @@ function MenuItemExpanded() {
 
     if (wasAdded) {
       timeoutId1Ref.current = setTimeout(() => {
-        setButtonContent({ text: "Added.", amount: "" });
+        setButtonContent({ text: "Added to cart", amount: "" });
       }, 100);
 
       timeoutId2Ref.current = setTimeout(() => {
@@ -151,7 +151,7 @@ function MenuItemExpanded() {
           </button>
         </div>
       </div>
-      <Link className={styles.checkoutButton} to={"/cart"}>Checkout</Link>
+      <Link className={styles.checkoutButton} to={"/cart"}>Go to Cart</Link>
     </div>
   );
 }

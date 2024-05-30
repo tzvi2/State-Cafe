@@ -2,7 +2,8 @@ import { format } from 'date-fns';
 import { db } from '../firebaseConfig';
 
 export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
-  console.log("totalCookTime", totalCookTime, "date", date, "time", time)
+  const formattedTime = new Date(time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+  console.log("Booking time slot, totalCookTime", totalCookTime, "date", date, "formatted time: ", formattedTime)
 	
 	try {
 			const response = await fetch(`https://state-cafe.vercel.app/timeslots/book-timeslot`, {
@@ -13,7 +14,7 @@ export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
 					body: JSON.stringify({
 							totalCookTime, // total cook time in minutes
 							date, // selected date in 'YYYY-MM-DD' format
-							time, // selected time slot in 'HH:MM' format
+							time: formattedTime, // selected time slot in 'HH:MM' format
 					}),
 			});
 

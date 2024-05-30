@@ -191,7 +191,7 @@ const handleRemoveTimeslot = async (req, res) => {
 const handle_get_available_timeslots = async (req, res) => {
   try {
     const date = req.query.date; // Expecting date in YYYY-MM-DD format
-    console.log('date:', date);
+    console.log('date:', date); 
 
     if (!date) {
       return res.status(400).json({ error: 'Date query parameter is required.' });
@@ -200,17 +200,17 @@ const handle_get_available_timeslots = async (req, res) => {
     const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10); // Cook time in seconds
     console.log('totalCookTimeInSeconds:', totalCookTimeInSeconds);
 
-    const deliveryTimeInMinutes = 6; // Fixed delivery time in minutes
+    const deliveryTimeInMinutes = 5; // Fixed delivery time in minutes
     const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
     console.log('totalOrderExecutionInMinutes:', totalOrderExecutionTimeInMinutes);
 
     // Current time in UTC
     let now = new Date();
-    console.log('now (UTC):', now);
+    //console.log('now (UTC):', now);
 
     // Convert current time to local time for debugging purposes (optional)
     let localNow = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-    console.log('now (Local):', localNow);
+    //console.log('now (Local):', localNow);
 
     const docRef = db.collection('time_slots').doc(date);
     const doc = await docRef.get();
@@ -219,10 +219,18 @@ const handle_get_available_timeslots = async (req, res) => {
       return res.status(404).json({ error: 'Daily slots document not found.' });
     }
 
-    const slots = doc.data().slots.map(slot => ({
-      ...slot,
-      time: slot.time.toDate() // Convert Firestore timestamp to Date
-    }));
+    console.log("doc.data(): ", doc.data().slots[0].time)
+
+    const slots = doc.data().slots.map(slot => {
+      // Convert Firestore timestamp to Date object in UTC
+      const utcTime = slot.time.toDate();
+      // Create a new Date object adjusted to the 'America/New_York' timezone
+      const localTime = new Date(utcTime.toLocaleString('en-US', { timeZone: 'America/New_York' }));
+      return {
+        ...slot,
+        time: localTime
+      };
+    });
 
     console.log('slots:', slots);
 
@@ -230,7 +238,7 @@ const handle_get_available_timeslots = async (req, res) => {
 
     // Iterate through slots, checking for availability and sufficiency of consecutive slots
     for (let i = 0; i < slots.length; i++) {
-      console.log(`Checking slot ${i} at ${slots[i].time}`);
+      //console.log(`Checking slot ${i} at ${slots[i].time}`);
       if (slots[i].isAvailable && slots[i].time >= now) {
         let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
         if (sequenceEndIndex < slots.length) {
@@ -249,7 +257,7 @@ const handle_get_available_timeslots = async (req, res) => {
       }
     }
 
-    console.log('availableTimeSlots:', availableTimeSlots);
+    //console.log('availableTimeSlots:', availableTimeSlots);
     res.json({ availableTimeSlots: availableTimeSlots });
   } catch (error) {
     console.error('Error fetching available time slots:', error);
@@ -257,52 +265,67 @@ const handle_get_available_timeslots = async (req, res) => {
   }
 };
 
-
 async function bookSlots(date, startTime, endTime) {
+  // Everything between start and end times (inclusive) should be marked false for the isAvailable property.
 	const dateId = date; // Assuming date is already in YYYY-MM-DD format
 	const docRef = db.collection('time_slots').doc(dateId);
 	const doc = await docRef.get();
 
 	if (doc.exists) {
-			let slots = doc.data().slots;
-			let isUpdated = false;
+		let slots = doc.data().slots;
+		let isUpdated = false;
 
-			slots = slots.map(slot => {
-					const slotTime = slot.time.toDate();
-					if (slotTime >= startTime && slotTime <= endTime) {
-							isUpdated = true;
-							return { ...slot, isAvailable: false }; 
-					}
-					return slot;
-			});
-
-			// Update Firestore only if changes were made
-			if (isUpdated) {
-					await docRef.set({ slots });
+		slots = slots.map(slot => {
+			const slotTime = slot.time.toDate();
+			if (slotTime >= startTime && slotTime <= endTime) {
+				isUpdated = true;
+				return { ...slot, isAvailable: false }; 
 			}
+			return slot;
+		});
+
+		// Update Firestore only if changes were made
+		if (isUpdated) {
+			await docRef.set({ slots });
+		}
 	} else {
-			console.log(`No slots found for ${dateId}.`);
+		console.log(`No slots found for ${dateId}.`);
 	}
 }
 
+
 const handleBookTimeslot = async (req, res) => {
-	const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
-	const deliveryBuffer = 5; // 5 minutes for delivery buffer
+  // TIMELINE
+  // 5 minutes before delivery slot | delivery minute | two minutes to get home
+  // (handle_get_available_timeslots only shows slots for delivery after accounting for five minute pack and delivery)
+  // In this function, I want to set start and end times as follows:
+  // start time: five minutes before the minute time slot that the customer selected for delivery
+  // end time: block off two minutes after the delivery slot to allow the order deliverer to return to the cafe, so end time should be 2 minutes after the delivery slot
+  const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
+  const returnBuffer = 2; // 2 minutes to get back to the café
+  const preDeliveryBuffer = 5; // 5 minutes before the delivery slot
 
-	try {
-			// Calculate end time based on totalCookTime and deliveryBuffer
-			const startTime = new Date(`${date}T${time}`);
-			const endTime = new Date(startTime.getTime() + totalCookTime * 60000 + deliveryBuffer * 60000);
+  console.log('date: ', date, "time: ", time);
 
-			// Book the slots
-			await bookSlots(date, startTime, endTime);
+  try {
+    // Calculate start and end times
+    const deliveryTime = new Date(`${date}T${time}`);
+    const startTime = new Date(deliveryTime.getTime() - preDeliveryBuffer * 60000);
+    const endTime = new Date(deliveryTime.getTime() + returnBuffer * 60000);
 
-			res.send("Time slots booked successfully.");
-	} catch (error) {
-			console.error("Error booking time slots:", error);
-			res.status(500).send("Failed to book time slots.");
-	}
+    console.log('startTime: ', startTime.toLocaleTimeString(), "endTime: ", endTime.toLocaleTimeString());
+    
+    // Book the slots
+    await bookSlots(date, startTime, endTime);
+
+    res.send({message: "Time slots booked successfully."});
+  } catch (error) {
+    console.error("Error booking time slots:", error);
+    res.status(500).send("Failed to book time slots.");
+  }
 };
+
+
 
 async function populateSlotsForDate(date, startHour, endHour) {
   const dateId = date.toISOString().split('T')[0];

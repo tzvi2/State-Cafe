@@ -34,11 +34,12 @@ export default function DeliverySlotProvider({ children }) {
   }, [phoneNumber]);
 
   useEffect(() => {
-    console.log('number', phoneNumber)
+    //console.log('number', phoneNumber)
   }, [phoneNumber])
 
   useEffect(() => {
     localStorage.setItem('deliverySlot', JSON.stringify(deliverySlot));
+    console.log('delivery slot: ', deliverySlot)
   }, [deliverySlot]);
 
   useEffect(() => {
@@ -46,6 +47,7 @@ export default function DeliverySlotProvider({ children }) {
   }, [deliveryDate]);
 
   const clearDeliveryDetails = () => {
+    console.log("clearing delivery details")
     setDeliverySlot("");
     setUnitNumber("");
     setDeliveryDate("");

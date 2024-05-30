@@ -22,7 +22,29 @@ const OrderConfirmation = () => {
   const { deliverySlot, unitNumber, deliveryDate, phoneNumber, clearDeliveryDetails } = useDeliveryDetails();
   const [savedOrder, setSavedOrder] = useState({});
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
+
+  const saveOrderToDatabase = async (paymentIntentId, orderDetails) => {
+    try {
+      const savedOrderResponse = await saveOrder(orderDetails);
+      setSavedOrder(savedOrderResponse);
+
+      // Book the time slot
+      await bookTimeSlot({
+        totalCookTime: cart.totalCookTime,
+        date: deliveryDate,
+        time: deliverySlot,
+      });
+
+      // Mark the order as saved in localStorage to prevent duplicates
+      localStorage.setItem(`orderSaved_${paymentIntentId}`, 'true');
+
+      // Save order details in local storage for future reference
+      localStorage.setItem(`orderDetails_${paymentIntentId}`, JSON.stringify(savedOrderResponse));
+    } catch (error) {
+      console.error('Error saving order to database:', error);
+      // Handle error (e.g., notify the user)
+    }
+  };
 
   useEffect(() => {
     const processOrder = async () => {
@@ -35,52 +57,48 @@ const OrderConfirmation = () => {
 
       if (paymentIntentId && !localStorage.getItem(`orderSaved_${paymentIntentId}`)) {
         try {
-          const cardDetails = await getLastFourDigits(paymentIntentId);
+          const cardInfo = await getLastFourDigits(paymentIntentId);
+
           const orderDetails = {
             items: cart.items,
             totalPrice: cart.totalPrice,
             deliverySlot,
             unitNumber,
-            lastFourDigits: cardDetails.lastFour,
-            cardBrand: cardDetails.brand,
+            lastFourDigits: cardInfo.lastFour,
+            cardBrand: cardInfo.brand,
             paymentIntentId,
-            phoneNumber
+            phoneNumber,
+            deliveryAddress: unitNumber,
+            deliveryTime: deliverySlot,
+            orderedAt: new Date().toISOString(), // Add orderedAt for consistency
           };
 
-          const savedOrderResponse = await saveOrder(orderDetails);
-          setSavedOrder(savedOrderResponse);
-
-          // Book the time slot
-          await bookTimeSlot({
-            totalCookTime: cart.totalCookTime,
-            date: deliveryDate,
-            time: deliverySlot,
-          });
-
-          // Mark the order as saved in localStorage to prevent duplicates
-          localStorage.setItem(`orderSaved_${paymentIntentId}`, 'true');
-
-          // Clear the cart and delivery details after successful order processing
-          clearCart()
-          clearDeliveryDetails();
+          await saveOrderToDatabase(paymentIntentId, orderDetails);
           
         } catch (error) {
           console.error('Error processing order:', error);
           // Handle error (e.g., notify the user)
+        } finally {
+          // Clear the cart and delivery details after attempting to process the order, regardless of success or failure
+          clearCart();
+          clearDeliveryDetails();
         }
       } else if (paymentIntentId) {
+        console.log('Order already saved, fetching from local storage');
         // If the order was previously saved, retrieve it from localStorage
-        const existingOrders = JSON.parse(localStorage.getItem('orderDetails')) || {};
-        if (existingOrders[paymentIntentId]) {
-          setSavedOrder(existingOrders[paymentIntentId]);
+        const existingOrder = JSON.parse(localStorage.getItem(`orderDetails_${paymentIntentId}`));
+        if (existingOrder) {
+          setSavedOrder(existingOrder);
         }
+        // Clear the cart and delivery details in case the order was already saved
+        clearCart();
+        clearDeliveryDetails();
       }
       setIsLoading(false); // Data has been loaded
     };
 
     processOrder();
-    
-  }, [cart, deliverySlot, unitNumber, deliveryDate, clearCart, clearDeliveryDetails]);
+  }, []); // Empty array means the effect runs only once
 
   // Helper function to convert integers to money format
   const intToMoneyString = (amount) => {
@@ -93,11 +111,10 @@ const OrderConfirmation = () => {
     <div className={styles.confirmationCard}>
       <h2>Your order is complete!</h2>
       <div className={styles.rows}>
-        {/* <OrderDetailsRow label="Order ID" value={savedOrder.orderId || 'N/A'} isLoading={isLoading} /> */}
         <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} isLoading={isLoading} />
         <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} isLoading={isLoading} />
         <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} isLoading={isLoading} />
-        <OrderDetailsRow label="Delivery" value={`Unit ${unitNumber} by ${formatIsoToTime(deliverySlot)}`} isLoading={isLoading} />
+        <OrderDetailsRow label="Delivery" value={`Unit ${savedOrder.deliveryAddress} by ${formatIsoToTime(savedOrder.deliveryTime)}`} isLoading={isLoading} />
       </div>
       <p>Something not right? <br/> Contact us: (551) 837-9907</p>
     </div>

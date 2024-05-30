@@ -63,11 +63,20 @@ nav {
     display: none;
   }
 
-  .menu {
+.menu {
     position: absolute;
     top: 15vw;
     width: 100%;
     padding-left: 1rem;  
+}
+
+.menuLink {
+    border: 1px solid black;
+    padding: .5vw 1vw;
+}
+
+.menuLink .isActive {
+    border: 1px solid white;
 }
 
 ul {

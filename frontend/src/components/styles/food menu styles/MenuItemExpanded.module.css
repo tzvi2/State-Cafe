@@ -108,6 +108,7 @@ img {
 	align-items: center;
 	justify-content: space-between;
 	flex-grow: 2;
+	text-align: center;
 	padding: 2%;
 	cursor: pointer;
 }

@@ -4,11 +4,13 @@ import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useCart } from '../../hooks/useCart';
 import { formatIsoToTime, formatTimeTo12Hour } from '../../utils/timeUtilities';
 import { filterTimeSlots } from '../../utils/timeSlotUtilities';
-import styles from '../styles/checkout process styles/DeliveryPage.module.css'
+import styles from '../styles/checkout process styles/DeliveryPage.module.css';
+import { bookTimeSlot } from '../../api/timeslotRequests';
 
 function DeliveryPage() {
     const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
-    const {cart} = useCart()
+    const [deliveryAvailable, setDeliveryAvailable] = useState(true);
+    const { cart } = useCart();
     const { setDeliverySlot, setUnitNumber, unitNumber, deliverySlot, setDeliveryDate, deliveryDate, phoneNumber, setPhoneNumber } = useDeliveryDetails();
     const navigate = useNavigate();
 
@@ -56,20 +58,20 @@ function DeliveryPage() {
         if (deliveryDate !== "" && cart.totalCookTime > 0) {
             fetchTimeSlots(deliveryDate);
         }
-        
     }, [deliveryDate, cart.totalCookTime]); 
 
     const handlePhoneNumberChange = (e) => {
         setPhoneNumber(e.target.value);
     };
 
-  
     const fetchTimeSlots = async () => {
         try {
             const response = await fetch(`https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
             if (!response.ok) throw new Error('Network response was not ok');
     
             const { availableTimeSlots } = await response.json();
+
+            console.log('available timeslots: ', availableTimeSlots)
     
             // Map to create objects with both `time` and `displayTime`
             let fetchedSlots = availableTimeSlots.map(slot => ({
@@ -77,17 +79,18 @@ function DeliveryPage() {
                 displayTime: timeFormatter.format(new Date(slot))
             }));
     
-            console.log('fetched slots', fetchedSlots)
+            //console.log('fetched slots', fetchedSlots);
             // Apply the filterTimeSlots function to narrow down to 5-minute intervals
             fetchedSlots = filterTimeSlots(fetchedSlots);
     
             setAvailableTimeSlots(fetchedSlots);
+            setDeliveryAvailable(fetchedSlots.length > 0);
         } catch (error) {
-            setAvailableTimeSlots([])
+            setAvailableTimeSlots([]);
+            setDeliveryAvailable(false);
             console.error('There was a problem with the fetch operation:', error);
         }
     };
-    
 
     const handleSlotSelection = (e) => {
         // The value is the ISO time string for accurate timestamp selection
@@ -98,9 +101,6 @@ function DeliveryPage() {
         setUnitNumber(e.target.value);
     };
 
-    
-    
-
     const handleSubmit = () => {
         if (unitNumber && deliverySlot && deliveryDate) {
             navigate('/payment');
@@ -108,6 +108,15 @@ function DeliveryPage() {
             alert('Please select both your apartment number and a delivery slot.');
         }
     };
+
+    const temporaryBooker = async () => {
+        console.log('booken')
+        await bookTimeSlot({
+            totalCookTime: cart.totalCookTime,
+            date: deliveryDate,
+            time: deliverySlot,
+          });
+    }
 
     const isDaySelected = (dateStr) => deliveryDate === dateStr;
 
@@ -152,22 +161,25 @@ function DeliveryPage() {
 
             {deliveryDate !== "" && (
                 <>
-                    <select className={styles.wideBtn} value={deliverySlot} onChange={handleSlotSelection}>
-                        <option value="">Select a time</option>
-                        {availableTimeSlots.map(slot => (
-                            <option 
-                                key={slot.time} 
-                                value={slot.time}
-                                className={slot.displayTime.endsWith('AM') ? styles.morningHours : styles.eveningHours}
-                            >
-                            {slot.displayTime}
-                            </option>
-                        ))}
-                    </select>
+                    {deliveryAvailable ? (
+                        <select className={styles.wideBtn} value={deliverySlot} onChange={handleSlotSelection}>
+                            <option value="">Select a time</option>
+                            {availableTimeSlots.map(slot => (
+                                <option 
+                                    key={slot.time} 
+                                    value={slot.time}
+                                    className={slot.displayTime.endsWith('AM') ? styles.morningHours : styles.eveningHours}
+                                >
+                                {slot.displayTime}
+                                </option>
+                            ))}
+                        </select>
+                    ) : (
+                        <div style={{textAlign: "center"}}>Delivery not Available</div>
+                    )}
 
-                    
-
-                    <button className={styles.wideBtn} onClick={handleSubmit}>Proceed to Checkout</button>
+                    <button className={styles.wideBtn} onClick={handleSubmit} disabled={!deliveryAvailable}>Proceed to Checkout</button>
+                    {/* <button className={styles.wideBtn} onClick={temporaryBooker} disabled={!deliveryAvailable}>Proceed to Checkout</button> */}
                 </>
             )}
         </div>
