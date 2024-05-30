@@ -1,4 +1,3 @@
-// EditMenuItem.js
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMenuItemByItemId, updateMenuItem } from '../../api/menuRequests';
@@ -45,7 +44,7 @@ const EditMenuItem = () => {
   const uploadImage = () => {}
 
   const handleImageChange = async (e) => {
-    return
+    return;
     const file = e.target.files[0];
     if (file) {
       const imageUrl = await uploadImage(file); // Use your actual API call to upload the image
@@ -60,7 +59,6 @@ const EditMenuItem = () => {
 
   const handleOptionChange = (index, e, isGroup = false, groupIndex = null) => {
     const { name, value } = e.target;
-
     const numericValue = name === 'price' || name === 'timeToCook' ? parseFloat(value) : value;
   
     if (isGroup) {
@@ -90,7 +88,7 @@ const EditMenuItem = () => {
       // Handling changes to individual options
       setMenuItem(prevState => ({
         ...prevState,
-        options: prevState.options.map((option, optIdx) => optIdx === index ? { ...option, [name]: value } : option),
+        options: prevState.options.map((option, optIdx) => optIdx === index ? { ...option, [name]: numericValue } : option),
       }));
     }
   };
@@ -148,8 +146,30 @@ const EditMenuItem = () => {
   };
   
   const handleSubmit = async (e) => {
-    console.log('description: ', menuItem.description)
     e.preventDefault();
+
+    // Validate that price and time to cook are numbers
+    const validateOptions = (options) => {
+      for (let option of options) {
+        if (isNaN(option.price) || isNaN(option.timeToCook)) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    if (!validateOptions(menuItem.options)) {
+      alert('Please ensure all option prices and time to cook are numbers.');
+      return;
+    }
+
+    for (let group of menuItem.optionGroups) {
+      if (!validateOptions(group.options)) {
+        alert('Please ensure all group option prices and time to cook are numbers.');
+        return;
+      }
+    }
+
     try {
       await updateMenuItem(menuItem);
       alert('Menu item updated successfully');
