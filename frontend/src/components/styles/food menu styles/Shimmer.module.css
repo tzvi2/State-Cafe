@@ -1,0 +1,47 @@
+@keyframes shimmer {
+  0% {
+    background-position: -468px 0;
+  }
+  100% {
+    background-position: 468px 0;
+  }
+}
+
+.shimmerWrapper {
+  display: flex;
+  border: 1px solid #515B2F;
+  border-radius: 15px;
+  padding: .75rem;
+  margin: 3% 0;
+  width: 80%;
+	height: 128px;
+  box-shadow: 1px 1px 3px rgba(81, 91, 47, .4);
+  position: relative;
+  overflow: hidden;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #f6f7f8 8%, #e8e8e8 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.5s infinite linear forwards;
+}
+
+.shimmerText {
+  width: 100%;
+  height: 15px;
+  background: #f0f0f0;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+@media (min-width: 550px) {
+  .shimmerWrapper {
+    width: 60%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .shimmerWrapper {
+    width: 30%;
+    margin: .75rem;
+    padding: .5rem;
+  }
+}

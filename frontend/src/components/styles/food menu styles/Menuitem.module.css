@@ -6,6 +6,7 @@
     padding: .75rem;
     margin: 3% 0;
     width: 80%;
+    height: 128px;
     box-shadow: 1px 1px 3px rgba(81, 91, 47, .4);
     color: black;
 }
