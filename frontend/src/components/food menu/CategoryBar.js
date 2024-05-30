@@ -1,19 +1,21 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styles from '../styles/food menu styles/CategoryBar.module.css';
-import CategoryBarLink from './CategoryBarLink'; // Ensure this path is correct
 
-function CategoryBar({categories, activeCategory, setActiveCategory}) {
+function capitalizeFirstLetter(string) {
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
 
-
+const CategoryBar = ({ categories, activeCategory, setActiveCategory }) => {
   return (
     <div className={styles.categoryBar}>
       {categories.map(category => (
-        <CategoryBarLink
+        <button
           key={category}
-          to={category}
-          active={activeCategory === category}
+          className={`${styles.categoryButton} ${activeCategory === category ? styles.active : ''}`}
           onClick={() => setActiveCategory(category)}
-        />
+        >
+          {capitalizeFirstLetter(category)}
+        </button>
       ))}
     </div>
   );

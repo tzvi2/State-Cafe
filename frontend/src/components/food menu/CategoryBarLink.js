@@ -7,19 +7,14 @@ function capitalizeFirstLetter(string) {
 }
 
 const CategoryBarLink = ({ to, active, onClick }) => {
-
   const className = active ? styles.active : '';
   return (
-    <Link
+    <a
       className={className} 
-      to={to}
-      spy={true}
-      smooth={true}
-      duration={500}
-      onClick={onClick}
+  
     >
       {capitalizeFirstLetter(to)}
-    </Link>
+    </a>
   );
 }
 

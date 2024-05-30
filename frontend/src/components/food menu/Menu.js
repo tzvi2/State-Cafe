@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Menuitem from "./Menuitem";
 import CategoryBar from "./CategoryBar";
-import Shimmer from "./Shimmer"; // Import the Shimmer component
+import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
 import { getQuickViewMenu } from "../../api/menuRequests";
 
@@ -12,6 +12,7 @@ export default function Menu() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const categoryRefs = useRef({});
+  const categoryBarRef = useRef(null);
 
   useEffect(() => {
     setIsLoading(true);
@@ -25,15 +26,17 @@ export default function Menu() {
   }, []);
 
   const handleScroll = () => {
-    const halfwayPoint = window.innerHeight / 2 + window.scrollY;
+    const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
+    const scrollTop = window.scrollY;
+    const highlightPosition = scrollTop + categoryBarHeight + 130;
+
     let newActiveCategory = null;
 
-    // Determine which category is at the halfway point
     categories.forEach(category => {
       const el = categoryRefs.current[category];
       if (el) {
-        const { offsetTop, clientHeight } = el;
-        if (offsetTop <= halfwayPoint && (offsetTop + clientHeight) >= halfwayPoint) {
+        const { offsetTop } = el;
+        if (offsetTop <= highlightPosition) {
           newActiveCategory = category;
         }
       }
@@ -44,6 +47,23 @@ export default function Menu() {
     }
   };
 
+  const handleCategoryClick = (category) => {
+    const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
+    const extraOffset = 120; // Additional margin for better visibility
+    const categoryElement = categoryRefs.current[category];
+    const elementPosition = categoryElement.getBoundingClientRect().top + window.pageYOffset;
+    const offsetPosition = elementPosition - categoryBarHeight - extraOffset;
+
+    window.scrollTo({
+      top: offsetPosition,
+      left: 0,
+      behavior: 'smooth'
+    });
+
+    // Set active category immediately on click
+    //setActiveCategory(category);
+  };
+
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -51,12 +71,17 @@ export default function Menu() {
 
   return (
     <>
-      <CategoryBar categories={categories} activeCategory={activeCategory} setActiveCategory={setActiveCategory} />
+      <CategoryBar 
+        categories={categories} 
+        activeCategory={activeCategory} 
+        setActiveCategory={handleCategoryClick} 
+        ref={categoryBarRef}
+      />
       <div className={styles.menuContainer}>
         {categories.map((category) => (
           <div
             key={category}
-            id={category} // Ensure this id matches the `to` prop being passed to CategoryBarLink
+            id={category}
             ref={(el) => categoryRefs.current[category] = el}
             className={styles.categoryContainer}>
             <div className={styles.menu}>
