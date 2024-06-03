@@ -4,8 +4,17 @@ import CategoryBar from "./CategoryBar";
 import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
 import { getQuickViewMenu } from "../../api/menuRequests";
+import { getStockForDate } from "../../api/stockRequests";
 
 const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", "soup", "coffee"];
+
+const getLocalDate = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
@@ -18,7 +27,16 @@ export default function Menu() {
     setIsLoading(true);
     const fetchQuickView = async () => {
       const items = await getQuickViewMenu();
-      setMenuItems(items);
+      const dateString = getLocalDate();
+      const stockData = await getStockForDate(dateString);
+      
+      // Merge stock data with menu items
+      const itemsWithStock = items.map(item => ({
+        ...item,
+        quantity: stockData[item.itemId]?.quantity || 0
+      }));
+
+      setMenuItems(itemsWithStock);
       setIsLoading(false);
     };
 

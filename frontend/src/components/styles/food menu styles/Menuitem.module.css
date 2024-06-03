@@ -9,69 +9,73 @@
     height: 128px;
     box-shadow: 1px 1px 3px rgba(81, 91, 47, .4);
     color: black;
-}
-
-.menuItem.inactiveItem {
-    /* opacity: 0.5;  */
-    pointer-events: none; /* Disable interactions */
-    color: #ccc5c5; /* Change the text color to a lighter shade */
-    background-color: #f0f0f0; /* Optional: change background to indicate inactive state */
-}
-
-.menuItem.inactiveItem .menuPhoto {
-    opacity: .5;
-}
-
-.menuPhoto {
+  }
+  
+  .menuItem.inactiveItem {
+    opacity: 0.5;
+    pointer-events: none;
+    color: #a0a0a0;
+    background-color: #f0f0f0;
+    display: none;
+  }
+  
+  .menuPhoto {
     height: 15vh;
     width: 15vh;
     border-radius: 5px;
     box-shadow: 1px 1px 4px grey;
     margin: 0;
-}
-
-.textBox {
-   flex-grow: 2;
-   text-align: center;
-   font-size: 1rem;
-   padding-left: .75rem;
-}
-
-.textBox h2 {
+  }
+  
+  .textBox {
+    flex-grow: 2;
+    text-align: center;
+    font-size: 1rem;
+    padding-left: .75rem;
+  }
+  
+  .textBox h2 {
     font-weight: 500;
     font-size: 1.25rem;
-}
-
-.textBox h4 {
+  }
+  
+  .textBox h4 {
     margin: 0;
-}
-
-.textBox .unavailableText {
-    color: red; /* or any other color to make it noticeable */
-    font-size: 1rem; /* slightly smaller than the price */
-    margin-top: 0.5rem; /* space it from the other text */
-}
-
-@media (min-width: 550px) {
-	.menuItem {
-        width: 60%;
+  }
+  
+  .stockMessage {
+    font-weight: bold;
+  }
+  
+  .outOfStock {
+    color: red;
+  }
+  
+  .lowStock {
+    color: green;
+  }
+  
+  @media (min-width: 550px) {
+    .menuItem {
+      width: 60%;
     }
-}
-
-@media (min-width: 1024px) {
-	.menuItem {
-        width: 30%;
-        margin: .75rem;
-        padding: .5rem;
+  }
+  
+  @media (min-width: 1024px) {
+    .menuItem {
+      width: 30%;
+      margin: .75rem;
+      padding: .5rem;
     }
-
+  
     .menuPhoto {
-        border-radius: 10px;
-        height: 8rem;
-        width: 8rem;
+      border-radius: 10px;
+      height: 8rem;
+      width: 8rem;
     }
-
+  
     .textBox {
-        padding-left: .5rem;
+      padding-left: .5rem;
     }
-}
+  }
+  

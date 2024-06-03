@@ -5,6 +5,7 @@ import BackArrow from '../BackArrow';
 import styles from '../styles/food menu styles/MenuItemExpanded.module.css';
 import { useCart } from '../../hooks/useCart';
 import { getMenuItemByItemId } from '../../api/menuRequests';
+import { getStockForDate } from '../../api/stockRequests'; // Import stock request
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { capitalizeFirstLetters } from '../../utils/stringUtilities';
 
@@ -15,6 +16,7 @@ function MenuItemExpanded() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
+  const [quantityLeft, setQuantityLeft] = useState(0); // State to track quantity left
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Order",
@@ -28,6 +30,10 @@ function MenuItemExpanded() {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
       setMenuItem(data);
+
+      const dateString = getLocalDate();
+      const stockData = await getStockForDate(dateString);
+      setQuantityLeft(stockData[itemId]?.quantity || 0); // Set quantity left from stock data
     };
     fetchData();
   }, [itemId]);
@@ -75,15 +81,15 @@ function MenuItemExpanded() {
   useEffect(() => {
     if (menuItem.price !== undefined) {
       let newButtonContent = {
-        text: "Add to Order ",
-        amount: centsToFormattedPrice(totalItemPrice)
+        text: quantityLeft === 0 ? "Out of Stock" : "Add to Order ",
+        amount: quantityLeft === 0 ? "" : centsToFormattedPrice(totalItemPrice)
       };
       setButtonContent(newButtonContent);
     }
-  }, [selectedOptions, quantity, menuItem]);
+  }, [selectedOptions, quantity, menuItem, quantityLeft]);
 
   const handleAddToCart = async () => {
-    if (buttonLocked || !menuItem) return;
+    if (buttonLocked || !menuItem || quantityLeft === 0) return;
 
     const validationErrors = validateOptionSelections();
     if (validationErrors.length > 0) {
@@ -91,12 +97,21 @@ function MenuItemExpanded() {
       return;
     }
 
+    if (quantity > quantityLeft) {
+      const userConfirmed = window.confirm(`Only ${quantityLeft} left in stock. Would you like to add the remaining ${quantityLeft} to your cart?`);
+      if (!userConfirmed) {
+        return;
+      } else {
+        setQuantity(quantityLeft); // Set quantity to the remaining quantity
+      }
+    }
+
     setButtonLocked(true);
 
     const wasAdded = addToCart({
       ...menuItem,
       options: selectedOptions,
-      quantity,
+      quantity: Math.min(quantity, quantityLeft), // Add the minimum of desired quantity and quantity left
       total: totalItemPrice,
     });
 
@@ -140,14 +155,23 @@ function MenuItemExpanded() {
         />
 
         <div className={styles.footer}>
-          <select className={styles.quantity} defaultValue={1} onChange={(e) => setQuantity(parseInt(e.target.value))}>
-            {[...Array(10).keys()].map(n => (
+          <select 
+            className={styles.quantity} 
+            defaultValue={1} 
+            onChange={(e) => setQuantity(parseInt(e.target.value))}
+            disabled={quantityLeft === 0} // Disable if out of stock
+          >
+            {[...Array(Math.min(10, quantityLeft)).keys()].map(n => (
               <option key={n} value={n + 1}>{n + 1}</option>
             ))}
           </select>
-          <button className={styles.addToCart} disabled={buttonLocked} onClick={handleAddToCart}>
+          <button 
+            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${quantityLeft === 0 ? styles.outOfStock : ''}`} 
+            disabled={buttonLocked || quantityLeft === 0} // Disable if out of stock
+            onClick={handleAddToCart}
+          >
             <span>{buttonContent.text}</span>
-            <span>{buttonContent.amount}</span>
+            {buttonContent.amount && <span>{buttonContent.amount}</span>}
           </button>
         </div>
       </div>
@@ -157,3 +181,11 @@ function MenuItemExpanded() {
 }
 
 export default MenuItemExpanded;
+
+function getLocalDate() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
