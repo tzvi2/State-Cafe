@@ -12,10 +12,14 @@
 }
 
 .menuItem.inactiveItem {
-    opacity: 0.5; /* Make the item appear faded */
+    /* opacity: 0.5;  */
     pointer-events: none; /* Disable interactions */
-    color: #a0a0a0; /* Change the text color to a lighter shade */
+    color: #ccc5c5; /* Change the text color to a lighter shade */
     background-color: #f0f0f0; /* Optional: change background to indicate inactive state */
+}
+
+.menuItem.inactiveItem .menuPhoto {
+    opacity: .5;
 }
 
 .menuPhoto {
@@ -42,10 +46,15 @@
     margin: 0;
 }
 
+.textBox .unavailableText {
+    color: red; /* or any other color to make it noticeable */
+    font-size: 1rem; /* slightly smaller than the price */
+    margin-top: 0.5rem; /* space it from the other text */
+}
+
 @media (min-width: 550px) {
 	.menuItem {
         width: 60%;
-    
     }
 }
 
@@ -62,10 +71,7 @@
         width: 8rem;
     }
 
-    
-
     .textBox {
         padding-left: .5rem;
     }
-
 }

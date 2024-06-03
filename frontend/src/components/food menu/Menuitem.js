@@ -11,6 +11,7 @@ const Menuitem = React.memo(function Menuitem({ item }) {
             <div className={styles.textBox}>
                 <h2>{item.title}</h2>
                 <h4>{centsToFormattedPrice(item.price)}</h4>
+                {!item.active && <p className={styles.unavailableText}>Product Unavailable</p>}
             </div>
         </Link>
     );
