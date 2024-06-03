@@ -8,6 +8,7 @@ const orderRoutes = require('./src/api/routes/orderRoutes');
 const configRoutes = require('./src/api/routes/configRoutes');
 const timeslotRoutes = require('./src/api/routes/timeslotRoutes');
 const editMenuRoutes = require('./src/api/routes/editMenuRoutes');
+const stockRoutes = require('./src/api/routes/stockRoutes')
 const morgan = require('morgan');
 const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandler');
 const helmet = require('helmet');
@@ -58,6 +59,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/config', configRoutes);
 app.use('/timeslots', timeslotRoutes);
+app.use('/stock', stockRoutes)
 app.post('/upload', upload.single('image'), handleFileUpload);
 
 app.listen(8000, () => {
