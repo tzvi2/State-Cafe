@@ -244,6 +244,7 @@ const handle_get_available_timeslots = async (req, res) => {
             }
           }
           if (allFollowingSlotsAvailable) {
+            console.log('yes')
             availableTimeSlots.push(slots[sequenceEndIndex].time.toISOString());
           }
         }

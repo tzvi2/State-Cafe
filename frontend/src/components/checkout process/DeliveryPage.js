@@ -51,7 +51,7 @@ function DeliveryPage() {
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
   const fetchTimeSlots = useCallback(async () => {
-    const url = `https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
+    const url = `http://localhost:8000/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
     console.log(`Fetching time slots from: ${url}`);
 
     try {

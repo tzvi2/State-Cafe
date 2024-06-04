@@ -1,5 +1,4 @@
-require('dotenv').config()
-
+require('dotenv').config();
 const express = require("express");
 const cors = require("cors");
 const menuRoutes = require('./src/api/routes/menuRoutes');
@@ -8,7 +7,7 @@ const orderRoutes = require('./src/api/routes/orderRoutes');
 const configRoutes = require('./src/api/routes/configRoutes');
 const timeslotRoutes = require('./src/api/routes/timeslotRoutes');
 const editMenuRoutes = require('./src/api/routes/editMenuRoutes');
-const stockRoutes = require('./src/api/routes/stockRoutes')
+const stockRoutes = require('./src/api/routes/stockRoutes');
 const morgan = require('morgan');
 const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandler');
 const helmet = require('helmet');
@@ -36,15 +35,21 @@ const corsOptions = {
 };
 
 const app = express();
+
+// Set the trust proxy setting
+app.set('trust proxy', 1);
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
-
 app.use(helmet());
-app.use(rateLimit({
+
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-}));
+});
+
+app.use(limiter);
 
 app.options('*', cors(corsOptions)); // Preflight handling
 
@@ -59,7 +64,7 @@ app.use('/api/payment', paymentRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/config', configRoutes);
 app.use('/timeslots', timeslotRoutes);
-app.use('/stock', stockRoutes)
+app.use('/stock', stockRoutes);
 app.post('/upload', upload.single('image'), handleFileUpload);
 
 app.listen(8000, () => {
