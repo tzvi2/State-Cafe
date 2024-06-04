@@ -190,25 +190,27 @@ const handleRemoveTimeslot = async (req, res) => {
 
 const handle_get_available_timeslots = async (req, res) => {
   try {
-    const date = req.query.date;
-    console.log('Received date:', date);
+    const date = req.query.date; // Expecting date in YYYY-MM-DD format
+    console.log('date:', date); 
 
     if (!date) {
       return res.status(400).json({ error: 'Date query parameter is required.' });
     }
 
-    const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10);
-    console.log('Total cook time in seconds:', totalCookTimeInSeconds);
+    const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10); // Cook time in seconds
+    console.log('totalCookTimeInSeconds:', totalCookTimeInSeconds);
 
-    const deliveryTimeInMinutes = 5;
+    const deliveryTimeInMinutes = 5; // Fixed delivery time in minutes
     const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
-    console.log('Total order execution time in minutes:', totalOrderExecutionTimeInMinutes);
+    console.log('totalOrderExecutionInMinutes:', totalOrderExecutionTimeInMinutes);
 
+    // Current time in UTC
     let now = new Date();
-    console.log('Current time (UTC):', now);
+    //console.log('now (UTC):', now);
 
-    const localNow = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-    console.log('Current time (Local):', localNow);
+    // Convert current time to local time for debugging purposes (optional)
+    let localNow = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
+    //console.log('now (Local):', localNow);
 
     const docRef = db.collection('time_slots').doc(date);
     const doc = await docRef.get();
@@ -217,8 +219,12 @@ const handle_get_available_timeslots = async (req, res) => {
       return res.status(404).json({ error: 'Daily slots document not found.' });
     }
 
+    console.log("doc.data(): ", doc.data().slots[0].time)
+
     const slots = doc.data().slots.map(slot => {
+      // Convert Firestore timestamp to Date object in UTC
       const utcTime = slot.time.toDate();
+      // Create a new Date object adjusted to the 'America/New_York' timezone
       const localTime = new Date(utcTime.toLocaleString('en-US', { timeZone: 'America/New_York' }));
       return {
         ...slot,
@@ -226,11 +232,13 @@ const handle_get_available_timeslots = async (req, res) => {
       };
     });
 
-    console.log('Slots:', slots);
+    console.log('slots:', slots);
 
     const availableTimeSlots = [];
 
+    // Iterate through slots, checking for availability and sufficiency of consecutive slots
     for (let i = 0; i < slots.length; i++) {
+      //console.log(`Checking slot ${i} at ${slots[i].time}`);
       if (slots[i].isAvailable && slots[i].time >= now) {
         let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
         if (sequenceEndIndex < slots.length) {
@@ -242,13 +250,14 @@ const handle_get_available_timeslots = async (req, res) => {
             }
           }
           if (allFollowingSlotsAvailable) {
+            // Add the ending slot's time as an available time slot
             availableTimeSlots.push(slots[sequenceEndIndex].time.toISOString());
           }
         }
       }
     }
 
-    console.log('Available time slots:', availableTimeSlots);
+    //console.log('availableTimeSlots:', availableTimeSlots);
     res.json({ availableTimeSlots: availableTimeSlots });
   } catch (error) {
     console.error('Error fetching available time slots:', error);
