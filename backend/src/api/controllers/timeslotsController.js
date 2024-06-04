@@ -232,7 +232,7 @@ const handle_get_available_timeslots = async (req, res) => {
       };
     });
 
-    console.log('slots:', slots);
+    //console.log('slots:', slots);
 
     const availableTimeSlots = [];
 

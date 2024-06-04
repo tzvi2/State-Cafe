@@ -22,12 +22,9 @@ function DeliveryPage() {
     hour12: true
   });
 
-  // date objects which get formatted and sent to endpoint
   function getESTDate() {
     const now = new Date();
-    // Convert current date to UTC
     const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-    // Convert UTC date to EST (UTC-5) -- Note: This does not handle daylight saving automatically
     const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
     return estDate;
   }
@@ -46,12 +43,10 @@ function DeliveryPage() {
     return `${month}-${day}-${year}`;
   }
 
-  // Calculate today and tomorrow in EST
   const todayEST = getESTDate();
   const tomorrowEST = new Date(todayEST);
   tomorrowEST.setDate(tomorrowEST.getDate() + 1);
 
-  // Format dates
   const todayFormatted = formatDateToYYYYMMDD(todayEST);
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
@@ -67,20 +62,18 @@ function DeliveryPage() {
 
   const fetchTimeSlots = async () => {
     try {
-      const response = await fetch(`https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
+      const response = await fetch(`http://localhost:8000/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
       if (!response.ok) throw new Error('Network response was not ok');
 
       const { availableTimeSlots } = await response.json();
 
       console.log('available timeslots: ', availableTimeSlots);
 
-      // Map to create objects with both `time` and `displayTime`
       let fetchedSlots = availableTimeSlots.map(slot => ({
         time: slot,
         displayTime: timeFormatter.format(new Date(slot))
       }));
 
-      // Apply the filterTimeSlots function to narrow down to 5-minute intervals
       fetchedSlots = filterTimeSlots(fetchedSlots);
 
       setAvailableTimeSlots(fetchedSlots);
