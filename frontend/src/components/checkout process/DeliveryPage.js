@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useCart } from '../../hooks/useCart';
@@ -22,26 +22,26 @@ function DeliveryPage() {
     hour12: true
   });
 
-  function getESTDate() {
+  const getESTDate = useCallback(() => {
     const now = new Date();
     const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
     const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
     return estDate;
-  }
+  }, []);
 
-  function formatDateToYYYYMMDD(date) {
+  const formatDateToYYYYMMDD = (date) => {
     const year = date.getFullYear();
     const month = `${date.getMonth() + 1}`.padStart(2, '0');
     const day = `${date.getDate()}`.padStart(2, '0');
     return `${year}-${month}-${day}`;
-  }
+  };
 
-  function formatDateToMDYYYY(date) {
+  const formatDateToMDYYYY = (date) => {
     const year = date.getFullYear();
-    const month = date.getMonth() + 1; // No padding, to avoid leading zeros
-    const day = date.getDate(); // No padding, to avoid leading zeros
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
     return `${month}-${day}-${year}`;
-  }
+  };
 
   const todayEST = getESTDate();
   const tomorrowEST = new Date(todayEST);
@@ -50,24 +50,16 @@ function DeliveryPage() {
   const todayFormatted = formatDateToYYYYMMDD(todayEST);
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
-  useEffect(() => {
-    if (deliveryDate !== "" && cart.totalCookTime > 0) {
-      fetchTimeSlots(deliveryDate);
-    }
-  }, [deliveryDate, cart.totalCookTime]);
+  const fetchTimeSlots = useCallback(async () => {
+    const url = `https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
+    console.log(`Fetching time slots from: ${url}`);
 
-  const handlePhoneNumberChange = (e) => {
-    setPhoneNumber(e.target.value);
-  };
-
-  const fetchTimeSlots = async () => {
     try {
-      const response = await fetch(`http://localhost:8000/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`);
+      const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
 
       const { availableTimeSlots } = await response.json();
-
-      console.log('available timeslots: ', availableTimeSlots);
+      console.log('Available timeslots fetched:', availableTimeSlots);
 
       let fetchedSlots = availableTimeSlots.map(slot => ({
         time: slot,
@@ -83,6 +75,16 @@ function DeliveryPage() {
       setDeliveryAvailable(false);
       console.error('There was a problem with the fetch operation:', error);
     }
+  }, [deliveryDate, cart.totalCookTime, timeFormatter]);
+
+  useEffect(() => {
+    if (deliveryDate !== "" && cart.totalCookTime > 0) {
+      fetchTimeSlots();
+    }
+  }, [deliveryDate, cart.totalCookTime, fetchTimeSlots]);
+
+  const handlePhoneNumberChange = (e) => {
+    setPhoneNumber(e.target.value);
   };
 
   const handleSlotSelection = (e) => {

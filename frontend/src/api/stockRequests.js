@@ -1,7 +1,7 @@
 export const setAllStockToZero = async (dateString) => {
 	console.log('initializing all to Zero ', dateString, "we're in the frontned")
   try {
-    const response = await fetch('http://localhost:8000/stock/initialize-quantities', {
+    const response = await fetch('https://state-cafe.vercel.app/stock/initialize-quantities', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -22,7 +22,7 @@ export const setAllStockToZero = async (dateString) => {
 
 export const getStockForDate = async (dateString) => {
   try {
-    const response = await fetch(`http://localhost:8000/stock/get-remaining-quantity?date=${dateString}`);
+    const response = await fetch(`https://state-cafe.vercel.app/stock/get-remaining-quantity?date=${dateString}`);
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -36,7 +36,7 @@ export const getStockForDate = async (dateString) => {
 
 export const updateQuantityRemaining = async (date, menuItemId, quantity) => {
   try {
-    const response = await fetch('http://localhost:8000/stock/update-quantity-remaining', {
+    const response = await fetch('https://state-cafe.vercel.app/stock/update-quantity-remaining', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
