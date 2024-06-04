@@ -75,9 +75,11 @@ function DeliveryPage() {
       setDeliveryAvailable(false);
       console.error('There was a problem with the fetch operation:', error);
     }
-  }, [deliveryDate, cart.totalCookTime, timeFormatter]);
+  }, [deliveryDate]);
 
   useEffect(() => {
+    console.log('useEffect triggered', { deliveryDate, totalCookTime: cart.totalCookTime });
+
     if (deliveryDate !== "" && cart.totalCookTime > 0) {
       fetchTimeSlots();
     }
@@ -153,7 +155,6 @@ function DeliveryPage() {
           value={phoneNumber}
           onChange={handlePhoneNumberChange}
           placeholder="123-456-7890"
-          pattern="^(\d{3}[-\s]?){2}\d{4}$"
           required
         />
       </div>
