@@ -226,6 +226,8 @@ const handle_get_available_timeslots = async (req, res) => {
       };
     });
 
+   
+
     //console.log('Slots:', slots);
 
     const availableTimeSlots = [];
@@ -244,7 +246,6 @@ const handle_get_available_timeslots = async (req, res) => {
             }
           }
           if (allFollowingSlotsAvailable) {
-            console.log('yes')
             availableTimeSlots.push(slots[sequenceEndIndex].time.toISOString());
           }
         }
@@ -252,7 +253,7 @@ const handle_get_available_timeslots = async (req, res) => {
     }
 
     //console.log('Available time slots:', availableTimeSlots);
-    res.json({ availableTimeSlots: availableTimeSlots });
+    res.json({ availableTimeSlots: slots });
   } catch (error) {
     console.error('Error fetching available time slots:', error);
     res.status(500).json({ error: error.message });
