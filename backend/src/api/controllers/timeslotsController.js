@@ -228,7 +228,8 @@ const handle_get_available_timeslots = async (req, res) => {
 
    
 
-    //console.log('Slots:', slots);
+    console.log('Slots:', slots, "now: ", now);
+    res.json({slots: slots, now: now})
 
     const availableTimeSlots = [];
 
