@@ -188,79 +188,100 @@ const handleRemoveTimeslot = async (req, res) => {
   }
 };
 
+function getCurrentTimeInEST() {
+  const now = new Date();
+
+  // Calculate the UTC offset for the local time zone
+  const localOffset = now.getTimezoneOffset() * 60000;
+
+  // Create the UTC time
+  const utcTime = new Date(now.getTime() + localOffset);
+
+  // Calculate the EST/EDT offset (EST is UTC-5, EDT is UTC-4)
+  const estOffset = -5 * 60 * 60 * 1000; // EST (UTC-5)
+  const edtOffset = -4 * 60 * 60 * 1000; // EDT (UTC-4)
+
+  // Determine if daylight saving time is in effect
+  const jan = new Date(now.getFullYear(), 0, 1);
+  const jul = new Date(now.getFullYear(), 6, 1);
+  const stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+  const isDaylightSavingTime = now.getTimezoneOffset() < stdTimezoneOffset;
+
+  // Apply the appropriate offset
+  const estTime = new Date(utcTime.getTime() + (isDaylightSavingTime ? edtOffset : estOffset));
+
+  // Format the date to an ISO string
+  const isoString = estTime.toISOString();
+
+  return isoString;
+}
+
 const handle_get_available_timeslots = async (req, res) => {
   try {
-    const date = req.query.date;
-    console.log('Received date:', date);
+    const { date, totalCookTime } = req.query;
+    console.log('date: ', date, "total cook time in minutes: ", parseInt(totalCookTime, 10) / 60);
 
-    if (!date) {
-      return res.status(400).json({ error: 'Date query parameter is required.' });
+    if (!date || !totalCookTime) {
+      return res.status(400).json({ error: 'Missing required parameters' });
     }
 
-    const totalCookTimeInSeconds = parseInt(req.query.totalCookTime, 10);
-    console.log('Total cook time in seconds:', totalCookTimeInSeconds);
-
+    const cookTimeInMinutes = parseInt(totalCookTime, 10) / 60;
     const deliveryTimeInMinutes = 5;
-    const totalOrderExecutionTimeInMinutes = Math.ceil(totalCookTimeInSeconds / 60) + deliveryTimeInMinutes;
-    console.log('Total order execution time in minutes:', totalOrderExecutionTimeInMinutes);
-
-    let now = new Date();
-    console.log('Current time (UTC):', now);
-
-    const localNow = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
-    console.log('Current time (Local):', localNow);
+    const requiredTimeInMinutes = cookTimeInMinutes + deliveryTimeInMinutes;
 
     const docRef = db.collection('time_slots').doc(date);
     const doc = await docRef.get();
 
     if (!doc.exists) {
-      return res.status(404).json({ error: 'Daily slots document not found.' });
+      return res.json({ availableTimeSlots: [] });
     }
 
-    const slots = doc.data().slots.map(slot => {
-      const utcTime = slot.time.toDate();
-      const localTime = new Date(utcTime.toLocaleString('en-US', { timeZone: 'America/New_York' }));
-      return {
-        ...slot,
-        time: localTime
-      };
-    });
+    // Get current time adjusted to EST/EDT
+    const current_time = getCurrentTimeInEST();
+    console.log('current time: ', current_time);
 
-   
+    const currentTimeDate = new Date(current_time);
+    currentTimeDate.setMinutes(currentTimeDate.getMinutes() + requiredTimeInMinutes);
+    const currentTimeWithBuffer = currentTimeDate.toISOString();
 
-    console.log('Slots:', slots, "now: ", now);
-    res.json({slots: slots, now: now})
-
+    const slots = doc.data().slots || [];
     const availableTimeSlots = [];
 
-    for (let i = 0; i < slots.length; i++) {
-      //console.log(`Checking slot ${i} at ${slots[i].time}`);
-      if (slots[i].isAvailable && slots[i].time >= now) {
-        let sequenceEndIndex = i + totalOrderExecutionTimeInMinutes - 1;
-        if (sequenceEndIndex < slots.length) {
-          let allFollowingSlotsAvailable = true;
-          for (let j = 1; j < totalOrderExecutionTimeInMinutes; j++) {
-            //console.log(`Checking sequence slot ${i + j} at ${slots[i + j].time}`);
-            if (!slots[i + j].isAvailable || slots[i + j].time - slots[i].time < j * 60000) {
-              allFollowingSlotsAvailable = false;
-              break;
-            }
-          }
-          if (allFollowingSlotsAvailable) {
-            availableTimeSlots.push(slots[sequenceEndIndex].time.toISOString());
-          }
+    // Filter slots to only include those later than the current time plus buffer
+    const availableSlotsLaterThanCurrentTime = slots.filter(slot => {
+      const slotTime = slot.time.toDate().toISOString();
+      //console.log('slotTime: ', slotTime);
+      return slotTime > currentTimeWithBuffer && slot.isAvailable;
+    });
+
+    console.log("availableSlotsLaterThanCurrentTime: ", availableSlotsLaterThanCurrentTime.length);
+
+    // Further filter to check consecutive slots
+    for (const slot of availableSlotsLaterThanCurrentTime) {
+      const slotTime = slot.time.toDate();
+      const startRequiredTime = new Date(slotTime.getTime() - requiredTimeInMinutes * 60 * 1000);
+      let allSlotsAvailable = true;
+
+      for (let i = startRequiredTime; i < slotTime; i = new Date(i.getTime() + 60 * 1000)) {
+        const matchingSlot = slots.find(s => s.time.toDate().getTime() === i.getTime());
+        if (!matchingSlot || !matchingSlot.isAvailable) {
+          allSlotsAvailable = false;
+          break;
         }
+      }
+
+      if (allSlotsAvailable) {
+        availableTimeSlots.push(slotTime.toISOString());
       }
     }
 
-    //console.log('Available time slots:', availableTimeSlots);
-    res.json({ availableTimeSlots: availableTimeSlots });
+    //console.log("Final available time slots: ", availableTimeSlots);
+    res.json({ availableTimeSlots });
   } catch (error) {
     console.error('Error fetching available time slots:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
-
 
 async function bookSlots(date, startTime, endTime) {
   // Everything between start and end times (inclusive) should be marked false for the isAvailable property.
