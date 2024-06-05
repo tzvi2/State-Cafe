@@ -191,24 +191,20 @@ const handleRemoveTimeslot = async (req, res) => {
 function getCurrentTimeInEST() {
   const now = new Date();
 
-  // Calculate the UTC offset for the local time zone
-  const localOffset = now.getTimezoneOffset() * 60000;
+  // Calculate the UTC offset for EST/EDT
+  const estOffset = -5 * 60; // EST is UTC-5
+  const edtOffset = -4 * 60; // EDT is UTC-4
 
-  // Create the UTC time
-  const utcTime = new Date(now.getTime() + localOffset);
-
-  // Calculate the EST/EDT offset (EST is UTC-5, EDT is UTC-4)
-  const estOffset = -5 * 60 * 60 * 1000; // EST (UTC-5)
-  const edtOffset = -4 * 60 * 60 * 1000; // EDT (UTC-4)
-
-  // Determine if daylight saving time is in effect
+  // Check if daylight saving time is in effect
   const jan = new Date(now.getFullYear(), 0, 1);
   const jul = new Date(now.getFullYear(), 6, 1);
   const stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
   const isDaylightSavingTime = now.getTimezoneOffset() < stdTimezoneOffset;
 
-  // Apply the appropriate offset
-  const estTime = new Date(utcTime.getTime() + (isDaylightSavingTime ? edtOffset : estOffset));
+  const offset = isDaylightSavingTime ? edtOffset : estOffset;
+
+  // Calculate the current time in EST/EDT
+  const estTime = new Date(now.getTime() + (offset + now.getTimezoneOffset()) * 60000);
 
   // Format the date to an ISO string
   const isoString = estTime.toISOString();
