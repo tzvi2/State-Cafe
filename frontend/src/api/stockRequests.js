@@ -29,7 +29,7 @@ export const getStockForDate = async (dateString) => {
     const data = await response.json();
     return data;
   } catch (error) {
-    console.error('Error fetching stock data:', error);
+    //console.error('Error fetching stock data:', error);
     throw error;
   }
 };

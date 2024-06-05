@@ -52,14 +52,14 @@ function DeliveryPage() {
 
   const fetchTimeSlots = useCallback(async () => {
     const url = `https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
-    console.log(`Fetching time slots from: ${url}`);
+    //console.log(`Fetching time slots from: ${url}`);
 
     try {
       const response = await fetch(url);
       if (!response.ok) throw new Error('Network response was not ok');
 
       const { availableTimeSlots } = await response.json();
-      console.log('Available timeslots fetched:', availableTimeSlots);
+      //console.log('Available timeslots fetched:', availableTimeSlots);
 
       let fetchedSlots = availableTimeSlots.map(slot => ({
         time: slot,

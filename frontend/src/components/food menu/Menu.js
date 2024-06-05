@@ -28,9 +28,22 @@ export default function Menu() {
     const fetchQuickView = async () => {
       const items = await getQuickViewMenu();
       const dateString = getLocalDate();
-      const stockData = await getStockForDate(dateString);
+      let stockData = {};
+
+      try {
+        stockData = await getStockForDate(dateString);
+      } catch (error) {
+        if (error.message === 'Network response was not ok') {
+          //console.log("Stock data not found for date, setting default quantities to 100");
+          stockData = items.reduce((acc, item) => {
+            acc[item.itemId] = { quantity: 100 };
+            return acc;
+          }, {});
+        } else {
+          //console.error("Error fetching stock data:", error);
+        }
+      }
       
-      // Merge stock data with menu items
       const itemsWithStock = items.map(item => ({
         ...item,
         quantity: stockData[item.itemId]?.quantity || 0
