@@ -1,8 +1,8 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { addMinutes, isSameMinute } = require('date-fns');
 const { format, toDate, fromZonedTime, toZonedTime } = require('date-fns-tz');
+const moment = require('moment-timezone');
 
-const timeZone = 'America/New_York'; // Define your desired time zone here
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
@@ -189,30 +189,12 @@ const handleRemoveTimeslot = async (req, res) => {
 };
 
 function getCurrentTimeInEST() {
-  const now = new Date();
-
-  // Calculate the UTC offset for EST/EDT
-  const estOffset = -5 * 60; // EST is UTC-5
-  const edtOffset = -4 * 60; // EDT is UTC-4
-
-  // Check if daylight saving time is in effect
-  const jan = new Date(now.getFullYear(), 0, 1);
-  const jul = new Date(now.getFullYear(), 6, 1);
-  const stdTimezoneOffset = Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
-  const isDaylightSavingTime = now.getTimezoneOffset() < stdTimezoneOffset;
-
-  const offset = isDaylightSavingTime ? edtOffset : estOffset;
-
-  // Calculate the current time in EST/EDT
-  const estTime = new Date(now.getTime() + (offset + now.getTimezoneOffset()) * 60000);
-
-  // Format the date to an ISO string
-  const isoString = estTime.toISOString();
-
-  return isoString;
+  const timeZone = 'America/New_York';
+  return moment.tz(timeZone).toISOString();
 }
 
 const handle_get_available_timeslots = async (req, res) => {
+  // return timeslots as array of ISO strings 
   try {
     const { date, totalCookTime } = req.query;
     console.log('date: ', date, "total cook time in minutes: ", parseInt(totalCookTime, 10) / 60);
@@ -236,24 +218,28 @@ const handle_get_available_timeslots = async (req, res) => {
     const current_time = getCurrentTimeInEST();
     console.log('current time: ', current_time);
 
-    const currentTimeDate = new Date(current_time);
-    currentTimeDate.setMinutes(currentTimeDate.getMinutes() + requiredTimeInMinutes);
-    const currentTimeWithBuffer = currentTimeDate.toISOString();
+    const currentTimeDate = new Date(current_time)
+    console.log('current time date: ', currentTimeDate)
 
+    const dateWithBufferAdded = new Date(currentTimeDate.getTime() + requiredTimeInMinutes * 60000).toISOString()
+    console.log('date with buffer added: ', dateWithBufferAdded)
+    
     const slots = doc.data().slots || [];
     const availableTimeSlots = [];
 
-    // Filter slots to only include those later than the current time plus buffer
-    const availableSlotsLaterThanCurrentTime = slots.filter(slot => {
+    // Filter out slot objects whose time is before buffer
+    const availableSlotsAfterBuffer = slots.filter(slot => {
       const slotTime = slot.time.toDate().toISOString();
-      //console.log('slotTime: ', slotTime);
-      return slotTime > currentTimeWithBuffer && slot.isAvailable;
+      return slotTime > dateWithBufferAdded && slot.isAvailable;
     });
 
-    console.log("availableSlotsLaterThanCurrentTime: ", availableSlotsLaterThanCurrentTime.length);
+    // at this point, slots is an array of objects like in firestore (time: timestamp, isAvailable: bool)
 
-    // Further filter to check consecutive slots
-    for (const slot of availableSlotsLaterThanCurrentTime) {
+    //console.log("availableSlotsAfterBuffer: ", availableSlotsAfterBuffer);
+
+
+    // Further filter to check for consecutive available slots
+    for (const slot of availableSlotsAfterBuffer) {
       const slotTime = slot.time.toDate();
       const startRequiredTime = new Date(slotTime.getTime() - requiredTimeInMinutes * 60 * 1000);
       let allSlotsAvailable = true;
@@ -338,8 +324,6 @@ const handleBookTimeslot = async (req, res) => {
     res.status(500).send("Failed to book time slots.");
   }
 };
-
-
 
 async function populateSlotsForDate(date, startHour, endHour) {
   const dateId = date.toISOString().split('T')[0];
