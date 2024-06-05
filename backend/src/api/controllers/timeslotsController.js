@@ -235,10 +235,7 @@ const handle_get_available_timeslots = async (req, res) => {
 
     // at this point, slots is an array of objects like in firestore (time: timestamp, isAvailable: bool)
 
-    //console.log("availableSlotsAfterBuffer: ", availableSlotsAfterBuffer);
-
-
-    // Further filter to check for consecutive available slots
+    // check for consecutive available slots
     for (const slot of availableSlotsAfterBuffer) {
       const slotTime = slot.time.toDate();
       const startRequiredTime = new Date(slotTime.getTime() - requiredTimeInMinutes * 60 * 1000);
