@@ -85,7 +85,7 @@ export const removeTimeSlot = async (date, startHour, endHour) => {
   console.log('removing timeslot ', date, startHour, endHour)
  
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/remove-time-slot`, {
+    const response = await fetch(`https://state-cafe.vercel.app/timeslots/remove-time-slot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
