@@ -1,8 +1,8 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
 const { addMinutes, isSameMinute } = require('date-fns');
-const { format, toDate, fromZonedTime, toZonedTime } = require('date-fns-tz');
-const moment = require('moment-timezone');
+const { format, toDate, fromZonedTime, toZonedTime, formatInTimeZone, getTimezoneOffset } = require('date-fns-tz');
 
+const timeZone = 'America/New_York'; // Define your desired time zone here
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
@@ -82,12 +82,15 @@ const handleAddTimeslot = async (req, res) => {
     const docRef = db.collection('time_slots').doc(dateId);
     const doc = await docRef.get();
 
-    const newSlots = generateTimeSlots(dateObj, startTime, endTime, timeZone);
+    // Generate time slots for the given range
+    const newSlots = generateTimeSlots(date, startTime, endTime);
 
     if (!doc.exists) {
+      // If document does not exist, create it with the new slots
       await docRef.set({ slots: newSlots });
       console.log(`Created new document and added slots for ${dateId}`);
     } else {
+      // If document exists, add the new slots to the existing ones
       await docRef.set({
         slots: admin.firestore.FieldValue.arrayUnion(...newSlots)
       }, { merge: true });
@@ -101,11 +104,21 @@ const handleAddTimeslot = async (req, res) => {
   }
 };
 
-function generateTimeSlots(date, startTime, endTime, timeZone) {
+function generateTimeSlots(dateString, startTime, endTime, timeZone = 'America/New_York') {
   let slots = [];
 
-  const startDate = fromZonedTime(parseTime(date, startTime), timeZone);
-  const endDate = fromZonedTime(parseTime(date, endTime), timeZone);
+  console.log("dateString: ", dateString, 'startTime: ', startTime, "endTime: ", endTime);
+  const [startHour, startMinute] = startTime.split(':').map(Number);
+  const [endHour, endMinute] = endTime.split(':').map(Number);
+
+  // Combine date and time and convert to the desired time zone
+  const startDateTime = `${dateString}T${String(startHour).padStart(2, '0')}:${String(startMinute).padStart(2, '0')}:00`;
+  const endDateTime = `${dateString}T${String(endHour).padStart(2, '0')}:${String(endMinute).padStart(2, '0')}:00`;
+
+  const startDate = fromZonedTime(new Date(startDateTime), timeZone);
+  const endDate = fromZonedTime(new Date(endDateTime), timeZone);
+
+  console.log("start date: ", startDate, "end date: ", endDate);
 
   for (let time = new Date(startDate); time <= endDate; time.setMinutes(time.getMinutes() + 1)) {
     slots.push({
@@ -116,6 +129,30 @@ function generateTimeSlots(date, startTime, endTime, timeZone) {
 
   return slots;
 }
+
+
+const parseTimeInZone = (date, time, timeZone) => {
+  const [hours, minutesPart] = time.split(':');
+  const minutes = minutesPart.slice(0, 2);
+  const isPM = time.includes('PM');
+  let hours24 = parseInt(hours, 10);
+  if (isPM && hours24 < 12) {
+    hours24 += 12;
+  } else if (!isPM && hours24 === 12) {
+    hours24 = 0;
+  }
+
+  const dateTimeString = `${date}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
+  const zonedDate = new Date(dateTimeString);
+
+  const zonedTime = toZonedTime(zonedDate, timeZone);
+  const offset = getTimezoneOffset(timeZone, zonedDate);
+  const utcTime = new Date(zonedDate.getTime() - offset);
+
+  console.log('Parsed time:', format(zonedTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone }));
+
+  return utcTime;
+};
 
 function parseTime(date, timeString) {
   const [time, modifier] = timeString.split(' ');
@@ -139,6 +176,7 @@ function parseTime(date, timeString) {
 
 const handleRemoveTimeslot = async (req, res) => {
   const { date, startHour, endHour } = req.body;
+  const timeZone = 'America/New_York';
   console.log('Attempting to remove time slot for date:', date, 'start:', startHour, 'end:', endHour);
 
   try {
@@ -155,8 +193,8 @@ const handleRemoveTimeslot = async (req, res) => {
       return res.status(404).json({ error: 'No time slots found for this date' });
     }
 
-    const startDate = fromZonedTime(parseTime(date, startHour), timeZone);
-    const endDate = fromZonedTime(parseTime(date, endHour), timeZone);
+    const startDate = parseTime(date, startHour, timeZone);
+    const endDate = parseTime(date, endHour, timeZone);
 
     if (!startDate || !endDate) {
       return res.status(400).json({ error: 'Invalid start or end time format' });
@@ -171,14 +209,14 @@ const handleRemoveTimeslot = async (req, res) => {
       slotsToRemove.push(admin.firestore.Timestamp.fromDate(new Date(time)));
     }
 
-    console.log('slotsToRemove:', slotsToRemove);
+    //console.log('slotsToRemove:', slotsToRemove.map(ts => ts.toDate().toISOString()));
 
     const updatedSlots = existingSlots.filter(slot => {
       const slotTime = slot.time.toDate().getTime();
       return !slotsToRemove.some(toRemove => toRemove.toDate().getTime() === slotTime);
     });
 
-    console.log('updatedSlots:', updatedSlots);
+    //console.log('updatedSlots:', updatedSlots.map(slot => slot.time.toDate().toISOString()));
 
     await docRef.set({ slots: updatedSlots }, { merge: true });
     res.json({ message: 'Time slot removed successfully.' });
@@ -263,63 +301,49 @@ const handle_get_available_timeslots = async (req, res) => {
 };
 
 async function bookSlots(date, startTime, endTime) {
-  // Everything between start and end times (inclusive) should be marked false for the isAvailable property.
 	const dateId = date; // Assuming date is already in YYYY-MM-DD format
 	const docRef = db.collection('time_slots').doc(dateId);
 	const doc = await docRef.get();
 
 	if (doc.exists) {
-		let slots = doc.data().slots;
-		let isUpdated = false;
+			let slots = doc.data().slots;
+			let isUpdated = false;
 
-		slots = slots.map(slot => {
-			const slotTime = slot.time.toDate();
-			if (slotTime >= startTime && slotTime <= endTime) {
-				isUpdated = true;
-				return { ...slot, isAvailable: false }; 
+			slots = slots.map(slot => {
+					const slotTime = slot.time.toDate();
+					if (slotTime >= startTime && slotTime <= endTime) {
+							isUpdated = true;
+							return { ...slot, isAvailable: false }; 
+					}
+					return slot;
+			});
+
+			// Update Firestore only if changes were made
+			if (isUpdated) {
+					await docRef.set({ slots });
 			}
-			return slot;
-		});
-
-		// Update Firestore only if changes were made
-		if (isUpdated) {
-			await docRef.set({ slots });
-		}
 	} else {
-		console.log(`No slots found for ${dateId}.`);
+			console.log(`No slots found for ${dateId}.`);
 	}
 }
 
-
 const handleBookTimeslot = async (req, res) => {
-  // TIMELINE
-  // 5 minutes before delivery slot | delivery minute | two minutes to get home
-  // (handle_get_available_timeslots only shows slots for delivery after accounting for five minute pack and delivery)
-  // In this function, I want to set start and end times as follows:
-  // start time: five minutes before the minute time slot that the customer selected for delivery
-  // end time: block off two minutes after the delivery slot to allow the order deliverer to return to the cafe, so end time should be 2 minutes after the delivery slot
-  const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
-  const returnBuffer = 2; // 2 minutes to get back to the café
-  const preDeliveryBuffer = 5; // 5 minutes before the delivery slot
+	const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
+	const deliveryBuffer = 5; // 5 minutes for delivery buffer
 
-  console.log('date: ', date, "time: ", time);
+	try {
+			// Calculate end time based on totalCookTime and deliveryBuffer
+			const startTime = new Date(`${date}T${time}`);
+			const endTime = new Date(startTime.getTime() + totalCookTime * 60000 + deliveryBuffer * 60000);
 
-  try {
-    // Calculate start and end times
-    const deliveryTime = new Date(`${date}T${time}`);
-    const startTime = new Date(deliveryTime.getTime() - preDeliveryBuffer * 60000);
-    const endTime = new Date(deliveryTime.getTime() + returnBuffer * 60000);
+			// Book the slots
+			await bookSlots(date, startTime, endTime);
 
-    console.log('startTime: ', startTime.toLocaleTimeString(), "endTime: ", endTime.toLocaleTimeString());
-    
-    // Book the slots
-    await bookSlots(date, startTime, endTime);
-
-    res.send({message: "Time slots booked successfully."});
-  } catch (error) {
-    console.error("Error booking time slots:", error);
-    res.status(500).send("Failed to book time slots.");
-  }
+			res.send("Time slots booked successfully.");
+	} catch (error) {
+			console.error("Error booking time slots:", error);
+			res.status(500).send("Failed to book time slots.");
+	}
 };
 
 async function populateSlotsForDate(date, startHour, endHour) {
