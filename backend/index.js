@@ -12,6 +12,7 @@ const morgan = require('morgan');
 const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandler');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
 const allowedOrigins = [
   'https://statecafeteaneck.com', 
@@ -35,6 +36,12 @@ const corsOptions = {
 };
 
 const app = express();
+
+// Serve static files from the 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Serve favicon from the public directory
+app.get('/favicon.ico', (req, res) => res.sendFile(path.join(__dirname, 'public', 'favicon.png')));
 
 // Set the trust proxy setting
 app.set('trust proxy', 1);

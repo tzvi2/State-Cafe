@@ -7,6 +7,7 @@ const timeZone = 'America/New_York'; // Define your desired time zone here
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
+  const timeZone = 'America/New_York';
 
   if (!date) {
     return res.status(400).json({ error: 'Date is required' });
@@ -31,24 +32,22 @@ const handleGetOpenHours = async (req, res) => {
 
     for (let i = 0; i < slots.length; i++) {
       const currentSlot = slots[i];
-      if (!currentSlot.time || !currentSlot.time.toDate || !currentSlot.isAvailable) {
-        continue; // Skip if the slot is not properly structured or not available
+      if (!currentSlot.time || !currentSlot.time.toDate) {
+        continue; // Skip if the slot is not properly structured
       }
       const currentSlotTime = toZonedTime(currentSlot.time.toDate(), timeZone);
 
-      if (currentSlot.isAvailable) {
-        if (!start) {
-          start = currentSlotTime;
-        }
+      if (!start) {
+        start = currentSlotTime;
+      }
 
-        const nextSlot = slots[i + 1];
-        if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
-          openRanges.push({
-            start: start,
-            end: currentSlotTime
-          });
-          start = null;
-        }
+      const nextSlot = slots[i + 1];
+      if (!nextSlot || !nextSlot.time || !nextSlot.time.toDate || !isSameMinute(currentSlotTime, addMinutes(toZonedTime(nextSlot.time.toDate(), timeZone), -1))) {
+        openRanges.push({
+          start: start,
+          end: currentSlotTime
+        });
+        start = null;
       }
     }
 
@@ -64,6 +63,7 @@ const handleGetOpenHours = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error' });
   }
 };
+
 
 const handleAddTimeslot = async (req, res) => {
   const { date, startTime, endTime } = req.body;
