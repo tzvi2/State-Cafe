@@ -1,4 +1,5 @@
 const {db} = require('../../firebase/firebaseAdminConfig'); 
+const { Timestamp } = require('firebase-admin').firestore;
 
 const getAllMenuItems = async (category) => {
   let query = db.collection('menuItems');
@@ -18,14 +19,14 @@ const getAllMenuItems = async (category) => {
 };
 
 const saveOrder = async (orderData) => {
-  // Convert deliverySlot from ISO string to Date object
-  const deliveryTime = new Date(orderData.deliverySlot);
+  // Convert deliverySlot from ISO string to Firestore Timestamp
+  const deliveryTime = Timestamp.fromDate(new Date(orderData.deliverySlot));
 
   const newOrder = {
     items: orderData.items,
     totalPrice: orderData.totalPrice,
-    orderedAt: new Date(), // Firestore will automatically convert JavaScript Date to Firestore Timestamp
-    deliveryTime, // same story as above
+    orderedAt: Timestamp.now(), // Firestore Timestamp for current time
+    deliveryTime, // Firestore Timestamp
     deliveryAddress: orderData.unitNumber,
     lastFourDigits: orderData.lastFourDigits,
     cardBrand: orderData.cardBrand,

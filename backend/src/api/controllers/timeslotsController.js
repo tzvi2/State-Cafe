@@ -347,7 +347,7 @@ const handleBookTimeslot = async (req, res) => {
     // Book the slots
     await bookSlots(date, startTime, endTime);
 
-    res.send("Time slots booked successfully.");
+    res.send({msg: "Time slots booked successfully."});
   } catch (error) {
     console.error("Error booking time slots:", error);
     res.status(500).send("Failed to book time slots.");
