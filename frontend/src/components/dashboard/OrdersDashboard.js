@@ -63,7 +63,7 @@ function Dashboard() {
   
   if (!isAuthorized) {
     return (
-      <p>You need to sign in to view this page</p>
+      <p>You need to <a onClick={() => signInWithGoogle()}>sign in</a> to view this page</p>
     );
   }
 

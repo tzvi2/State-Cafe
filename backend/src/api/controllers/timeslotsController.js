@@ -272,6 +272,8 @@ const handle_get_available_timeslots = async (req, res) => {
       return slotTime > dateWithBufferAdded && slot.isAvailable;
     });
 
+    console.log("number of available slots after buffer: ", availableSlotsAfterBuffer.length)
+
     // at this point, slots is an array of objects like in firestore (time: timestamp, isAvailable: bool)
 
     // check for consecutive available slots
@@ -329,23 +331,29 @@ async function bookSlots(date, startTime, endTime) {
 }
 
 const handleBookTimeslot = async (req, res) => {
-	const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
-	const deliveryBuffer = 5; // 5 minutes for delivery buffer
+  const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
+  const deliveryBuffer = 5; // 5 minutes for delivery buffer
 
-	try {
-			// Calculate end time based on totalCookTime and deliveryBuffer
-			const startTime = new Date(`${date}T${time}`);
-			const endTime = new Date(startTime.getTime() + totalCookTime * 60000 + deliveryBuffer * 60000);
+  try {
+    // Calculate end time based on the provided time
+    const endTime = new Date(`${date}T${time}`);
+    
+    // Calculate start time by subtracting totalCookTime (in seconds) and deliveryBuffer (in minutes) from the end time
+    const startTime = new Date(endTime.getTime() - (totalCookTime * 1000 + deliveryBuffer * 60000));
 
-			// Book the slots
-			await bookSlots(date, startTime, endTime);
+    console.log('Calculated start time:', startTime);
+    console.log('Provided end time:', endTime);
 
-			res.send("Time slots booked successfully.");
-	} catch (error) {
-			console.error("Error booking time slots:", error);
-			res.status(500).send("Failed to book time slots.");
-	}
+    // Book the slots
+    await bookSlots(date, startTime, endTime);
+
+    res.send("Time slots booked successfully.");
+  } catch (error) {
+    console.error("Error booking time slots:", error);
+    res.status(500).send("Failed to book time slots.");
+  }
 };
+
 
 async function populateSlotsForDate(date, startHour, endHour) {
   const dateId = date.toISOString().split('T')[0];
