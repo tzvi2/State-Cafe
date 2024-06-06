@@ -39,7 +39,7 @@ export const formatLocalDate = (date) => {
 
 export const getOpenHours = async (date) => {
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/open-hours?date=${date}`, {
+    const response = await fetch(`https://state-cafe.vercel.app/timeslots/open-hours?date=${date}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
