@@ -331,7 +331,6 @@ async function bookSlots(date, startTime, endTime) {
 }
 
 const handleBookTimeslot = async (req, res) => {
-  
   const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
   const deliveryBuffer = 5; // 5 minutes for delivery buffer
 
