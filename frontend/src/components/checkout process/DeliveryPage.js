@@ -100,32 +100,26 @@ function DeliveryPage() {
   const handleSubmit = async () => {
     let isValid = true;
 
-    // if (!unitNumber || unitNumber.length !== 3 || unitNumber < 201 || unitNumber > 558) {
-    //   setApartmentNumberError('Apartment number should be 3 digits long.');
-    //   isValid = false;
-    // } else {
-    //   setApartmentNumberError('');
-    // }
-
-    // const phonePattern = /^(\d{3}[-\s]?){2}\d{4}$/;
-    // if (!phoneNumber || !phonePattern.test(phoneNumber)) {
-    //   setPhoneNumberError('Phone number should contain 10 digits.');
-    //   isValid = false;
-    // } else {
-    //   setPhoneNumberError('');
-    // }
-
-    // if (isValid && unitNumber && deliverySlot && deliveryDate) {
-    //   navigate('/payment');
-    // }
-
-    if (isValid) {
-      await bookTimeSlot({
-        totalCookTime: cart.totalCookTime,
-        date: deliveryDate,
-        time: deliverySlot,
-      });
+    if (!unitNumber || unitNumber.length !== 3 || unitNumber < 201 || unitNumber > 558) {
+      setApartmentNumberError('Apartment number should be 3 digits long.');
+      isValid = false;
+    } else {
+      setApartmentNumberError('');
     }
+
+    const phonePattern = /^(\d{3}[-\s]?){2}\d{4}$/;
+    if (!phoneNumber || !phonePattern.test(phoneNumber)) {
+      setPhoneNumberError('Phone number should contain 10 digits.');
+      isValid = false;
+    } else {
+      setPhoneNumberError('');
+    }
+
+    if (isValid && unitNumber && deliverySlot && deliveryDate) {
+      navigate('/payment');
+    }
+
+    
   };
 
   const isDaySelected = (dateStr) => deliveryDate === dateStr;
@@ -134,7 +128,7 @@ function DeliveryPage() {
     <div className={styles.deliveryPage}>
       <h2>Delivery</h2>
 
-      {/* <div className={styles.errorRow}>
+      <div className={styles.errorRow}>
         {apartmentNumberError && <p className={styles.error}>{apartmentNumberError}</p>}
       </div>
 
@@ -165,7 +159,7 @@ function DeliveryPage() {
           placeholder="123-456-7890"
           required
         />
-      </div> */}
+      </div>
 
       <div className={styles.flexRow}>
         <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
