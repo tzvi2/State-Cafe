@@ -62,7 +62,7 @@ export const getOpenHours = async (date) => {
 export const addTimeSlot = async (date, startTime, endTime) => {
   console.log("sending new range to backend ", date, startTime, endTime)
   try {
-    const response = await fetch(`http://localhost:8000/timeslots/add-time-slot`, {
+    const response = await fetch(`https://state-cafe.vercel.app/timeslots/add-time-slot`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
