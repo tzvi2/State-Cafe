@@ -97,7 +97,7 @@ function DeliveryPage() {
     setUnitNumber(e.target.value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let isValid = true;
 
     // if (!unitNumber || unitNumber.length !== 3 || unitNumber < 201 || unitNumber > 558) {
@@ -120,7 +120,11 @@ function DeliveryPage() {
     // }
 
     if (isValid) {
-      navigate('/payment')
+      await bookTimeSlot({
+        totalCookTime: cart.totalCookTime,
+        date: deliveryDate,
+        time: deliverySlot,
+      });
     }
   };
 

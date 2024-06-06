@@ -1,6 +1,6 @@
 const {db, admin} = require('../../../firebase/firebaseAdminConfig')
-const { addMinutes, isSameMinute } = require('date-fns');
-const { format, toDate, fromZonedTime, toZonedTime, formatInTimeZone, getTimezoneOffset } = require('date-fns-tz');
+const { addMinutes, isSameMinute, parse, format } = require('date-fns');
+const { toDate, fromZonedTime, toZonedTime, formatInTimeZone, getTimezoneOffset } = require('date-fns-tz');
 const moment = require("moment-timezone")
 
 const timeZone = 'America/New_York'; // Define your desired time zone here
@@ -303,56 +303,84 @@ const handle_get_available_timeslots = async (req, res) => {
   }
 };
 
+const convertESTDateAndTimeToUTC = (dateString, timeString) => {
+  const timeZone = 'America/New_York';
+
+  // Combine date and time into a single string
+  const dateTimeString = `${dateString} ${timeString}`;
+
+  // Parse the combined string into a Date object assuming it's in the EST timezone
+  const parsedDate = parse(dateTimeString, 'yyyy-MM-dd HH:mm', new Date());
+
+  if (isNaN(parsedDate)) {
+    console.error('Error parsing date:', dateTimeString);
+    return new Date('Invalid Date');
+  }
+
+  // Convert the parsed date to a UTC Date object
+  const utcDate = fromZonedTime(parsedDate, timeZone);
+
+  return utcDate;
+};
+
 async function bookSlots(date, startTime, endTime) {
-	const dateId = date; // Assuming date is already in YYYY-MM-DD format
-	const docRef = db.collection('time_slots').doc(dateId);
-	const doc = await docRef.get();
+  console.log("start: ", startTime, "end: ", endTime);
 
-	if (doc.exists) {
-			let slots = doc.data().slots;
-			let isUpdated = false;
+  const dateId = date; // Assuming date is already in YYYY-MM-DD format
+  const docRef = db.collection('time_slots').doc(dateId);
+  const doc = await docRef.get();
 
-			slots = slots.map(slot => {
-					const slotTime = slot.time.toDate();
-					if (slotTime >= startTime && slotTime <= endTime) {
-							isUpdated = true;
-							return { ...slot, isAvailable: false }; 
-					}
-					return slot;
-			});
+  if (doc.exists) {
+    let slots = doc.data().slots;
+    let isUpdated = false;
 
-			// Update Firestore only if changes were made
-			if (isUpdated) {
-					await docRef.set({ slots });
-			}
-	} else {
-			console.log(`No slots found for ${dateId}.`);
-	}
+    slots = slots.map(slot => {
+      const slotTime = slot.time.toDate();
+      if (slotTime >= startTime && slotTime <= endTime) {
+        isUpdated = true;
+        return { ...slot, isAvailable: false };
+      }
+      return slot;
+    });
+
+    // Update Firestore only if changes were made
+    if (isUpdated) {
+      await docRef.set({ slots });
+    }
+  } else {
+    console.log(`No slots found for ${dateId}.`);
+  }
 }
 
 const handleBookTimeslot = async (req, res) => {
-  const { totalCookTime, date, time } = req.body; // Assuming the time is provided in a compatible format
+  const { totalCookTime, date, time } = req.body; 
+
+  // total cook time in seconds, date "MM-DD-YYYY" time "HH:MM"
+
+  console.log('total cook time: ', totalCookTime, "date: ", date, "time: ", time);
+
   const deliveryBuffer = 5; // 5 minutes for delivery buffer
 
   try {
-    // Calculate end time based on the provided time
-    const endTime = new Date(`${date}T${time}`);
-    
-    // Calculate start time by subtracting totalCookTime (in seconds) and deliveryBuffer (in minutes) from the end time
-    const startTime = new Date(endTime.getTime() - (totalCookTime * 1000 + deliveryBuffer * 60000));
+    // End date as UTC date object from given date string plus time in EST
+    const endDate = convertESTDateAndTimeToUTC(date, time);
 
-    console.log('Calculated start time:', startTime);
-    console.log('Provided end time:', endTime);
+    // Start date as UTC date object from buffer + totalCookTime minutes before endDate
+    const startDate = new Date(endDate.getTime() - (totalCookTime * 1000) - (deliveryBuffer * 60 * 1000));
+
+    console.log("startDate: ", startDate, "endDate: ", endDate);
 
     // Book the slots
-    await bookSlots(date, startTime, endTime);
+    await bookSlots(date, startDate, endDate);
 
-    res.send({msg: "Time slots booked successfully."});
+    res.json({ message: "Time slots booked successfully." });
   } catch (error) {
     console.error("Error booking time slots:", error);
     res.status(500).send("Failed to book time slots.");
   }
 };
+
+
 
 
 async function populateSlotsForDate(date, startHour, endHour) {
