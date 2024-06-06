@@ -40,6 +40,7 @@ const OrderConfirmation = () => {
 
       // Save order details in local storage for future reference
       localStorage.setItem(`orderDetails_${paymentIntentId}`, JSON.stringify(savedOrderResponse));
+      localStorage.setItem('lastOrder', JSON.stringify(savedOrderResponse));
     } catch (error) {
       console.error('Error saving order to database:', error);
       // Handle error (e.g., notify the user)
@@ -88,11 +89,24 @@ const OrderConfirmation = () => {
         // If the order was previously saved, retrieve it from localStorage
         const existingOrder = JSON.parse(localStorage.getItem(`orderDetails_${paymentIntentId}`));
         if (existingOrder) {
+          //console.log('Existing order found:', existingOrder);
           setSavedOrder(existingOrder);
+        } else {
+          //console.log('No existing order found in local storage for:', paymentIntentId);
         }
         // Clear the cart and delivery details in case the order was already saved
         clearCart();
         clearDeliveryDetails();
+      } else {
+        //console.log('No payment intent ID found, fetching last saved order');
+        // If no payment intent ID is found, retrieve the last saved order from localStorage
+        const lastOrder = JSON.parse(localStorage.getItem('lastOrder'));
+        if (lastOrder) {
+          //console.log('Last order found:', lastOrder);
+          setSavedOrder(lastOrder);
+        } else {
+          //console.log('No last order found in local storage');
+        }
       }
       setIsLoading(false); // Data has been loaded
     };
