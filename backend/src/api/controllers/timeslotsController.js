@@ -193,14 +193,18 @@ const handleRemoveTimeslot = async (req, res) => {
       return res.status(404).json({ error: 'No time slots found for this date' });
     }
 
-    const startDate = parseTime(date, startHour, timeZone);
-    const endDate = parseTime(date, endHour, timeZone);
+    const startTimeStr = `${date} ${startHour}`;
+    const endTimeStr = `${date} ${endHour}`;
+
+    // Convert the combined date-time string to the desired time zone
+    const startDate = fromZonedTime(new Date(startTimeStr), timeZone);
+    const endDate = fromZonedTime(new Date(endTimeStr), timeZone);
 
     if (!startDate || !endDate) {
       return res.status(400).json({ error: 'Invalid start or end time format' });
     }
 
-    console.log('startDate:', startDate, 'endDate:', endDate);
+    console.log('startDate:', startDate.toISOString(), 'endDate:', endDate.toISOString());
 
     const existingSlots = doc.data().slots;
     const slotsToRemove = [];
@@ -209,14 +213,10 @@ const handleRemoveTimeslot = async (req, res) => {
       slotsToRemove.push(admin.firestore.Timestamp.fromDate(new Date(time)));
     }
 
-    //console.log('slotsToRemove:', slotsToRemove.map(ts => ts.toDate().toISOString()));
-
     const updatedSlots = existingSlots.filter(slot => {
       const slotTime = slot.time.toDate().getTime();
       return !slotsToRemove.some(toRemove => toRemove.toDate().getTime() === slotTime);
     });
-
-    //console.log('updatedSlots:', updatedSlots.map(slot => slot.time.toDate().toISOString()));
 
     await docRef.set({ slots: updatedSlots }, { merge: true });
     res.json({ message: 'Time slot removed successfully.' });
