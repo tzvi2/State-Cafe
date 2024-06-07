@@ -87,7 +87,7 @@ export default function CheckoutForm() {
     const stockData = await getStockForDate(dateString);
     const outOfStockItems = [];
     const lowStockItems = [];
-
+  
     cart.items.forEach(item => {
       const availableQuantity = stockData[item.itemId]?.quantity || 0;
       if (availableQuantity === 0) {
@@ -99,28 +99,28 @@ export default function CheckoutForm() {
         });
       }
     });
-
+  
     if (outOfStockItems.length > 0) {
       return {
         success: false,
         message: `The following items are out of stock: ${outOfStockItems.join(', ')}. Please remove them from your cart before checking out.`,
       };
     }
-
+  
     if (lowStockItems.length > 0) {
       const userConfirmed = window.confirm(
         `The following items have limited stock:\n\n${lowStockItems
           .map(item => `${item.title}: only ${item.availableQuantity} available`)
           .join('\n')}\n\nWould you like to adjust the quantities to the available stock?`
       );
-
+  
       if (userConfirmed) {
         lowStockItems.forEach(item => {
           const cartItem = cart.items.find(cartItem => cartItem.title === item.title);
           updateItemQuantity(cartItem.cartItemId, item.availableQuantity);
         });
         return {
-          success: true,
+          success: false, // Indicate the process should halt after adjusting quantities
         };
       } else {
         return {
@@ -129,7 +129,7 @@ export default function CheckoutForm() {
         };
       }
     }
-
+  
     return { success: true };
   };
 

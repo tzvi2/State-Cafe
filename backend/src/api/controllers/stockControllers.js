@@ -78,3 +78,51 @@ exports.setAllProductQuantitiesToZero = async (req, res) => {
     console.error('Error setting product quantities to zero:', error);
   }
 };
+
+exports.updateStockLevels = async (req, res) => {
+  console.log('updating stock levels.');
+
+  const { date, cartItems } = req.body;
+  console.log('date ', date);
+  //console.log('cartItems ', cartItems);
+
+  if (!date || !cartItems || !Array.isArray(cartItems)) {
+    return res.status(400).json({ error: 'Invalid input. Date and cart items are required.' });
+  }
+
+  const batch = db.batch();
+  const stockRef = db.collection('stock').doc(date);
+
+  try {
+    const stockDoc = await stockRef.get();
+
+    if (!stockDoc.exists) {
+      return res.status(404).json({ error: 'Stock document for the specified date does not exist.' });
+    }
+
+    const stockData = stockDoc.data();
+    console.log('stockData: ', stockData);  // Log the structure of stockData
+
+    cartItems.forEach(item => {
+      const itemStock = stockData[item.itemId]?.quantity; // Use optional chaining to safely access the quantity
+      console.log(`Item ID ${item.itemId} stock: `, itemStock);
+
+      if (itemStock != null && typeof itemStock === 'number') {
+        const updatedQuantity = itemStock - item.quantity;
+        if (updatedQuantity >= 0) {
+          batch.update(stockRef, { [`${item.itemId}.quantity`]: updatedQuantity }); // Update the nested quantity field
+        } else {
+          console.error(`Not enough stock for item ID ${item.itemId}. Current stock: ${itemStock}, required: ${item.quantity}`);
+        }
+      } else {
+        console.error(`Item ID ${item.itemId} does not exist in stock data or is not a number.`);
+      }
+    });
+
+    await batch.commit();
+    res.status(200).json({ message: 'Stock levels updated successfully.' });
+  } catch (error) {
+    console.error('Error updating stock levels:', error);
+    res.status(500).json({ error: 'Failed to update stock levels.' });
+  }
+};

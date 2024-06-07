@@ -54,3 +54,24 @@ export const updateQuantityRemaining = async (date, menuItemId, quantity) => {
     throw error;
   }
 };
+
+export const updateQuantityOfAllCartItems = async (date, cartItems) => {
+  try {
+    const response = await fetch('https://state-cafe.vercel.app/stock/update-stock-from-cart', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ date, cartItems }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+
+    const result = await response.json();
+    console.log('Stock levels updated successfully:', result);
+  } catch (error) {
+    console.error('Error updating stock levels:', error);
+  }
+};
