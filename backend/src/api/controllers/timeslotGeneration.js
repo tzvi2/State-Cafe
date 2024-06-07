@@ -15,6 +15,7 @@ async function populateSlotsForDate(date, startHour, endHour) {
 }
 
 function generateTimeSlots(date, startHour, endHour) {
+  console.log('generating time slots for date ', date, "start hour: ", startHour, "end hour: ", endHour)
   let slots = [];
   
   function isEDT(date) {
