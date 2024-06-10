@@ -53,6 +53,7 @@ function App() {
               </AuthContextProvider>
             </DeliveryDetailsProvider>
           </CartProvider>
+          {/* secret comment  */}
       </BrowserRouter>
     </>
   );
