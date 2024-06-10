@@ -18,7 +18,7 @@ const allowedOrigins = [
   'https://statecafeteaneck.com', 
   'https://www.statecafeteaneck.com',
   'http://localhost:3000', // Add this for local development, remove it in production
-  '192.168.1.152:3000'
+  'http://192.168.1.152:3000'
 ];
 
 const corsOptions = {
