@@ -1,6 +1,7 @@
+import apiUrl from '../config';
 export const getLastFourDigits = async (paymentIntentId) => {
 	try {
-			const response = await fetch(`https://state-cafe.vercel.app/api/payment/get-last-four`, { 
+			const response = await fetch(`${apiUrl}/api/payment/get-last-four`, { 
 					method: 'POST',
 					headers: {
 							'Content-Type': 'application/json',

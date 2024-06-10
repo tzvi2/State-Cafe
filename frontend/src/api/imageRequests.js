@@ -1,9 +1,11 @@
+import apiUrl from '../config';
+
 async function uploadImage(file) {
 	const formData = new FormData();
 	formData.append('image', file);
 
 	try {
-		const response = await fetch('https://state-cafe.vercel.app/upload', {
+		const response = await fetch(`${apiUrl}/upload`, {
 			method: 'POST',
 			body: formData,
 		});

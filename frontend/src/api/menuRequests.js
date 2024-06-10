@@ -1,9 +1,10 @@
+import apiUrl from '../config';
 export const getMenuItems = async (category = '') => {
   // returns all items (in a specific category, if specified)
   try {
     // Encode the category to ensure it's a valid URL component
     const categoryParam = category ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`https://state-cafe.vercel.app/menu-data${categoryParam}`);
+    const res = await fetch(`${apiUrl}/menu-data${categoryParam}`);
 
     if (!res.ok) {
         throw new Error('Couldn\'t retrieve menu data.');
@@ -19,7 +20,7 @@ export const getMenuItems = async (category = '') => {
 }
 export const getQuickViewMenu = async () => {
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/menu-data/quickView`)
+    const response = await fetch(`${apiUrl}/menu-data/quickView`)
     const data = await response.json()
     return data
   } catch (err) {
@@ -32,7 +33,7 @@ export const getQuickViewMenu = async () => {
 export const getMenuItemByItemId = async (itemId) => {
 	try {
 			
-			const res = await fetch(`https://state-cafe.vercel.app/menu-data/by-item-id/${itemId}`);
+			const res = await fetch(`${apiUrl}/menu-data/by-item-id/${itemId}`);
 			if (!res.ok) {
 					throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
 			}
@@ -46,7 +47,7 @@ export const getMenuItemByItemId = async (itemId) => {
 
 export const addMenuItem = async (menuItem) => {
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/edit-menu/add-menu-item`, {
+    const response = await fetch(`${apiUrl}/edit-menu/add-menu-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -69,7 +70,7 @@ export const addMenuItem = async (menuItem) => {
 export const updateMenuItemActiveStatus = async (itemId, isActive) => {
   console.log('updating ', itemId, "new status: ", isActive)
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/edit-menu/update-status`, {
+    const response = await fetch(`${apiUrl}/edit-menu/update-status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -96,7 +97,7 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
 export const updateMenuItem = async (menuItemDetails) => {
   console.log('attempting update: ', menuItemDetails)
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/edit-menu/update-item`, {
+    const response = await fetch(`${apiUrl}/edit-menu/update-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -119,7 +120,7 @@ export const updateMenuItem = async (menuItemDetails) => {
 export const deleteMenuItem = async (documentId) => {
   console.log('deleting menu item with id: ', documentId)
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/edit-menu/delete-menu-item`, {
+    const response = await fetch(`${apiUrl}/edit-menu/delete-menu-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

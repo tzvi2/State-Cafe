@@ -1,6 +1,7 @@
+import apiUrl from '../config';
 export const saveOrder = async (order) => {
   try {
-    const response = await fetch(`https://state-cafe.vercel.app/api/orders`, {
+    const response = await fetch(`${apiUrl}/api/orders`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

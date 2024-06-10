@@ -6,6 +6,8 @@ import { formatIsoToTime, formatTimeTo12Hour } from '../../utils/timeUtilities';
 import { filterTimeSlots } from '../../utils/timeSlotUtilities';
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
 import { bookTimeSlot } from '../../api/timeslotRequests';
+import apiUrl from '../../config'
+
 
 function DeliveryPage() {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
@@ -51,7 +53,7 @@ function DeliveryPage() {
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
   const fetchTimeSlots = useCallback(async () => {
-    const url = `https://state-cafe.vercel.app/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
+    const url = `${apiUrl}/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
     //console.log(`Fetching time slots from: ${url}`);
 
     try {
