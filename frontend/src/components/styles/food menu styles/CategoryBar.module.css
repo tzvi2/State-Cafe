@@ -1,7 +1,7 @@
 .categoryBar {
   display: flex;
   border: 1px solid #B5C38A;
-  font-size: 5.5vw;
+  font-size: 5.5vh;
   font-weight: 500;
   overflow: auto;
   align-items: stretch;
@@ -24,6 +24,7 @@
   border: none;
   cursor: pointer;
 	align-items: center;
+  font-size: large;
 }
 
 .categoryButton:not(:last-child) {
@@ -35,11 +36,18 @@
   background-color: #E6EAD7;
 }
 
+
+
 @media (min-width: 550px) {
   .categoryBar {
     height: 5rem;
     top: 5rem;
   }
+
+  .categoryButton button {
+    font-size: 9vw;
+  }
+  
 
   .categoryButton {
     font-size: 1.25rem;
@@ -48,6 +56,8 @@
     flex-grow: 1;
     text-align: center;
   }
+
+  
 }
 
 @media (min-width: 1024px) {
@@ -67,4 +77,6 @@
     flex-grow: 1;
     text-align: center;
   }
+
+  
 }
