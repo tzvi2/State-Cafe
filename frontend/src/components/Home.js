@@ -1,5 +1,4 @@
 import React from 'react'
-import AboutSlide from './home page slides/AboutSlide'
 import ContactSlide from './home page slides/ContactSlide'
 import DescriptionSlide from './home page slides/DescriptionSlide'
 import MenuSlide from './home page slides/MenuSlide'

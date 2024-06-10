@@ -9,7 +9,8 @@ exports.getQuantityRemaining = async (req, res) => {
       const data = doc.data();
       res.status(200).json(data);
     } else {
-      res.status(404).json({ message: 'No data found for the given date' });
+      // Return a 200 status with a message indicating no data found
+      res.status(200).json({ message: 'No stock data found for the given date' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
