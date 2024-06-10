@@ -27,6 +27,7 @@ export default function Menu() {
     setIsLoading(true);
     const fetchQuickView = async () => {
       const items = await getQuickViewMenu();
+      
       const dateString = getLocalDate();
       let stockData = {};
 
@@ -55,6 +56,10 @@ export default function Menu() {
 
     fetchQuickView();
   }, []);
+
+  useEffect(() => {
+    console.log('menu items: ', menuItems)
+  }, [menuItems])
 
   const handleScroll = () => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
