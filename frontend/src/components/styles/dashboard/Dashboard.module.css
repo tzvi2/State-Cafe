@@ -1,0 +1,19 @@
+.menuItems {
+	display: flex;
+	flex-direction: column;
+}
+
+.menuItem {
+	display: flex;
+	justify-content: space-between;
+	margin: 1% 0;
+}
+
+.quantity {
+	display: flex;
+	justify-content: space-around;
+}
+
+.quantity input[type="number"] {
+	width: 60%;
+}

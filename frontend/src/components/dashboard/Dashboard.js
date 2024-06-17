@@ -144,21 +144,29 @@ const Dashboard = () => {
       <h2>Menu Items and Quantities</h2>
       {stockInitialized ? (
         menuItems.length > 0 ? (
-          menuItems.map(item => (
-            <div key={item.itemId} className={styles.menuItem}>
-              <span>{item.title}</span>
-              <input 
-                type="number" 
-                value={stock[item.itemId]?.quantity || 0} 
-                onChange={e => handleQuantityChange(item.itemId, parseInt(e.target.value))}
-              />
-              <input 
-                type="button" 
-                value="Save" 
-                onClick={() => saveQuantityChange(item.itemId)}
-              />
-            </div>
-          ))
+          <div className={styles.menuItems}>
+            {menuItems.map(item => (
+              <div key={item.itemId} className={styles.menuItem}>
+
+                <div className={styles.title}>
+                  <span>{item.title}</span>
+                </div>
+                
+                <div className={styles.quantity}>
+                  <input
+                    type="number"
+                    value={stock[item.itemId]?.quantity || 0}
+                    onChange={e => handleQuantityChange(item.itemId, parseInt(e.target.value))}
+                  />
+                  <input
+                    type="button"
+                    value="Save"
+                    onClick={() => saveQuantityChange(item.itemId)}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         ) : (
           <p>No menu items available</p>
         )

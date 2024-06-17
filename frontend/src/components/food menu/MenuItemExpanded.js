@@ -16,7 +16,7 @@ function MenuItemExpanded() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [quantityLeft, setQuantityLeft] = useState(0); // State to track quantity left
+  const [quantityLeft, setQuantityLeft] = useState(''); // State to track quantity left
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Order",

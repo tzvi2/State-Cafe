@@ -56,7 +56,10 @@ const MenuDashboard = () => {
 
   if (!isAuthorized) {
     return (
-      <p>You need so sign in to view this page.</p>
+      <>
+      <p>You need to sign in to view this page.</p>
+      <button onClick={() => signInWithGoogle()}></button>
+      </>
     )
   }
   

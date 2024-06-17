@@ -12,7 +12,7 @@ function ToggleImage({ src, alt, overlayText, category }) {
     <div>
       <h2 className={styles.category}>{category}</h2>
       <div className={styles.imageCard} onClick={handleClick}>
-        <img src={src} alt={alt}/>
+        <img loading='lazy' src={src} alt={alt}/>
         <div className={`${styles.overlay} ${showOverlay ? styles.show : styles.hide}`}>
           <span>{overlayText}</span>
         </div>

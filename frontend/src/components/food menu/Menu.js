@@ -25,35 +25,27 @@ export default function Menu() {
 
   useEffect(() => {
     setIsLoading(true);
+  
     const fetchQuickView = async () => {
-      const items = await getQuickViewMenu();
-      
-      const dateString = getLocalDate();
-      let stockData = {};
-
       try {
-        stockData = await getStockForDate(dateString);
+        const [items, stockData] = await Promise.all([
+          getQuickViewMenu(),
+          getStockForDate(getLocalDate())
+        ]);
+  
+        const itemsWithStock = items.map(item => ({
+          ...item,
+          quantity: stockData[item.itemId]?.quantity || 0
+        }));
+  
+        setMenuItems(itemsWithStock);
       } catch (error) {
-        if (error.message === 'Network response was not ok') {
-          //console.log("Stock data not found for date, setting default quantities to 100");
-          stockData = items.reduce((acc, item) => {
-            acc[item.itemId] = { quantity: 100 };
-            return acc;
-          }, {});
-        } else {
-          //console.error("Error fetching stock data:", error);
-        }
+        console.error("Error fetching data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      
-      const itemsWithStock = items.map(item => ({
-        ...item,
-        quantity: stockData[item.itemId]?.quantity || 0
-      }));
-
-      setMenuItems(itemsWithStock);
-      setIsLoading(false);
     };
-
+  
     fetchQuickView();
   }, []);
 

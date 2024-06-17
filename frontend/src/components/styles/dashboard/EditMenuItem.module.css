@@ -10,6 +10,15 @@
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.menuButton {
+  width: 30%;
+  margin-bottom: 3%;
+  padding: 1%;
+  border: 1px solid grey;
+  text-decoration: none;
+  color: black;
+}
+
 .editForm {
   display: flex;
   flex-direction: column;
@@ -75,4 +84,8 @@
 
 .saveButton:hover {
   background-color: #007B9E;
+}
+
+label textarea {
+  width: 100%;
 }

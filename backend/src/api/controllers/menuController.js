@@ -13,23 +13,10 @@ const fetchMenuData = async (req, res) => {
 };
 
 const fetchQuickView = async (req, res) => {
-
   try {
     const menuItemsRef = db.collection('menuItems');
-    const snapshot = await menuItemsRef.get();
-    const quickViewMenu = [];
-
-    snapshot.forEach(doc => {
-      const data = doc.data();
-      quickViewMenu.push({
-        title: data.title,
-        img: data.img,
-        price: data.price,
-        itemId: data.itemId,
-        category: data.category,
-        active: data.active || false
-      });
-    });
+    const snapshot = await menuItemsRef.select('title', 'img', 'price', 'itemId', 'category', 'active').get();
+    const quickViewMenu = snapshot.docs.map(doc => doc.data());
 
     res.json(quickViewMenu);
   } catch (err) {
@@ -37,6 +24,7 @@ const fetchQuickView = async (req, res) => {
     res.status(500).send("Error fetching quick view menu");
   }
 };
+
 
 const getItemByDocumentId = async (req, res) => {
   const { documentId } = req.params
@@ -89,10 +77,47 @@ const getItemPrice = async (req, res) => {
   }
 }
 
+const updateMenuItemIds = async (req, res) => {
+  try {
+    const collectionRef = db.collection('menuItems');
+    const snapshot = await collectionRef.get();
+
+    if (snapshot.empty) {
+      return res.status(404).json({ message: 'No documents found in collection.' });
+    }
+
+    console.log('Starting to update document IDs...');
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data();
+      const itemId = data.itemId;
+
+      if (itemId) {
+        // Create a new document with the itemId as the document ID
+        await collectionRef.doc(itemId).set(data);
+
+        // Delete the old document
+        await doc.ref.delete();
+
+        console.log(`Document with ID: ${doc.id} has been updated to new ID: ${itemId}`);
+      } else {
+        console.error(`Document with ID: ${doc.id} does not have an itemId field.`);
+      }
+    }
+
+    console.log('Document ID update completed.');
+    return res.status(200).json({ message: 'Document ID update completed.' });
+  } catch (error) {
+    console.error('Error updating document IDs:', error);
+    return res.status(500).json({ message: 'Error updating document IDs.', error: error.message });
+  }
+};
+
 module.exports = {
   fetchMenuData,
   getItemByDocumentId,
   getItemByItemId,
   getItemPrice,
-  fetchQuickView
+  fetchQuickView,
+  updateMenuItemIds
 };

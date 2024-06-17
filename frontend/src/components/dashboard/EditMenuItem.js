@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getMenuItemByItemId, updateMenuItem } from '../../api/menuRequests';
 import styles from '../styles/dashboard/EditMenuItem.module.css'; // Ensure the correct path to your CSS module
+import { Link } from 'react-router-dom';
 
 const EditMenuItem = () => {
   const { itemId } = useParams();
@@ -59,7 +60,7 @@ const EditMenuItem = () => {
 
   const handleOptionChange = (index, e, isGroup = false, groupIndex = null) => {
     const { name, value } = e.target;
-    const numericValue = name === 'price' || name === 'timeToCook' ? parseFloat(value) : value;
+    const numericValue = name === 'price' || name === 'timeToCook' ? parseFloat(value) || 0 : value;
   
     if (isGroup) {
       setMenuItem(prevState => {
@@ -103,7 +104,7 @@ const EditMenuItem = () => {
   const addIndividualOption = () => {
     setMenuItem(prevState => ({
       ...prevState,
-      options: [...prevState.options, { title: '', price: '', timeToCook: '' }],
+      options: [...prevState.options, { title: '', price: 0, timeToCook: 0 }],
     }));
   };
   
@@ -112,7 +113,7 @@ const EditMenuItem = () => {
       const newOptionGroups = [...prevState.optionGroups];
       newOptionGroups[groupIndex].options = [
         ...newOptionGroups[groupIndex].options,
-        { title: '', price: '', timeToCook: '' },
+        { title: '', price: 0, timeToCook: 0 },
       ];
 
       return { ...prevState, optionGroups: newOptionGroups };
@@ -154,6 +155,9 @@ const EditMenuItem = () => {
         if (isNaN(option.price) || isNaN(option.timeToCook)) {
           return false;
         }
+        // Convert empty string values to 0
+        option.price = option.price || 0;
+        option.timeToCook = option.timeToCook || 0;
       }
       return true;
     };
@@ -170,6 +174,10 @@ const EditMenuItem = () => {
       }
     }
 
+    // Convert main price and timeToCook to 0 if they are empty strings
+    menuItem.price = menuItem.price || 0;
+    menuItem.timeToCook = menuItem.timeToCook || 0;
+
     try {
       await updateMenuItem(menuItem);
       alert('Menu item updated successfully');
@@ -182,6 +190,7 @@ const EditMenuItem = () => {
 
   return (
     <div className={styles.editMenuItemContainer}>
+      <Link to={"/menu-dashboard"} className={styles.menuButton}>⬅ Menu Dashboard</Link>
       <form onSubmit={handleSubmit} className={styles.editForm}>
         <h2>Edit Menu Item</h2>
         <label>

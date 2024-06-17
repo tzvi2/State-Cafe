@@ -1,4 +1,5 @@
 import apiUrl from '../config';
+
 export const getMenuItems = async (category = '') => {
   // returns all items (in a specific category, if specified)
   try {

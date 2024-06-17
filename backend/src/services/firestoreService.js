@@ -63,13 +63,19 @@ const addMenuItemToFirestore = async (menuItem) => {
       }));
     }
     
-    const docRef = await db.collection('menuItems').add(menuItem);
-    return { id: docRef.id, ...menuItem };
+    // Sanitize itemId to ensure it's a valid Firestore document ID
+    const sanitizedItemId = newItem.itemId.replace(/[\/\\#?]/g, '_').replace(/\s+/g, '-');
+    
+    // Use the sanitized itemId as the document ID
+    const docRef = await db.collection('menuItems').doc(sanitizedItemId).set(newItem);
+    return { id: sanitizedItemId, ...newItem };
   } catch (error) {
     console.error('Error adding menu item to Firestore:', error);
     throw error;
   }
+  
 };
+
 
 const updateMenuItemActiveStatusInFirestore = async (itemId, active) => {
   try {
@@ -116,7 +122,6 @@ const deleteMenuItem = async (documentId) => {
   }
   
 }
-
 
 
 module.exports = {

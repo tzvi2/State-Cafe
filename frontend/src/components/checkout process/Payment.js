@@ -13,14 +13,14 @@ function Checkout(props) {
   const [clientSecret, setClientSecret] = useState(null)
 
   useEffect(() => {
-    fetch(`${apiUrl}/config`).then(async (res) => {
+    fetch(`https://state-cafe.vercel.app/config`).then(async (res) => {
       const {publishableKey} = await res.json()
       setStripePromise(loadStripe(publishableKey))
     })
   }, [])
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/payment/create-payment-intent`, {
+    fetch(`https://state-cafe.vercel.app/api/payment/create-payment-intent`, {
       method: "POST",
       headers: { "Content-Type": "application/json"},
       body: JSON.stringify({ items: cart.items }), 
