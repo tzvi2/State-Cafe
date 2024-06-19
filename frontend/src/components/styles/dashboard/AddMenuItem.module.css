@@ -1,6 +1,12 @@
 .form {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-start;
 	row-gap: 2vw;
+	padding: 2%;
+	
 }
 
+.form input, .form textarea {
+	width: 250px;
+}

@@ -113,11 +113,13 @@ const updateMenuItemIds = async (req, res) => {
   }
 };
 
+
+
 module.exports = {
   fetchMenuData,
   getItemByDocumentId,
   getItemByItemId,
   getItemPrice,
   fetchQuickView,
-  updateMenuItemIds
+  updateMenuItemIds,
 };

@@ -8,6 +8,7 @@ const configRoutes = require('./src/api/routes/configRoutes');
 const timeslotRoutes = require('./src/api/routes/timeslotRoutes');
 const editMenuRoutes = require('./src/api/routes/editMenuRoutes');
 const stockRoutes = require('./src/api/routes/stockRoutes');
+const cronController = require('./src/api/controllers/cron')
 const morgan = require('morgan');
 const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandler');
 const helmet = require('helmet');
@@ -74,6 +75,7 @@ app.use('/config', configRoutes);
 app.use('/timeslots', timeslotRoutes);
 app.use('/stock', stockRoutes);
 app.post('/upload', upload.single('image'), handleFileUpload);
+app.get('/api/cron', cronController);
 
 app.listen(8000, () => {
   console.log('Server started on port 8000');
