@@ -65,9 +65,14 @@ exports.setAllProductQuantitiesToZero = async (req, res) => {
     let quantities = {};
     menuItemsSnapshot.forEach(doc => {
       const menuItem = doc.data();
-      quantities[menuItem.itemId] = {
-        quantity: 0
-      };
+      if (menuItem.soldByWeight) {
+        quantities[menuItem.itemId] = []
+      } else {
+        quantities[menuItem.itemId] = {
+          quantity: 0
+        };
+      }
+      
     });
 
     // Set the quantities for the given date

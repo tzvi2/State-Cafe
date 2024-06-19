@@ -1,4 +1,5 @@
 import apiUrl from '../config';
+
 export const setAllStockToZero = async (dateString) => {
 	console.log('initializing all to Zero ', dateString, "we're in the frontned")
   try {

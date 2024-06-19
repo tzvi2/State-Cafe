@@ -8,18 +8,18 @@ const EditMenuItem = () => {
   const { itemId } = useParams();
   const navigate = useNavigate();
   const [menuItem, setMenuItem] = useState({
-    category: '',
-    img: '',
-    itemId: '',
-    pieces: '',
+    title: '', 
+    description: '',
     price: '',
+    pieces: '', 
+    category: '',
     tags: '',
-    timeToCook: '',
-    title: '',
+    timeToCook: '', 
     options: [],
     optionGroups: [],
-    description: '',
-    active: false,
+    soldByWeight: false,
+    weightOptions: [],
+    active: true,
   });
 
   useEffect(() => {
@@ -43,6 +43,14 @@ const EditMenuItem = () => {
   }, [itemId]);
   
   const uploadImage = () => {}
+
+  const toggleSoldByWeight = (e) => {
+    setMenuItem((prevMenuItem) => ({
+      ...prevMenuItem,
+      soldByWeight: e.target.checked
+    }))
+  }
+
 
   const handleImageChange = async (e) => {
     return;
@@ -371,6 +379,16 @@ const EditMenuItem = () => {
           </div>
         ))}
         <button type="button" onClick={addOptionGroup}>Add Option Group</button>
+
+        <label className={styles.toggleLabel}>
+        Sold by weight:
+        <input
+          type="checkbox"
+          checked={menuItem.soldByWeight}
+          onChange={toggleSoldByWeight}
+          className={styles.toggleInput}
+        />
+      </label>
 
       <button type="submit" className={styles.saveButton}>Save Changes</button>
 

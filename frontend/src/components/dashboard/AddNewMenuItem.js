@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { addMenuItem } from '../../api/menuRequests';
 import uploadImage from '../../api/imageRequests';
@@ -16,6 +16,8 @@ function AddNewMenuItem() {
     timeToCook: '', 
     options: [],
     optionGroups: [],
+    soldByWeight: false,
+    weightOptions: [],
     active: true,
   });
 
@@ -36,6 +38,13 @@ function AddNewMenuItem() {
       active: e.target.checked,
     }));
   };
+
+  const toggleSoldByWeight = (e) => {
+    setMenuItem((prevMenuItem) => ({
+      ...prevMenuItem,
+      soldByWeight: e.target.checked
+    }))
+  }
 
   const handleOptionChange = (groupIndex, e, field, isOptionGroup = false, subIndex = null) => {
     const { name, value } = e.target;
@@ -71,6 +80,10 @@ function AddNewMenuItem() {
       }
     });
   };
+
+  useEffect(() => {
+    //console.log('menu item: ', menuItem)
+  }, [menuItem])
 
   const addOption = () => {
     const newOption = { title: '', timeToCook: '', price: '' };
@@ -164,11 +177,11 @@ function AddNewMenuItem() {
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
       <input name="title" value={menuItem.title} onChange={handleChange} placeholder="Title" />
-      <input name="pieces" type="number" value={menuItem.pieces} onChange={handleChange} placeholder="Pieces" />
+      {/* <input name="pieces" type="number" value={menuItem.pieces} onChange={handleChange} placeholder="Pieces" /> */}
       <textarea name="description" value={menuItem.description} onChange={handleChange} placeholder="Description" />
       <input name="price" type="text" value={menuItem.price} onChange={handleChange} placeholder="Price (in cents)" />
       <input name="category" value={menuItem.category} onChange={handleChange} placeholder="Category" />
-      <input name="tags" value={menuItem.tags} onChange={handleChange} placeholder="Tags (comma-separated)" />
+      {/* <input name="tags" value={menuItem.tags} onChange={handleChange} placeholder="Tags (comma-separated)" /> */}
       <input name="timeToCook" type="text" value={menuItem.timeToCook} onChange={handleChange} placeholder="Time to Cook (in seconds)" />
       <label>Image: <input type="file" onChange={handleImageChange} /></label>
       <button type="button" onClick={addOption}>Add Individual Option</button>
@@ -267,6 +280,16 @@ function AddNewMenuItem() {
           type="checkbox"
           checked={menuItem.active}
           onChange={handleToggleChange}
+          className={styles.toggleInput}
+        />
+      </label>
+
+      <label className={styles.toggleLabel}>
+        Sold by weight:
+        <input
+          type="checkbox"
+          checked={menuItem.soldByWeight}
+          onChange={toggleSoldByWeight}
           className={styles.toggleInput}
         />
       </label>

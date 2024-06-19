@@ -105,7 +105,8 @@ export default function Menu() {
         setActiveCategory={handleCategoryClick} 
         ref={categoryBarRef}
       />
-      <div className={styles.menuContainer}>
+      <h1 className={styles.temporaryBanner}>Coming Soon...</h1>
+      {/* <div className={styles.menuContainer}>
         {categories.map((category) => (
           <div
             key={category}
@@ -123,7 +124,7 @@ export default function Menu() {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
     </>
   );
 }

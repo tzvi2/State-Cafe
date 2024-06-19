@@ -19,7 +19,7 @@ function MenuItemExpanded() {
   const [quantityLeft, setQuantityLeft] = useState(''); // State to track quantity left
 
   const [buttonContent, setButtonContent] = useState({
-    text: "Add to Order",
+    text: "Add to Cart",
     amount: ""
   });
 
@@ -81,7 +81,7 @@ function MenuItemExpanded() {
   useEffect(() => {
     if (menuItem.price !== undefined) {
       let newButtonContent = {
-        text: quantityLeft === 0 ? "Out of Stock" : "Add to Order ",
+        text: quantityLeft === 0 ? "Out of Stock" : "Add to Cart ",
         amount: quantityLeft === 0 ? "" : centsToFormattedPrice(totalItemPrice)
       };
       setButtonContent(newButtonContent);
@@ -122,7 +122,7 @@ function MenuItemExpanded() {
 
       timeoutId2Ref.current = setTimeout(() => {
         setButtonContent({
-          text: "Add to Order ",
+          text: "Add to Cart ",
           amount: centsToFormattedPrice(totalItemPrice),
         });
         setButtonLocked(false);

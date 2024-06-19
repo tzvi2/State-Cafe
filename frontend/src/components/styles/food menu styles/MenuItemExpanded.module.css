@@ -152,7 +152,7 @@ img {
   }
 
   .menuItemExpanded {
-    width: 30%;
+    width: 25%;
   }
 
   .description {
@@ -183,6 +183,10 @@ img {
     height: 2rem;
     margin: 0;
     margin-right: 3%;
+  }
+
+  .footer select {
+    width: 15%;
   }
 
   .footer select, .footer button {
