@@ -1,6 +1,7 @@
 require('dotenv').config(); 
 
 const admin = require('firebase-admin');
+const { Storage } = require('@google-cloud/storage');
 
 var serviceAccount = {
   "type": "service_account",
@@ -23,7 +24,16 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+const storage = new Storage({
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  credentials: {
+    client_email: serviceAccount.client_email,
+    private_key: serviceAccount.private_key,
+  },
+});
+
 module.exports = {
   db,
   admin,
+  storage
 };
