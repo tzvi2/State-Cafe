@@ -15,7 +15,7 @@ const fetchMenuData = async (req, res) => {
 const fetchQuickView = async (req, res) => {
   try {
     const menuItemsRef = db.collection('menuItems');
-    const snapshot = await menuItemsRef.select('title', 'img', 'price', 'itemId', 'category', 'active').get();
+    const snapshot = await menuItemsRef.select('title', 'img', 'price', 'itemId', 'category', 'active', 'soldByWeight').get();
     const quickViewMenu = snapshot.docs.map(doc => doc.data());
 
     res.json(quickViewMenu);

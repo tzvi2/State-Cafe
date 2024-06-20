@@ -1,4 +1,9 @@
-const {db} = require('../../../firebase/firebaseAdminConfig')
+const { db } = require('../../../firebase/firebaseAdminConfig');
+
+const admin = require('firebase-admin');
+
+// Make sure to import FieldValue from admin.firestore
+const FieldValue = admin.firestore.FieldValue;
 
 exports.getQuantityRemaining = async (req, res) => {
   const { date } = req.query;
@@ -9,14 +14,12 @@ exports.getQuantityRemaining = async (req, res) => {
       const data = doc.data();
       res.status(200).json(data);
     } else {
-      // Return a 200 status with a message indicating no data found
       res.status(200).json({ message: 'No stock data found for the given date' });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 
 exports.updateQuantityRemaining = async (req, res) => {
   const { date, menuItemId, quantity } = req.body;
@@ -26,7 +29,6 @@ exports.updateQuantityRemaining = async (req, res) => {
     const doc = await stockRef.get();
 
     if (doc.exists) {
-      // If the document exists, update or add the menu item field
       const data = doc.data();
       const updatedData = {
         ...data,
@@ -36,7 +38,6 @@ exports.updateQuantityRemaining = async (req, res) => {
       };
       await stockRef.set(updatedData);
     } else {
-      // If the document does not exist, create it with the menu item field
       await stockRef.set({
         [menuItemId]: {
           quantity: quantity
@@ -50,38 +51,34 @@ exports.updateQuantityRemaining = async (req, res) => {
   }
 };
 
-
 exports.setAllProductQuantitiesToZero = async (req, res) => {
-	const {dateString} = req.body
+  const { dateString } = req.body;
   try {
-    // Fetch all menu items from the menuItems collection
     const menuItemsSnapshot = await db.collection('menuItems').get();
     if (menuItemsSnapshot.empty) {
       console.log('No menu items found');
-      return;
+      return res.status(404).json({ message: 'No menu items found' });
     }
 
-    // Create an object to hold the menu item quantities set to zero
     let quantities = {};
     menuItemsSnapshot.forEach(doc => {
       const menuItem = doc.data();
       if (menuItem.soldByWeight) {
-        quantities[menuItem.itemId] = []
+        quantities[menuItem.itemId] = [];
       } else {
         quantities[menuItem.itemId] = {
           quantity: 0
         };
       }
-      
     });
 
-    // Set the quantities for the given date
     const stockRef = db.collection('stock').doc(dateString);
     await stockRef.set(quantities, { merge: true });
 
-    console.log(`All product quantities set to zero for ${dateString}`);
+    res.status(200).json({ message: `All product quantities set to zero for ${dateString}` });
   } catch (error) {
     console.error('Error setting product quantities to zero:', error);
+    res.status(500).json({ message: 'Error setting product quantities to zero' });
   }
 };
 
@@ -89,8 +86,6 @@ exports.updateStockLevels = async (req, res) => {
   console.log('updating stock levels.');
 
   const { date, cartItems } = req.body;
-  console.log('date ', date);
-  //console.log('cartItems ', cartItems);
 
   if (!date || !cartItems || !Array.isArray(cartItems)) {
     return res.status(400).json({ error: 'Invalid input. Date and cart items are required.' });
@@ -107,16 +102,15 @@ exports.updateStockLevels = async (req, res) => {
     }
 
     const stockData = stockDoc.data();
-    console.log('stockData: ', stockData);  // Log the structure of stockData
+    console.log('stockData: ', stockData);
 
     cartItems.forEach(item => {
-      const itemStock = stockData[item.itemId]?.quantity; // Use optional chaining to safely access the quantity
-      console.log(`Item ID ${item.itemId} stock: `, itemStock);
+      const itemStock = stockData[item.itemId]?.quantity;
 
       if (itemStock != null && typeof itemStock === 'number') {
         const updatedQuantity = itemStock - item.quantity;
         if (updatedQuantity >= 0) {
-          batch.update(stockRef, { [`${item.itemId}.quantity`]: updatedQuantity }); // Update the nested quantity field
+          batch.update(stockRef, { [`${item.itemId}.quantity`]: updatedQuantity });
         } else {
           console.error(`Not enough stock for item ID ${item.itemId}. Current stock: ${itemStock}, required: ${item.quantity}`);
         }
@@ -132,3 +126,92 @@ exports.updateStockLevels = async (req, res) => {
     res.status(500).json({ error: 'Failed to update stock levels.' });
   }
 };
+
+exports.saveWeightData = async (req, res) => {
+  const { date, itemId, weightData } = req.body;
+
+  console.log(`Received request to save weight data: date=${date}, itemId=${itemId}, weightData=${JSON.stringify(weightData)}`);
+
+  try {
+    const stockRef = db.collection('stock').doc(date);
+    const stockDoc = await stockRef.get();
+
+    if (!stockDoc.exists) {
+      return res.status(404).json({ message: 'Stock document not found' });
+    }
+
+    // Ensure weightData is not nested
+    if (!Array.isArray(weightData)) {
+      return res.status(400).json({ message: 'weightData must be an array' });
+    }
+
+    const updatedData = {
+      [itemId]: weightData
+    };
+
+    console.log(`Updating stock with: ${JSON.stringify(updatedData)}`);
+
+    await stockRef.update(updatedData);
+
+    res.status(200).json({ message: 'Weight data saved successfully' });
+  } catch (error) {
+    console.error('Error saving weight data:', error);
+    res.status(500).json({ message: 'Error saving weight data' });
+  }
+};
+
+exports.deleteWeightData = async (req, res) => {
+  const { date, itemId, weightData } = req.body;
+
+  try {
+    const stockRef = db.collection('stock').doc(date);
+    await stockRef.update({
+      [itemId]: FieldValue.arrayRemove(weightData)
+    });
+    res.status(200).json({ message: 'Weight data deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting weight data:', error);
+    res.status(500).json({ message: 'Error deleting weight data' });
+  }
+};
+
+exports.updateWeightQuantity = async (req, res) => {
+  const { date, itemId, weightIndex, newQuantity } = req.body;
+
+  console.log(`Received request to update weight quantity: date=${date}, itemId=${itemId}, weightIndex=${weightIndex}, newQuantity=${newQuantity}`);
+
+  if (!date || !itemId || weightIndex === undefined || newQuantity === undefined) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  try {
+    const stockRef = db.collection('stock').doc(date);
+    const stockDoc = await stockRef.get();
+
+    if (!stockDoc.exists) {
+      return res.status(404).json({ message: 'Stock document not found' });
+    }
+
+    const stockData = stockDoc.data();
+    if (!stockData[itemId] || !Array.isArray(stockData[itemId]) || !stockData[itemId][weightIndex]) {
+      return res.status(400).json({ message: 'Invalid item ID or weight index' });
+    }
+
+    // Update the specific weight entry's quantity
+    const updatedWeightData = [...stockData[itemId]];
+    updatedWeightData[weightIndex].quantity = newQuantity;
+
+    console.log(`Updating weight data for itemId ${itemId} at index ${weightIndex} with new quantity ${newQuantity}`);
+    console.log(`Updated weight data:`, updatedWeightData);
+
+    await stockRef.update({
+      [itemId]: updatedWeightData
+    });
+
+    res.status(200).json({ message: 'Weight quantity updated successfully' });
+  } catch (error) {
+    console.error('Error updating weight quantity:', error);
+    res.status(500).json({ message: 'Error updating weight quantity' });
+  }
+};
+//exports.getItemWeightOptions = async (req)

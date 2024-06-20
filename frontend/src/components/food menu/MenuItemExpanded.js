@@ -16,7 +16,7 @@ function MenuItemExpanded() {
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [quantityLeft, setQuantityLeft] = useState(''); // State to track quantity left
+  const [quantityLeft, setQuantityLeft] = useState(0); // State to track quantity left
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Cart",
@@ -29,11 +29,28 @@ function MenuItemExpanded() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
-      setMenuItem(data);
-
       const dateString = getLocalDate();
       const stockData = await getStockForDate(dateString);
-      setQuantityLeft(stockData[itemId]?.quantity || 0); // Set quantity left from stock data
+
+      const weightOptionsGroup = data.soldByWeight ? {
+        title: 'Available Portions',
+        options: stockData[itemId] || [],
+        minSelection: 1
+      } : null;
+
+      data.optionGroups = weightOptionsGroup 
+        ? [weightOptionsGroup, ...(data.optionGroups || [])] 
+        : data.optionGroups;
+
+      data.quantity = data.quantity || []; // Initialize quantity as an empty array if undefined
+      setMenuItem(data);
+
+      if (data.soldByWeight) {
+        const totalQuantity = stockData[itemId]?.reduce((total, option) => total + option.quantity, 0) || 0;
+        setQuantityLeft(totalQuantity);
+      } else {
+        setQuantityLeft(stockData[itemId]?.quantity || 0);
+      }
     };
     fetchData();
   }, [itemId]);
@@ -155,7 +172,7 @@ function MenuItemExpanded() {
         />
 
         <div className={styles.footer}>
-          <select 
+          {!menuItem.soldByWeight && <select 
             className={styles.quantity} 
             defaultValue={1} 
             onChange={(e) => setQuantity(parseInt(e.target.value))}
@@ -164,7 +181,7 @@ function MenuItemExpanded() {
             {[...Array(Math.min(10, quantityLeft)).keys()].map(n => (
               <option key={n} value={n + 1}>{n + 1}</option>
             ))}
-          </select>
+          </select>}
           <button 
             className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${quantityLeft === 0 ? styles.outOfStock : ''}`} 
             disabled={buttonLocked || quantityLeft === 0} // Disable if out of stock

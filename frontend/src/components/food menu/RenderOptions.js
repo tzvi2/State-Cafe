@@ -21,7 +21,7 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange }) => {
                 />
                 <label 
                   className={styles.optionLabel}
-                  htmlFor={`group-${groupIndex}-option-${optionIndex}`}>{option.title} (+{centsToFormattedPrice(option.price)})
+                  htmlFor={`group-${groupIndex}-option-${optionIndex}`}>{option.title || option.weight} (+{centsToFormattedPrice(option.price)})
                 </label>
               </div>
             </div>

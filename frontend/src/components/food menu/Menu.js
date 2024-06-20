@@ -32,11 +32,21 @@ export default function Menu() {
           getQuickViewMenu(),
           getStockForDate(getLocalDate())
         ]);
-  
-        const itemsWithStock = items.map(item => ({
-          ...item,
-          quantity: stockData[item.itemId]?.quantity || 0
-        }));
+
+        const itemsWithStock = items.map(item => {
+          if (item.soldByWeight === true) {
+            return {
+              ...item,
+              weightOptions: stockData[item.itemId] || []
+            };
+          } else {
+            //console.log(stockData[item.itemId].quantity)
+            return {
+              ...item,
+              quantity: stockData[item.itemId].quantity || 0
+            };
+          }
+        });
   
         setMenuItems(itemsWithStock);
       } catch (error) {
@@ -50,8 +60,8 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    console.log('menu items: ', menuItems)
-  }, [menuItems])
+    console.log('menu items: ', menuItems);
+  }, [menuItems]);
 
   const handleScroll = () => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
@@ -89,7 +99,7 @@ export default function Menu() {
     });
 
     // Set active category immediately on click
-    //setActiveCategory(category);
+    setActiveCategory(category);
   };
 
   useEffect(() => {
@@ -105,8 +115,7 @@ export default function Menu() {
         setActiveCategory={handleCategoryClick} 
         ref={categoryBarRef}
       />
-      <h1 className={styles.temporaryBanner}>Coming Soon...</h1>
-      {/* <div className={styles.menuContainer}>
+      <div className={styles.menuContainer}>
         {categories.map((category) => (
           <div
             key={category}
@@ -124,7 +133,7 @@ export default function Menu() {
             </div>
           </div>
         ))}
-      </div> */}
+      </div>
     </>
   );
 }
