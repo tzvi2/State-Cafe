@@ -19,6 +19,7 @@ const allowedOrigins = [
   'https://statecafeteaneck.com', 
   'https://www.statecafeteaneck.com',
   'http://localhost:3000', // Add this for local development, remove it in production
+  'http://localhost:3001', // Add this for local development, remove it in production
   'http://192.168.1.152:3000'
 ];
 

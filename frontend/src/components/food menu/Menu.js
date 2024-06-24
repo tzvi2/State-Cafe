@@ -43,7 +43,7 @@ export default function Menu() {
             //console.log(stockData[item.itemId].quantity)
             return {
               ...item,
-              quantity: stockData[item.itemId].quantity || 0
+              quantity: stockData[item.itemId]?.quantity || 0
             };
           }
         });

@@ -23,6 +23,7 @@ const handleGetLastFour = async (req, res) => {
 		console.log(err)
 	}
 }
+// j
 
 module.exports = {
 	handleCreatePaymentIntent,
