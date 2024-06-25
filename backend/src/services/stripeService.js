@@ -34,17 +34,32 @@ const createPaymentIntent = async (items) => {
 };
 
 const getLastFourAndBrand = async (paymentIntentId) => {
-  const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
-
-  const paymentMethod = await stripe.paymentMethods.retrieve(
-    paymentIntent.payment_method
-  );
-
-  const lastFour = paymentMethod.card.last4;
-  const brand = paymentMethod.card.brand;
-
-  return { lastFour, brand };
-};
+    const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+  
+    if (!paymentIntent.payment_method) {
+      throw new Error('No payment method found for this payment intent.');
+    }
+  
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentIntent.payment_method);
+  
+    let lastFour, brand;
+    
+    switch (paymentMethod.type) {
+      case 'card':
+        lastFour = paymentMethod.card.last4;
+        brand = paymentMethod.card.brand;
+        break;
+      case 'link':
+        lastFour = paymentMethod.link?.last4;
+        brand = 'Link';
+        break;
+      // Handle other payment methods as needed
+      default:
+        throw new Error(`Unsupported payment method type: ${paymentMethod.type}`);
+    }
+  
+    return { lastFour, brand };
+  };
 
 module.exports = {
   calculateTotal,

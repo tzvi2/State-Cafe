@@ -34,8 +34,9 @@ const corsOptions = {
     return callback(null, true);
   },
   optionsSuccessStatus: 200,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  preflightContinue: false
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE, OPTIONS",
+  preflightContinue: false,
+  allowedHeader: ['Content-Type']
 };
 
 const app = express();

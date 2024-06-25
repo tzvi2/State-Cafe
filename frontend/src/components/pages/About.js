@@ -11,7 +11,7 @@ function About() {
         <p>👋 <strong>Hi, we're Tzvi and Yakira</strong> - the duo behind State Cafe. Our goal is to give people a great experience with fresh, high-quality food.</p>
         
         <p>
-          🏡 <strong>Doing it from scratch:</strong> An end product can only be as good as it's components - or ingredients. That's why we favor homemade, fresh, and high-quality ingredients to give you the very best result.
+          🏡 <strong>Doing it from scratch:</strong> An end product can only be as good as it's ingredients. That's why we favor homemade, fresh, and high-quality ingredients to give you the very best result.
         </p>
         
         <p>
