@@ -12,7 +12,7 @@ export default function DeliverySlotProvider({ children }) {
 
   const [unitNumber, setUnitNumber] = useState(() => {
     const savedUnitNumber = localStorage.getItem('unitNumber');
-    return savedUnitNumber || "";
+    return savedUnitNumber || "501";
   });
 
   const [deliveryDate, setDeliveryDate] = useState(() => {
@@ -22,7 +22,7 @@ export default function DeliverySlotProvider({ children }) {
 
   const [phoneNumber, setPhoneNumber] = useState(() => {
     const savedPhoneNumber = localStorage.getItem('phoneNumber');
-    return savedPhoneNumber || "";
+    return savedPhoneNumber || "1234567890";
   });
 
   useEffect(() => {

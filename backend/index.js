@@ -20,7 +20,8 @@ const allowedOrigins = [
   'https://www.statecafeteaneck.com',
   'http://localhost:3000', // Add this for local development, remove it in production
   'http://localhost:3001', // Add this for local development, remove it in production
-  'http://192.168.1.152:3000'
+  'http://192.168.1.152:3000',
+  '192.168.1.152:3000'
 ];
 
 const corsOptions = {
@@ -40,6 +41,10 @@ const corsOptions = {
 };
 
 const app = express();
+
+console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY);
+console.log('Node Environment:', process.env.NODE_ENV);
+
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

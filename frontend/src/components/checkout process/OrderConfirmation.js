@@ -8,11 +8,12 @@ import { bookTimeSlot } from '../../api/timeslotRequests';
 import { formatIsoToTime } from '../../utils/timeUtilities';
 import styles from '../styles/checkout process styles/OrderConfirmation.module.css';
 import { updateQuantityOfAllCartItems } from '../../api/stockRequests';
+import { centsToFormattedPrice } from '../../utils/priceUtilities';
 
 const OrderDetailsRow = ({ label, value, isLoading }) => {
   return (
     <div className={styles.orderDetailsRow}>
-      <span>{label}:</span>
+      <span className={styles.label}>{label}:</span>
       <span>{isLoading ? <span className={styles.skeleton}></span> : value}</span>
     </div>
   );
@@ -26,27 +27,34 @@ const OrderConfirmation = () => {
 
   const saveOrderToDatabase = async (paymentIntentId, orderDetails) => {
     try {
-      const savedOrderResponse = await saveOrder(orderDetails);
+      // Ensure all fields are defined
+      const definedOrderDetails = {
+        ...orderDetails,
+        lastFourDigits: orderDetails.lastFourDigits || '',
+        cardBrand: orderDetails.cardBrand || 'Unknown',
+      };
+  
+      const savedOrderResponse = await saveOrder(definedOrderDetails);
       setSavedOrder(savedOrderResponse);
-
+  
       // Book the time slot
       await bookTimeSlot({
         totalCookTime: cart.totalCookTime,
         date: deliveryDate,
         time: deliverySlot,
       });
-
+  
       // Mark the order as saved in localStorage to prevent duplicates
       localStorage.setItem(`orderSaved_${paymentIntentId}`, 'true');
-
+  
       // Save order details in local storage for future reference
       localStorage.setItem(`orderDetails_${paymentIntentId}`, JSON.stringify(savedOrderResponse));
       localStorage.setItem('lastOrder', JSON.stringify(savedOrderResponse));
     } catch (error) {
       console.error('Error saving order to database:', error);
-      // Handle error (e.g., notify the user)
     }
   };
+  
 
   useEffect(() => {
     const processOrder = async () => {
@@ -61,6 +69,8 @@ const OrderConfirmation = () => {
         try {
           const cardInfo = await getLastFourDigits(paymentIntentId);
 
+          console.log('payment method ', cardInfo)
+
           const orderDetails = {
             items: cart.items,
             totalPrice: cart.totalPrice,
@@ -72,51 +82,36 @@ const OrderConfirmation = () => {
             phoneNumber,
             deliveryAddress: unitNumber,
             deliveryTime: deliverySlot,
-            orderedAt: new Date().toISOString(), // Add orderedAt for consistency
+            orderedAt: new Date().toISOString(),
           };
 
           await saveOrderToDatabase(paymentIntentId, orderDetails);
-          await updateQuantityOfAllCartItems(deliveryDate, cart.items)
-          
+          await updateQuantityOfAllCartItems(deliveryDate, cart.items);
         } catch (error) {
           console.error('Error processing order:', error);
-          // Handle error (e.g., notify the user)
         } finally {
-          // Clear the cart and delivery details after attempting to process the order, regardless of success or failure
           clearCart();
           clearDeliveryDetails();
         }
       } else if (paymentIntentId) {
-        console.log('Order already saved, fetching from local storage');
-        // If the order was previously saved, retrieve it from localStorage
         const existingOrder = JSON.parse(localStorage.getItem(`orderDetails_${paymentIntentId}`));
         if (existingOrder) {
-          //console.log('Existing order found:', existingOrder);
           setSavedOrder(existingOrder);
-        } else {
-          //console.log('No existing order found in local storage for:', paymentIntentId);
         }
-        // Clear the cart and delivery details in case the order was already saved
         clearCart();
         clearDeliveryDetails();
       } else {
-        //console.log('No payment intent ID found, fetching last saved order');
-        // If no payment intent ID is found, retrieve the last saved order from localStorage
         const lastOrder = JSON.parse(localStorage.getItem('lastOrder'));
         if (lastOrder) {
-          //console.log('Last order found:', lastOrder);
           setSavedOrder(lastOrder);
-        } else {
-          //console.log('No last order found in local storage');
         }
       }
-      setIsLoading(false); // Data has been loaded
+      setIsLoading(false);
     };
 
     processOrder();
-  }, []); // Empty array means the effect runs only once
+  }, []);
 
-  // Helper function to convert integers to money format
   const intToMoneyString = (amount) => {
     if (!amount) return "";
     const dollars = amount / 100;
@@ -125,13 +120,48 @@ const OrderConfirmation = () => {
 
   return (
     <div className={styles.confirmationCard}>
-      <h2>Your order is complete!</h2>
+      <h2>Thank you, your order is complete.</h2>
       <div className={styles.rows}>
-        <OrderDetailsRow label="Total" value={intToMoneyString(savedOrder.totalPrice)} isLoading={isLoading} />
-        <OrderDetailsRow label="Payment" value={`${savedOrder.cardBrand?.toUpperCase()} ****${savedOrder.lastFourDigits}`} isLoading={isLoading} />
         <OrderDetailsRow label="Ordered" value={formatIsoToTime(savedOrder.orderedAt)} isLoading={isLoading} />
-        <OrderDetailsRow label="Delivery" value={`Unit ${savedOrder.deliveryAddress} by ${formatIsoToTime(savedOrder.deliveryTime)}`} isLoading={isLoading} />
+        <OrderDetailsRow label="Delivery" value={`Unit ${savedOrder.deliveryAddress} at ${formatIsoToTime(savedOrder.deliveryTime)}`} isLoading={isLoading} />
+        {/* <OrderDetailsRow label="Order" value={""} isLoading={isLoading}/> */}
       </div>
+      <table className={styles.orderTable}>
+        <thead>
+          <tr>
+            <th>Qty</th>
+            <th className={styles.itemDescription}>Item</th>
+            <th >Price</th>
+          </tr>
+          </thead>
+          <tbody>
+          {savedOrder && savedOrder.items && savedOrder.items.map(item => (
+            <tr>
+              <td>{item.quantity}</td>
+              <td className={styles.itemDescription}>
+                {item.itemId}<br></br>
+                {item.options.map(option => (
+                  <div className={styles.optionRow}>
+                  <span>-{option.title}</span>
+                  <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
+                  </div>
+                ))}
+                </td>
+              <td className={styles.price}>{centsToFormattedPrice(item.total)}</td>
+            </tr>
+            
+            // <li>{item.itemId} {item.quantity} {item.total}</li>
+          ))}
+          </tbody>
+          <tfoot>
+            <tr>
+              <td colSpan="2" className={styles.totalLabel}>Total:</td>
+              <td className={styles.price}>{intToMoneyString(savedOrder.totalPrice)}</td>
+            </tr>
+          </tfoot>
+        </table>
+        <OrderDetailsRow label="Payment Method" value={`${savedOrder.cardBrand?.toUpperCase()} ${savedOrder.lastFourDigits}`} isLoading={isLoading} />
+
       <p>Something not right? <br/> Contact us: (551) 837-9907</p>
     </div>
   );

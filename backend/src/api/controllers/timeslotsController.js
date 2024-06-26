@@ -324,7 +324,7 @@ const convertESTDateAndTimeToUTC = (dateString, timeString) => {
 };
 
 async function bookSlots(date, startTime, endTime) {
-  console.log("start: ", startTime, "end: ", endTime);
+  //console.log("start: ", startTime, "end: ", endTime);
 
   const dateId = date; // Assuming date is already in YYYY-MM-DD format
   const docRef = db.collection('time_slots').doc(dateId);

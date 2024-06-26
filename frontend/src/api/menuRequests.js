@@ -5,7 +5,8 @@ export const getMenuItems = async (category = '') => {
   try {
     // Encode the category to ensure it's a valid URL component
     const categoryParam = category ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`${apiUrl}/menu-data${categoryParam}`);
+    //const res = await fetch(`${apiUrl}/menu-data${categoryParam}`);
+    const res = await fetch(`https://state-cafe.vercel.app/menu-data${categoryParam}`);
 
     if (!res.ok) {
         throw new Error('Couldn\'t retrieve menu data.');

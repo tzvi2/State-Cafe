@@ -5,9 +5,9 @@ import { useCart } from '../../hooks/useCart';
 import { formatIsoToTime, formatTimeTo12Hour } from '../../utils/timeUtilities';
 import { filterTimeSlots } from '../../utils/timeSlotUtilities';
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
+import Tooltip from './Tooltip';
 import { bookTimeSlot } from '../../api/timeslotRequests';
 import apiUrl from '../../config'
-
 
 function DeliveryPage() {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
@@ -160,7 +160,10 @@ function DeliveryPage() {
           onChange={handlePhoneNumberChange}
           placeholder="123-456-7890"
           required
+
         />
+        {/* <Tooltip className={styles.tooltip} message="Used for any questions re. your order, as well as to send a text informing you when your order has been delivered." /> */}
+        
       </div>
 
       <div className={styles.flexRow}>
