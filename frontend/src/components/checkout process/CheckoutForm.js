@@ -47,7 +47,7 @@ export default function CheckoutForm() {
       setMessage(error.message);
       setPaymentLoading(false);
     } else if (paymentIntent && paymentIntent.status === 'succeeded') {
-      console.log('no error');
+      //console.log('no error');
       clearCart();
       setPaymentLoading(false);
     }

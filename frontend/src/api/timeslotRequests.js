@@ -4,7 +4,7 @@ import apiUrl from '../config';
 
 export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
   const formattedTime = new Date(time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
-  console.log("Booking time slot, totalCookTime", totalCookTime, "date", date, "formatted time: ", formattedTime)
+  //console.log("Booking time slot, totalCookTime", totalCookTime, "date", date, "formatted time: ", formattedTime)
 	
 	try {
 			const response = await fetch(`${apiUrl}/timeslots/book-timeslot`, {

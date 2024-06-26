@@ -69,7 +69,7 @@ const OrderConfirmation = () => {
         try {
           const cardInfo = await getLastFourDigits(paymentIntentId);
 
-          console.log('payment method ', cardInfo)
+          //console.log('payment method ', cardInfo)
 
           const orderDetails = {
             items: cart.items,
@@ -135,15 +135,15 @@ const OrderConfirmation = () => {
           </tr>
           </thead>
           <tbody>
-          {savedOrder && savedOrder.items && savedOrder.items.map(item => (
-            <tr>
+          {savedOrder && savedOrder.items && savedOrder.items.map((item, idx) => (
+            <tr key={idx}>
               <td>{item.quantity}</td>
               <td className={styles.itemDescription}>
                 {item.itemId}<br></br>
-                {item.options.map(option => (
-                  <div className={styles.optionRow}>
-                  <span>-{option.title}</span>
-                  <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
+                {item.options.map((option, idx) => (
+                  <div key={idx} className={styles.optionRow}>
+                    <span>-{option.title}</span>
+                    <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
                   </div>
                 ))}
                 </td>

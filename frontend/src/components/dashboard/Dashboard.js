@@ -27,7 +27,7 @@ const Dashboard = () => {
     try {
       const openHours = await getOpenHours(selectedDate);
       setOpenHours(openHours);
-      console.log("Open Hours: ", openHours);
+     //console.log("Open Hours: ", openHours);
     } catch (error) {
       console.error("Error fetching open hours:", error);
     }
@@ -66,7 +66,7 @@ const Dashboard = () => {
 
   const handleSaveRange = async () => {
     try {
-      console.log("start", startTime, "end", endTime);
+      //console.log("start", startTime, "end", endTime);
       await addTimeSlot(selectedDate, startTime, endTime);
       const openHours = await getOpenHours(selectedDate);
       setOpenHours(openHours);

@@ -71,7 +71,7 @@ export const updateQuantityOfAllCartItems = async (date, cartItems) => {
     }
 
     const result = await response.json();
-    console.log('Stock levels updated successfully:', result);
+    //console.log('Stock levels updated successfully:', result);
   } catch (error) {
     console.error('Error updating stock levels:', error);
   }

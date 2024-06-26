@@ -10,7 +10,7 @@ export default function CartPage() {
 	const {cart, removeFromCart, updateItemQuantity} = useCart()
 
 	useEffect(() => {
-		console.log('cart items ', cart.items)
+		//console.log('cart items ', cart.items)
 	}, [])
 
 	return (

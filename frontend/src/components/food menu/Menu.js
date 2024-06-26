@@ -60,7 +60,7 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    console.log('menu items: ', menuItems);
+    //console.log('menu items: ', menuItems);
   }, [menuItems]);
 
   const handleScroll = () => {

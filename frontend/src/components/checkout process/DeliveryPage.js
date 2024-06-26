@@ -80,8 +80,7 @@ function DeliveryPage() {
   }, [deliveryDate]);
 
   useEffect(() => {
-    console.log('useEffect triggered', { deliveryDate, totalCookTime: cart.totalCookTime });
-
+    
     if (deliveryDate !== "" && cart.totalCookTime > 0) {
       fetchTimeSlots();
     }
@@ -162,11 +161,11 @@ function DeliveryPage() {
           required
 
         />
-        {/* <Tooltip className={styles.tooltip} message="Used for any questions re. your order, as well as to send a text informing you when your order has been delivered." /> */}
+        
         
       </div>
 
-      <div className={styles.flexRow}>
+      <div className={`${styles.flexRow} ${styles.dateButtons}`}>
         <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
           <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
         </button>

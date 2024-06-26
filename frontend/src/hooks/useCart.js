@@ -40,7 +40,7 @@ export default function CartProvider({children}) {
 	};
 
 	const clearCart = () => {
-		console.log('clearing cart')
+		//console.log('clearing cart')
 		setCartItems([])
 		setTotalPrice(0)
 		setTotalCount(0)

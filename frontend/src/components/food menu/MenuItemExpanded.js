@@ -92,7 +92,7 @@ function MenuItemExpanded() {
   };
 
   useEffect(() => {
-    console.log('menu item ', menuItem);
+    //console.log('menu item ', menuItem);
   }, [menuItem]);
 
   useEffect(() => {

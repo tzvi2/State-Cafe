@@ -20,7 +20,12 @@
 .flexRow {
 	display: flex;
 	justify-content: space-between;
-	align-items: flex-end;
+	align-items: center;
+
+}
+
+.dateButtons {
+	margin-top: 10%;
 }
 
 .errorRow {
