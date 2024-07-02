@@ -27,7 +27,7 @@ function Header() {
 
   return (
     <>
-      <nav className={styles.mobileHeader} ref={wrapper}>
+      <div className={styles.mobileHeader} ref={wrapper}>
         <div className={styles.topBar}>
           <Hamburger className={styles.hamburgerReact} toggled={isOpen} toggle={() => setIsOpen(!isOpen)}/>
           <NavLink onClick={() => setIsOpen(false)} className={styles.logo} to="/">State Cafe</NavLink>
@@ -47,7 +47,7 @@ function Header() {
             </ul>
           </nav>
         )}
-      </nav>
+      </div>
 
       <nav className={styles.desktopHeader}>
         <div className={styles.logoSection}>

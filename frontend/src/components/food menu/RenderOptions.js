@@ -20,10 +20,11 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange }) => {
                   onChange={(e) => handleOptionChange(option, e.target.checked, group.title)}
                 />
                 <label 
-                  className={styles.optionLabel}
-                  htmlFor={`group-${groupIndex}-option-${optionIndex}`}>{option.title || option.weight} (+{centsToFormattedPrice(option.price)})
+                  className={styles.optionTitle}
+                  htmlFor={`group-${groupIndex}-option-${optionIndex}`}>{option.title || option.weight}
                 </label>
               </div>
+              <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
             </div>
           ))}
         </div>
@@ -42,10 +43,11 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange }) => {
                 onChange={(e) => handleOptionChange(option, e.target.checked)}
               />
               <label 
-                className={styles.optionLabel}
-                htmlFor={`individual-option-${optionIndex}`}>{option.title} (+{centsToFormattedPrice(option.price)})
+                className={styles.optionTitle}
+                htmlFor={`individual-option-${optionIndex}`}>{option.title}
               </label>
             </div>
+            <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
           </div>
         </div>
       ))}

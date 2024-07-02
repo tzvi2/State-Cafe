@@ -140,13 +140,19 @@ exports.saveWeightData = async (req, res) => {
       return res.status(404).json({ message: 'Stock document not found' });
     }
 
-    // Ensure weightData is not nested
-    if (!Array.isArray(weightData)) {
-      return res.status(400).json({ message: 'weightData must be an array' });
+    // Retrieve current weight data array for the item, if it exists
+    let currentWeightData = stockDoc.data()[itemId] || [];
+
+    // Ensure currentWeightData is an array
+    if (!Array.isArray(currentWeightData)) {
+      return res.status(500).json({ message: 'Existing weight data is not an array' });
     }
 
+    // Add the new weight data object to the array
+    currentWeightData.push(weightData);
+
     const updatedData = {
-      [itemId]: weightData
+      [itemId]: currentWeightData
     };
 
     console.log(`Updating stock with: ${JSON.stringify(updatedData)}`);
@@ -159,6 +165,7 @@ exports.saveWeightData = async (req, res) => {
     res.status(500).json({ message: 'Error saving weight data' });
   }
 };
+
 
 exports.deleteWeightData = async (req, res) => {
   const { date, itemId, weightData } = req.body;

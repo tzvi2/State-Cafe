@@ -1,0 +1,21 @@
+.dashboardNav {
+
+}
+
+.dashboardMenu {
+	display: flex;
+	justify-content: space-around;
+	list-style-type: none;
+	padding-inline-start: 0;
+	padding: 2%;
+	font-size: large;
+}
+
+.dashboardMenu li a {
+	text-decoration: none;
+	color: black;
+}
+
+.activeLink {
+	font-weight: 600;
+}

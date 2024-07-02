@@ -1,92 +1,95 @@
 .optionsList {
-	display: flex;
-	flex-direction: column;
-	margin: .5rem;
-	row-gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin: .5rem;
+  row-gap: 1rem;
 }
 
 .optionGroup {
-	display: flex;
-	flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
-.optionGroup h3 {
-	margin: 1% 0;
-	font-size: 1.25rem;
+.optionGroup h4 {
+  margin: 1% 0;
+  font-size: 1.25rem;
 }
 
 .optionRow {
-	display: flex;
-	justify-content: space-between;
-	margin: 3vw 0;
-	column-gap: 3%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Ensure items are vertically centered */
+  margin: 3vw 0;
+  column-gap: 3%;
 }
 
 .optionRow p {
-	margin: 0;
+  margin: 0;
 }
 
 .checkbox_and_label {
-	display: flex;
-	align-items: center;
-	flex-grow: 2;
-	justify-content: space-between;
+  display: flex;
+  align-items: center;
+  flex-grow: 2;
 }
 
 .checkbox_and_label input[type="checkbox"] {
-	width: 25px;
-	height: 25px;
-	margin: 0;
-	margin-right: 3%;
+  width: 25px;
+  height: 25px;
+  margin: 0;
+  margin-right: 0.5rem; /* Space between checkbox and label */
 }
 
-.optionLabel {
-	text-align: end;
+.optionTitle {
+  margin-right: auto; /* Push the option price to the right */
+}
+
+.optionPrice {
+  text-align: end;
+  margin-left: auto; /* Ensure the price is all the way to the right */
 }
 
 @media (min-width: 1024px) {
-	.title, .description, .checkbox_and_label label, .price {
-		font-size: 1.25rem
-	}
+  .title, .description, .checkbox_and_label label, .price {
+    font-size: 1.25rem;
+  }
 
-	.menuItemExpanded {
-		width: 30%;
-	}
+  .menuItemExpanded {
+    width: 30%;
+  }
 
-	.description {
-		text-align: justify;
-		margin: .5rem;
-	}
+  .description {
+    text-align: justify;
+    margin: .5rem;
+  }
 
-	.title {
-		margin: .5rem;
-	}
-	
-	img {
-		height: 12rem;
-		width: 12rem;
-		margin: 0;
-	}
+  .title {
+    margin: .5rem;
+  }
 
-	.optionsList {
+  img {
+    height: 12rem;
+    width: 12rem;
+    margin: 0;
+  }
 
-	}
+  .optionsList {
+    /* No changes needed here */
+  }
 
-	.optionRow {
-		margin: .5rem 0;
-	}
+  .optionRow {
+    margin: .5rem 0;
+  }
 
-	.checkbox_and_label input[type="checkbox"] {
-		width: 2rem;
-		height: 2rem;
-		margin: 0;
-		margin-right: 3%;
-	}
+  .checkbox_and_label input[type="checkbox"] {
+    width: 2rem;
+    height: 2rem;
+    margin: 0;
+    margin-right: 0.5rem; /* Space between checkbox and label */
+  }
 
-	.footer select, .footer button {
-
-		font-size: 1.5rem;
-		margin: .5rem;
-
-	}
+  .footer select, .footer button {
+    font-size: 1.5rem;
+    margin: .5rem;
+  }
 }

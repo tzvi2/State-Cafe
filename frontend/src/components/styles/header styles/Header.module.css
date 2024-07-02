@@ -1,10 +1,10 @@
-nav {
+.mobileHeader {
     background: #D3DBBA;
     position: sticky;
     top: 0;
     z-index: 3;
     min-width: 260px;
-
+    
 }
 
 .topBar {
@@ -59,19 +59,21 @@ nav {
     color: rgb(0, 0, 0);
   }
 
-  .desktopHeader {
+.desktopHeader {
     display: none;
-  }
+    position: sticky;
+}
 
 .menu {
     position: absolute;
     top: 15vw;
     width: 100%;
-    padding-left: 1rem;  
+    padding-left: 1rem;
+    background: #D3DBBA;  
 }
 
 .menuLink {
-    border: 1px solid black;
+    /* border: 1px solid black; */
     padding: .5vw 1vw;
 }
 
@@ -79,16 +81,16 @@ nav {
     border: 1px solid white;
 }
 
-ul {
+.menu ul {
     list-style-type: none;
     padding: 0;
 }
 
-li {
+.menu > ul > li {
     margin: 7% 0;
 }
 
-li > a {
+.menu > ul > li > a {
     color: black;
     text-decoration: none;
     font-size: 5.5vw;
@@ -112,12 +114,17 @@ li > a {
         display: none;
     }
 
+    
+
     .desktopHeader {
         display: flex;
         justify-content: space-between;
         align-items: center;
         height: 3rem;
         padding: 0 2%;
+        background: #D3DBBA;
+        position: sticky;
+        top: 0;
     }
 
     .desktopHeader .links {
@@ -127,6 +134,10 @@ li > a {
         margin: 0;
         column-gap: 5%;
         align-items: center;
+    }
+
+    .desktopHeader ul {
+        list-style-type: none;
     }
 
     .links li {

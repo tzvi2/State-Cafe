@@ -103,7 +103,7 @@ export default function CheckoutForm() {
     if (outOfStockItems.length > 0) {
       return {
         success: false,
-        message: `The following items are out of stock: ${outOfStockItems.join(', ')}. Please remove them from your cart before checking out.`,
+        message: `The following items have sold out: <span class="${styles.soldOutItems}">${outOfStockItems.join(', ')}</span>. Please remove them from your cart before checking out.`,
       };
     }
   
@@ -135,7 +135,9 @@ export default function CheckoutForm() {
 
   return (
     <>
-      <p className={styles.message}>{message}</p>
+      {message && (
+        <p className={styles.message} dangerouslySetInnerHTML={{ __html: message }}></p>
+      )}
       <form className={styles.checkoutForm} id="payment-form" onSubmit={handleSubmit}>
         <PaymentElement />
         {!formLoading && (

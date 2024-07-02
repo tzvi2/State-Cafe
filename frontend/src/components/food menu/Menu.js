@@ -60,7 +60,7 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    //console.log('menu items: ', menuItems);
+    console.log('menu items: ', menuItems);
   }, [menuItems]);
 
   const handleScroll = () => {
@@ -116,7 +116,7 @@ export default function Menu() {
         ref={categoryBarRef}
       />
       <div className={styles.menuContainer}>
-        {categories.map((category) => (
+        {/* {categories.map((category) => (
           <div
             key={category}
             id={category}
@@ -132,7 +132,8 @@ export default function Menu() {
                 ))}
             </div>
           </div>
-        ))}
+        ))} */}
+        <h2 className={styles.temporaryBanner}>Coming soon...</h2>
       </div>
     </>
   );
