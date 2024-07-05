@@ -44,19 +44,17 @@ const getItemByItemId = async (req, res) => {
   
   const { itemId } = req.params;
   try {
-      const menuItemsRef = db.collection('menuItems');
-      const snapshot = await menuItemsRef.where('itemId', '==', itemId).limit(1).get();
-      if (snapshot.empty) {
-          return res.status(404).json({ message: 'MenuItem not found' });
-      }
-      let itemData = {};
-      snapshot.forEach(doc => {
-          itemData = { firestoreId: doc.id, ...doc.data() }; 
-      });
-      res.json(itemData);
+    const itemDoc = await db.collection('menuItems').doc(itemId).get();
+
+    if (!itemDoc.exists) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    const itemData = itemDoc.data();
+    return res.status(200).json(itemData);
   } catch (error) {
-      console.error('Error fetching menu item by itemId:', error);
-      res.status(500).json({ error: 'Error fetching menu item' });
+    console.error('Error getting item by itemId:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 

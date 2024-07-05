@@ -2,10 +2,9 @@ const { db } = require('../../../firebase/firebaseAdminConfig');
 
 const admin = require('firebase-admin');
 
-// Make sure to import FieldValue from admin.firestore
 const FieldValue = admin.firestore.FieldValue;
 
-exports.getQuantityRemaining = async (req, res) => {
+exports.getFullStock = async (req, res) => {
   const { date } = req.query;
 
   try {
@@ -165,7 +164,6 @@ exports.saveWeightData = async (req, res) => {
     res.status(500).json({ message: 'Error saving weight data' });
   }
 };
-
 
 exports.deleteWeightData = async (req, res) => {
   const { date, itemId, weightData } = req.body;

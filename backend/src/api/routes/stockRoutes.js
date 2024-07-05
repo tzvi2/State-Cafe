@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { 
-  getQuantityRemaining, 
+  getFullStock, 
   updateQuantityRemaining, 
   setAllProductQuantitiesToZero, 
   updateStockLevels, 
@@ -11,7 +11,7 @@ const {
   updateWeightQuantity 
 } = require('../controllers/stockControllers');
 
-router.get('/get-remaining-quantity', getQuantityRemaining);
+router.get('/get-remaining-quantity', getFullStock);
 router.post('/initialize-quantities', setAllProductQuantitiesToZero);
 router.put('/update-quantity-remaining', updateQuantityRemaining);
 router.put('/update-stock-from-cart', updateStockLevels);

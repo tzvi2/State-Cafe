@@ -1,8 +1,13 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import styles from '../styles/dashboard/DashboardMenu.module.css';
 
-function DashboardMenu() {
+function DashboardMenu({ selectedDate, setSelectedDate }) {
+
+  const location = useLocation();
+
+  const showDateInput = !location.pathname.startsWith('/dashboard/menu');
+
   return (
     <nav className={styles.dashboardNav}>
       <ul className={styles.dashboardMenu}>
@@ -27,6 +32,12 @@ function DashboardMenu() {
           </NavLink>
         </li>
       </ul>
+      {showDateInput && <input
+        className={styles.date}
+        type="date"
+        value={selectedDate}
+        onChange={e => setSelectedDate(e.target.value)}
+      />}
     </nav>
   );
 }

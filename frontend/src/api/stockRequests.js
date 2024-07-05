@@ -17,6 +17,8 @@ export const setAllStockToZero = async (dateString) => {
 
     const result = await response.json();
     console.log(result.message);
+    return result
+    
   } catch (error) {
     console.error('Error:', error);
   }

@@ -1,19 +1,40 @@
 .itemsColumn {
-	display: flex;
-	flex-direction: column;
-	row-gap: 10px;
-	padding-left: 0;
-	list-style-type: none;
-	margin: 0 20px;
-	justify-content: space-around;
+  display: flex;
+  flex-direction: column;
+	padding-inline-start: 0;
+	margin: 0 5%;
+}
+
+.date {
+	margin: 0;
+  margin-bottom: 1rem;
 }
 
 .flexRow {
-	display: flex;
-	justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.flexColumn {
-	display: flex;
-	flex-direction: column;
+
+.list {
+  list-style: none;
+}
+
+.list .flexRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr; 
+  gap: 1rem;
+}
+
+.list .flexRow p {
+  margin: 6% 0;
+}
+
+.flexRow .quantity {
+	text-align: end;
+}
+
+input {
+  margin-right: 0.5rem;
 }

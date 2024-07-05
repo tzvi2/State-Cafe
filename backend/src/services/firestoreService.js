@@ -89,25 +89,24 @@ const updateMenuItemActiveStatusInFirestore = async (itemId, active) => {
 };
 
 const updateMenuItemDetailsInFirestore = async (menuItemDetails) => {
+  const { itemId, newMenuItem } = menuItemDetails;
   try {
-    const { itemId, ...updateData } = menuItemDetails;
-    // Query for the document with the matching itemId
-    const querySnapshot = await db.collection('menuItems').where('itemId', '==', itemId).get();
-    
-    if (querySnapshot.empty) {
-      console.log('No matching document found with itemId:', itemId);
-      return null; 
+    console.log('itemId ', itemId)
+    console.log('newMenuItem ', newMenuItem)
+    const item = await db.collection('menuItems').doc(itemId).get()
+
+    if (!item.exists) {
+      console.log('Item not found - cannot update.')
+      return { status: 'error', message: 'Item not found' };
     }
 
-    // Assuming itemId is unique and only one document matches
-    querySnapshot.forEach(async (doc) => {
-      await db.collection('menuItems').doc(doc.id).update(updateData);
-    });
+    await db.collection('menuItems').doc(itemId).update(newMenuItem)
+    console.log('Menu item updated successfully.')
+    return { status: 'success', message: 'Menu item updated successfully.' };
 
-    return { itemId, ...updateData };
   } catch (error) {
-    console.error('Error updating menu item details in Firestore:', error);
-    throw error;
+    console.error('Error updating item: ', error)
+    return { status: 'error', message: 'Error updating item' };
   }
 };
 

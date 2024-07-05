@@ -54,14 +54,7 @@ const MenuDashboard = () => {
     }
   };
 
-  if (!isAuthorized) {
-    return (
-      <>
-      <p>You need to sign in to view this page.</p>
-      <button onClick={() => signInWithGoogle()}></button>
-      </>
-    )
-  }
+  
   
 	
 

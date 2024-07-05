@@ -98,7 +98,7 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
 
 
 export const updateMenuItem = async (menuItemDetails) => {
-  console.log('attempting update: ', menuItemDetails)
+  console.log('attempting update...: ', menuItemDetails)
   try {
     const response = await fetch(`${apiUrl}/edit-menu/update-item`, {
       method: 'POST',

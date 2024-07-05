@@ -1,127 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { getStockForDate, saveWeightData } from '../../api/stockRequests';
-import { getCurrentDateString } from '../../utils/dateUtilities';
+import React, { useEffect, useState } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { getStockForDate, setAllStockToZero } from '../../api/stockRequests';
 import styles from '../styles/dashboard/StockPage.module.css';
-import { centsToFormattedPrice } from '../../utils/priceUtilities';
+import ItemQuantity from './ItemQuantity';
 
 function StockPage() {
-  const getLocalDate = () => {
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
+  const [selectedDate] = useOutletContext();
   const [stockData, setStockData] = useState({});
-  const [selectedDate, setSelectedDate] = useState(getLocalDate());
 
   useEffect(() => {
-    const getStockData = async () => {
-      const data = await getStockForDate(selectedDate);
-      setStockData(data);
+    const fetchStockData = async () => {
+      const response = await getStockForDate(selectedDate);
+      setStockData(response.message ? {} : response);
     };
-    getStockData();
+    fetchStockData();
   }, [selectedDate]);
 
-  useEffect(() => {
-    console.log('stock data ', stockData);
-  }, [stockData]);
-
-  return (
-    <ul className={styles.itemsColumn}>
-      <input 
-        type='date' 
-        value={selectedDate} 
-        onChange={e => setSelectedDate(e.target.value)} 
-      />
-      {Object.entries(stockData).map(([menuItem, data]) => (
-        <ItemQuantity key={menuItem} title={menuItem} data={data} selectedDate={selectedDate} />
-      ))}
-    </ul>
-  );
-}
-
-const ItemQuantity = ({ title, data, selectedDate }) => {
-  const [showNewWeight, setShowNewWeight] = useState(false);
-  const [newWeightData, setNewWeightData] = useState({
-    weight: '',
-    price: 0,
-    quantity: 0,
-  });
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewWeightData({
-      ...newWeightData,
-      [name]: value,
-    });
+  const handleInitializeStock = async () => {
+    await setAllStockToZero(selectedDate);
+    const updatedStockData = await getStockForDate(selectedDate);
+    setStockData(updatedStockData);
   };
 
-  const handleAddNewWeight = async () => {
-		const validatedWeightData = {
-			weight: newWeightData.weight,
-			price: Number(newWeightData.price),
-			
-		}
-
-    await saveWeightData(selectedDate, title, validatedWeightData);
-    // Add the new weight data to the existing data
-    data.push(newWeightData);
-    setNewWeightData({ weight: '', price: 0, quantity: 0 });
-    setShowNewWeight(false);
+  const updateStockData = (updateFunction) => {
+    setStockData((prevData) => updateFunction(prevData));
   };
 
   return (
     <div>
-      <li className={styles.flexRow}>
-        <p>{title}</p>
-
-        {/* not sold by weight */}
-        {!Array.isArray(data) && <p>{data.quantity}</p>}
-      </li>
-
-      {/* sold by weight */}
-      {Array.isArray(data) && (
-        <ul className={styles.flexColumn}>
-          {data.map((item, index) => (
-            <li className={styles.flexRow} key={index}>
-              <p>{item.weight}</p>
-              <p>{centsToFormattedPrice(item.price)}</p>
-              <p>{item.quantity}</p>
-            </li>
-          ))}
-          <button onClick={() => setShowNewWeight(!showNewWeight)}>+</button>
-          {showNewWeight && (
-            <div>
-              <input
-                type="text"
-                name="weight"
-                value={newWeightData.weight}
-                onChange={handleInputChange}
-                placeholder="Weight"
-              />
-              <input
-                type="number"
-                name="price"
-                value={newWeightData.price}
-                onChange={handleInputChange}
-                placeholder="Price"
-              />
-              <input
-                type="number"
-                name="quantity"
-                value={newWeightData.quantity}
-                onChange={handleInputChange}
-                placeholder="Quantity"
-              />
-              <button onClick={handleAddNewWeight}>Save</button>
-            </div>
-          )}
-        </ul>
-      )}
+      <ul className={styles.itemsColumn}>
+        {Object.entries(stockData).map(([menuItem, data]) => (
+          <ItemQuantity 
+            key={menuItem} 
+            title={menuItem} 
+            data={data} 
+            selectedDate={selectedDate} 
+            updateStockData={updateStockData} 
+          />
+        ))}
+        {Object.keys(stockData).length === 0 && (
+          <button onClick={handleInitializeStock}>Initialize Stock for {selectedDate}</button>
+        )}
+      </ul>
     </div>
   );
-};
+}
 
 export default StockPage;

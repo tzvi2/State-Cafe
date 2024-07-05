@@ -42,9 +42,14 @@ const corsOptions = {
 
 const app = express();
 
-console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY);
+//console.log('Stripe Secret Key:', process.env.STRIPE_SECRET_KEY);
 console.log('Node Environment:', process.env.NODE_ENV);
 
+app.use((req, res, next) => {
+  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
+  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  next();
+});
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));

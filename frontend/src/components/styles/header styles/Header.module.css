@@ -142,10 +142,13 @@
 
     .links li {
         margin: 0;
+       
     }
 
     .logoSection a, .links li a {
         font-size: 1.5vw;
+        color: black;
+        text-decoration: none;
     } 
 
     .links li a:hover {

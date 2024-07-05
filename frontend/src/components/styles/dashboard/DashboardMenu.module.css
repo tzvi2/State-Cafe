@@ -1,5 +1,7 @@
 .dashboardNav {
-
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 5%;
 }
 
 .dashboardMenu {
@@ -8,6 +10,7 @@
 	list-style-type: none;
 	padding-inline-start: 0;
 	padding: 2%;
+	margin: 3%;
 	font-size: large;
 }
 
@@ -18,4 +21,11 @@
 
 .activeLink {
 	font-weight: 600;
+}
+
+.date {
+	margin: 0 5%;
+	width: 90vw;
+	align-self: center;
+	font-size: large;
 }
