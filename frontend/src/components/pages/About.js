@@ -15,7 +15,7 @@ function About() {
         </p>
         
         <p>
-          🚀 <strong>Unbeatable freshness and speed:</strong> We carefully choose our packaging for every dish and test the method of delivery before launcing a new product. Beside for optimal delivery packaging, we deliver your food just five minutes after your order is cooked.*
+          🚀 <strong>Unbeatable freshness and speed:</strong> We carefully choose and test the packaging for every dish before launching a new product. In addition to optimal delivery packaging, we deliver your food just five minutes after your order is cooked.*
         </p>
         <p>
           🚪 <strong>Seamless delivery:</strong> No more awkward encounters with unknown drivers, and certainly no tip screens - we just leave your food at your door. Wait till we're gone, crack the door, grab your food, and enjoy. 
