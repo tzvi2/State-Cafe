@@ -12,13 +12,12 @@ function ContactSlide() {
 					<a href="tel:5518379907">(551) 837-9907</a>
 				</div>
 			</div>
-			<div className={styles.hours}>
+			{/* <div className={styles.hours}>
 				<h4>Open:</h4>
 				<p><strong>Sunday - Thursday</strong></p>
 				<p>Morning: 7:00am - 9:00am</p>
 				<p>Evening: 6:00pm - 8:00pm</p>
-
-			</div>
+			</div> */}
 		</div>
 	)
 }
