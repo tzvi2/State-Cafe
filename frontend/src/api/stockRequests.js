@@ -1,7 +1,7 @@
 import apiUrl from '../config';
 
 export const setAllStockToZero = async (dateString) => {
-  console.log('initializing all to Zero ', dateString, "we're in the frontend");
+  console.log('initializing all to Zero ', dateString);
   try {
     const response = await fetch(`${apiUrl}/stock/initialize-quantities`, {
       method: 'POST',

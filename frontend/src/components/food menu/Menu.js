@@ -60,7 +60,7 @@ export default function Menu() {
   }, []);
 
   useEffect(() => {
-    console.log('menu items: ', menuItems);
+    //console.log('menu items: ', menuItems);
   }, [menuItems]);
 
   const handleScroll = () => {
@@ -109,14 +109,15 @@ export default function Menu() {
 
   return (
     <>
-      <CategoryBar 
+      {/* <CategoryBar 
         categories={categories} 
         activeCategory={activeCategory} 
         setActiveCategory={handleCategoryClick} 
         ref={categoryBarRef}
-      />
+      /> */}
+      <h2 className={styles.offering}>Breakfast</h2>
       <div className={styles.menuContainer}>
-        {/* {categories.map((category) => (
+        {categories.map((category) => (
           <div
             key={category}
             id={category}
@@ -132,8 +133,8 @@ export default function Menu() {
                 ))}
             </div>
           </div>
-        ))} */}
-        <h2 className={styles.temporaryBanner}>Coming soon...</h2>
+        ))}
+        {/* <h2 className={styles.temporaryBanner}>Coming soon...</h2> */}
       </div>
     </>
   );

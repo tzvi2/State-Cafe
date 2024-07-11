@@ -32,8 +32,11 @@ const storage = new Storage({
   },
 });
 
+const FieldValue = admin.firestore.FieldValue;
+
 module.exports = {
   db,
   admin,
-  storage
+  storage,
+  FieldValue
 };

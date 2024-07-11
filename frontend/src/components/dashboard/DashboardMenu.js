@@ -6,7 +6,8 @@ function DashboardMenu({ selectedDate, setSelectedDate }) {
 
   const location = useLocation();
 
-  const showDateInput = !location.pathname.startsWith('/dashboard/menu');
+  // const showDateInput = !location.pathname.startsWith('/dashboard/menu');
+  const showDateInput = true
 
   return (
     <nav className={styles.dashboardNav}>

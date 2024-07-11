@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../../firebaseConfig';
 import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
-import styles from '../styles/dashboard/OrdersDashboard.module.css';
-import { useAuth } from '../../hooks/useAuth';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 function Dashboard() {
   const [orders, setOrders] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const { user, signInWithGoogle } = useAuth(); 
-  const AUTHORIZED_EMAILS = ['tzvib8@gmail.com']; 
-  const isAuthorized = user && AUTHORIZED_EMAILS.includes(user.email);
+
 
   function formatTime(firestoreTimestamp) {
     if (!firestoreTimestamp) return '';
@@ -23,9 +16,7 @@ function Dashboard() {
     return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
   }
 
-  useEffect(() => {
-    console.log('user change ', user);
-  }, [user]);
+
 
   useEffect(() => {
     const startOfDay = new Date(selectedDate.setHours(0, 0, 0, 0));
@@ -57,15 +48,7 @@ function Dashboard() {
     console.log('orders: ', orders);
   }, [orders]);
 
-  if (user === undefined) { 
-    return <p>Checking authentication...</p>;
-  }
-  
-  if (!isAuthorized) {
-    return (
-      <p>You need to <a onClick={() => signInWithGoogle()}>sign in</a> to view this page</p>
-    );
-  }
+
 
   return (
     <div className={styles.orders}>

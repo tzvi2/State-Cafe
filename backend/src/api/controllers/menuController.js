@@ -43,6 +43,8 @@ const getItemByDocumentId = async (req, res) => {
 const getItemByItemId = async (req, res) => {
   
   const { itemId } = req.params;
+
+  console.log('attempting to get item with itemId ',itemId)
   try {
     const itemDoc = await db.collection('menuItems').doc(itemId).get();
 

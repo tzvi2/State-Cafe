@@ -1,3 +1,10 @@
+.offering {
+  text-align: center;
+  margin: 5%;
+  color: rgb(5, 103, 31);
+  font-weight: 500;
+}
+
 .menu {
 	padding: 4%;
 	display: flex;

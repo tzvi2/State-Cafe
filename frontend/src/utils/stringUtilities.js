@@ -6,3 +6,12 @@ export const capitalizeFirstLetters = (str) => {
 	}
 	return results.join(" ");
 }
+
+export function formatPhoneNumber(phoneNumber) {
+
+  if (phoneNumber.includes('-')) {
+    return phoneNumber.replace(/^(\d{3})/, '($1)');
+  } else {
+    return phoneNumber.replace(/^(\d{3})(\d{3})(\d{4})$/, '($1)-$2-$3');
+  }
+}

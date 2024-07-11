@@ -190,7 +190,7 @@ function DeliveryPage() {
               ))}
             </select>
           ) : (
-            <div style={{textAlign: "center"}}>Delivery not Available</div>
+            <div style={{textAlign: "center"}}>Not available for selected date</div>
           )}
 
           <button className={styles.wideBtn} onClick={handleSubmit} disabled={!deliveryAvailable}>Proceed to Checkout</button>

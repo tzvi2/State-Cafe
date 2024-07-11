@@ -27,7 +27,7 @@ function IndividualOptions({ options, setOptions }) {
   };
 
   useEffect(() => {
-    console.log('options:', options);
+    //console.log('options:', options);
   }, [options]);
 
   return (

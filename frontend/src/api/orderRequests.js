@@ -7,26 +7,33 @@ export const saveOrder = async (order) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        items: order.items,
-        totalPrice: order.totalPrice,
-				deliverySlot: order.deliverySlot,
-				unitNumber: order.unitNumber,
-				lastFourDigits: order.lastFourDigits,
-        cardBrand: order.cardBrand,
-        phoneNumber: order.phoneNumber
-      }),
+      body: JSON.stringify(order),
     });
 
     if (!response.ok) {
       throw new Error('Failed to save order');
     }
 
-    const data = await response.json();
-    return data; 
+    return await response.json();
   } catch (error) {
     console.error('Error saving order:', error);
-    throw error; 
+    throw error;
   }
 };
 
+export const getOrdersForDate = async (date) => {
+  try {
+    const response = await fetch(`${apiUrl}/api/orders/get-orders-for-date?date=${date}`)
+
+    if (!response.ok) {
+      throw new Error('error getting orders for date: ', date)
+    }
+
+    const orders = await response.json()
+    return orders
+    
+  } catch (error) {   
+    //console.log(error)
+    return {error: error.message}
+  }
+}

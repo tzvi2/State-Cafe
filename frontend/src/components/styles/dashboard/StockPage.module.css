@@ -16,6 +16,14 @@
   align-items: center;
 }
 
+.flexRow .quantity {
+	text-align: end;
+}
+
+.flexRow input {
+  width: 15%;
+}
+
 
 .list {
   list-style: none;
@@ -31,9 +39,6 @@
   margin: 6% 0;
 }
 
-.flexRow .quantity {
-	text-align: end;
-}
 
 input {
   margin-right: 0.5rem;

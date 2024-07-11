@@ -1,0 +1,100 @@
+.menuContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px; 
+  padding-inline-start: 0;
+  padding: 2%;
+}
+
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+}
+
+.square {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  text-align: center;
+  border: 1px solid rgb(182, 179, 179);
+  border-radius: 10px;
+}
+
+.square h5 {
+  margin: 5px 0;
+}
+
+.square img {
+  margin: 2%;
+}
+
+.flexRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 3px;
+}
+
+.activeBox input {
+  height: 22px;
+  width: 22px;
+  border-radius: 5px;
+  margin-right: 5px; 
+}
+
+.activeBox {
+  display: flex;
+  align-items: center;
+}
+
+.delete_button {
+  background-color: red;
+  color: white; 
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  height: 22px; 
+  width: 22px;
+  border-radius: 2px;
+}
+
+.delete_button:hover {
+  background-color: darkred;
+}
+
+@media (min-width: 1024px) {
+
+  .menuPage {
+    width: 65%;
+  }
+
+  .menuContainer {
+    grid-template-columns: repeat(4, 1fr);
+    
+  }
+
+  .menuItem {
+    padding: 5%;
+  }
+
+  .square {
+    display: flex;
+    align-items: center;
+  }
+
+  .square h5 {
+    font-size: large;
+    width: 75%;
+    
+  }
+
+  .square img {
+    width: 165px;
+    height: 165px;
+  }
+
+}

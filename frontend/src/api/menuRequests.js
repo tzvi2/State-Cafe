@@ -71,7 +71,6 @@ export const addMenuItem = async (menuItem) => {
 };
 
 export const updateMenuItemActiveStatus = async (itemId, isActive) => {
-  console.log('updating ', itemId, "new status: ", isActive)
   try {
     const response = await fetch(`${apiUrl}/edit-menu/update-status`, {
       method: 'POST',
@@ -98,7 +97,6 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
 
 
 export const updateMenuItem = async (menuItemDetails) => {
-  console.log('attempting update...: ', menuItemDetails)
   try {
     const response = await fetch(`${apiUrl}/edit-menu/update-item`, {
       method: 'POST',
@@ -121,7 +119,6 @@ export const updateMenuItem = async (menuItemDetails) => {
 };
 
 export const deleteMenuItem = async (documentId) => {
-  console.log('deleting menu item with id: ', documentId)
   try {
     const response = await fetch(`${apiUrl}/edit-menu/delete-menu-item`, {
       method: 'POST',

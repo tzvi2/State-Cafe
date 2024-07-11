@@ -6,7 +6,7 @@ const calculateTotal = async (items) => {
   let total = 0;
 
   for (const item of items) {
-    const docRef = db.collection('menuItems').doc(item.firestoreId);
+    const docRef = db.collection('menuItems').doc(item.itemId);
     const doc = await docRef.get();
 
     if (doc.exists) {
@@ -14,7 +14,7 @@ const calculateTotal = async (items) => {
       const price = itemData.price;
       total += price * item.quantity;
     } else {
-      console.log(`Item not found in the database: ${item.firestoreId}`);
+      console.log(`Item not found in the database: ${item.itemId}`);
     }
   }
 

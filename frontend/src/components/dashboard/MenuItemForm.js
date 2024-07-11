@@ -152,7 +152,7 @@ function MenuItemForm() {
         type="file"
         ref={fileInputRef}
         onChange={handleImageChange}
-        style={{ display: 'none' }}
+       
       />
 
       <div>

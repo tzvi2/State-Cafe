@@ -5,6 +5,7 @@ const handleCreatePaymentIntent = async (req, res) => {
     const { items } = req.body;
     //console.log("items received for payment intent:", items);
 
+    console.log('request: ', req)
     const clientSecret = await createPaymentIntent(items);
     res.json({ clientSecret });
   } catch (err) {

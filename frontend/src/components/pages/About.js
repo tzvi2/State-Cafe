@@ -15,7 +15,7 @@ function About() {
         </p>
         
         <p>
-          🚀 <strong>Unbeatable freshness and speed:</strong> We carefully choose and test the packaging for every dish before launching a new product. In addition to optimal delivery packaging, we deliver your food just five minutes after your order is cooked.*
+          🚀 <strong>Unbeatable freshness:</strong> We carefully choose and test the packaging for every dish before launching a new product. In addition to optimal packaging, we deliver your food just five minutes after your order is cooked.*
         </p>
         <p>
           🚪 <strong>Seamless delivery:</strong> No more awkward encounters with unknown drivers, and certainly no tip screens - we just leave your food at your door. Wait till we're gone, crack the door, grab your food, and enjoy. 
@@ -25,7 +25,7 @@ function About() {
         </p>
         
         <p>
-          🙏 Thank you for being a part of our journey. If you have any comments, questions, or concerns, we'd love to hear from you.<br></br><br></br> Email: support@statecafeteaneck.com
+          🙏 Thank you for being a part of our journey. If you have any comments, questions, or concerns, we'd love to hear from you.<br></br><br></br> Email: support@statecafeteaneck.com <br></br><br></br> Call or Text: (551)-837-9907
           
           
         </p>

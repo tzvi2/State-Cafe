@@ -123,8 +123,9 @@
         height: 3rem;
         padding: 0 2%;
         background: #D3DBBA;
-        position: sticky;
-        top: 0;
+       
+   
+        z-index: 10;
     }
 
     .desktopHeader .links {

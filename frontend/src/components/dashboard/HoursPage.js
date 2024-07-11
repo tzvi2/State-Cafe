@@ -49,11 +49,11 @@ const HoursPage = () => {
   };
 
   return (
-    <>
+    <div className={styles.hours}>
       {openHours.length > 0 ? (
         openHours.map((range, index) => (
           <div key={index} className={styles.range}>
-            <span>{range.start} - {range.end}</span>
+            <p className={styles.rangeHours}>{range.start} - {range.end}</p>
             <input className={styles.delete_range} type='button' value={"delete"} onClick={() => handleDeleteRange(range.start, range.end)} />
           </div>
         ))
@@ -61,14 +61,16 @@ const HoursPage = () => {
         <p>No open times</p>
       )}
 
-      {showNewRange && <div className={styles.range}>
-        <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)}></input>
-        <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)}></input>
+      {showNewRange && <div className={styles.newRange}>
+        <div className={styles.times}>
+          <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)}></input>
+          <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)}></input>
+        </div>
         <input className={styles.save_range} type='button' value={"save"} onClick={() => handleSaveRange()}></input>
-        <input className={styles.delete_range} type='button' value={"delete"} onClick={() => setShowNewRange(false)}></input>
+        <input className={styles.cancel_range} type='button' value={"cancel"} onClick={() => setShowNewRange(false)}></input>
       </div>}
-      <input type='button' value={"add range"} onClick={() => setShowNewRange(!showNewRange)}></input>
-    </>
+      {!showNewRange && <input className={styles.add_range} type='button' value={"add range"} onClick={() => setShowNewRange(!showNewRange)}></input>}
+    </div>
   );
 }
 

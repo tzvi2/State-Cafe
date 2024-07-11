@@ -16,10 +16,6 @@ function MenuPage() {
     fetchMenuItems();
   }, []);
 
-  useEffect(() => {
-    console.log(menuItems);
-  }, [menuItems]);
-
   const handleDeleteMenuItem = async (documentId) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu item?');
     if (isConfirmed) {
@@ -46,19 +42,28 @@ function MenuPage() {
 
   return (
     <div className={styles.menuPage}>
-      <h1>Menu Items</h1>
-      <button onClick={() => navigate('/dashboard/menu/new')}>Add New Menu Item</button>
-      <ul>
+      <ul className={styles.menuContainer}>
         {menuItems.map((item) => (
-          <li key={item.id} onClick={() => navigate(`/dashboard/menu/${item.id}`)}>
-            {item.title}
-            <button onClick={(e) => { e.stopPropagation(); handleToggleActiveStatus(item.id, item.active); }}>
-              {item.active ? 'Deactivate' : 'Activate'}
-            </button>
-            <button onClick={(e) => { e.stopPropagation(); handleDeleteMenuItem(item.id); }}>Delete</button>
+          <li className={styles.menuItem} key={item.id}>
+            <div className={styles.square} onClick={() => navigate(`/dashboard/menu/${item.id}`)}>
+              <h5>{item.title}</h5>
+              <img src={item.img} alt={item.title} />
+            </div>
+            <div className={styles.flexRow}>
+              <label className={styles.activeBox} onClick={(e) => e.stopPropagation()}>
+                <input 
+                  type="checkbox" 
+                  checked={item.active} 
+                  onChange={(e) => handleToggleActiveStatus(item.id, item.active)}
+                />
+                Active
+              </label>
+              <button className={styles.delete_button} onClick={(e) => { e.stopPropagation(); handleDeleteMenuItem(item.id); }}>x</button>
+            </div>
           </li>
         ))}
       </ul>
+      <button onClick={() => navigate('/dashboard/menu/new')}>Add New Menu Item</button>
     </div>
   );
 }

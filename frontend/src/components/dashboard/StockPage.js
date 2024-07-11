@@ -27,22 +27,22 @@ function StockPage() {
   };
 
   return (
-    <div>
-      <ul className={styles.itemsColumn}>
-        {Object.entries(stockData).map(([menuItem, data]) => (
-          <ItemQuantity 
-            key={menuItem} 
-            title={menuItem} 
-            data={data} 
-            selectedDate={selectedDate} 
-            updateStockData={updateStockData} 
-          />
-        ))}
-        {Object.keys(stockData).length === 0 && (
-          <button onClick={handleInitializeStock}>Initialize Stock for {selectedDate}</button>
-        )}
-      </ul>
-    </div>
+
+    <ul className={styles.itemsColumn}>
+      {Object.entries(stockData).map(([menuItem, data]) => (
+        <ItemQuantity 
+          key={menuItem} 
+          title={menuItem} 
+          data={data} 
+          selectedDate={selectedDate} 
+          updateStockData={updateStockData} 
+        />
+      ))}
+      {Object.keys(stockData).length === 0 && (
+        <button onClick={handleInitializeStock}>Initialize Stock for {selectedDate}</button>
+      )}
+    </ul>
+
   );
 }
 

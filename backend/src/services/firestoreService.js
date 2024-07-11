@@ -1,4 +1,4 @@
-const {db} = require('../../firebase/firebaseAdminConfig'); 
+const {db, FieldValue} = require('../../firebase/firebaseAdminConfig'); 
 
 const getAllMenuItems = async (category) => {
   let query = db.collection('menuItems');
@@ -18,27 +18,24 @@ const getAllMenuItems = async (category) => {
 };
 
 const saveOrder = async (orderData) => {
-  // Convert deliverySlot from ISO string to Date object
+  console.log('received order ', orderData)
   const deliveryTime = new Date(orderData.deliverySlot);
+  const dateString = deliveryTime.toISOString().split('T')[0];
 
-  const newOrder = {
-    items: orderData.items,
-    totalPrice: orderData.totalPrice,
-    orderedAt: new Date(), // Firestore will automatically convert JavaScript Date to Firestore Timestamp
-    deliveryTime, // same story as above
-    deliveryAddress: orderData.unitNumber,
-    lastFourDigits: orderData.lastFourDigits,
-    cardBrand: orderData.cardBrand,
-    phoneNumber: orderData.phoneNumber
-  };
+  console.log('date string: ', dateString)
+
+  const docRef = db.collection('orders').doc(dateString);
 
   try {
-    const docRef = await db.collection('orders').add(newOrder);
-    const savedOrderWithId = {
-      orderId: docRef.id,
-      ...newOrder
-    };
-    return savedOrderWithId;
+    const docSnap = await docRef.get();
+
+    if (docSnap.exists) {
+      await docRef.update({ orders: FieldValue.arrayUnion(orderData) });
+    } else {
+      await docRef.set({ orders: [orderData] });
+    }
+
+    return { orderId: dateString, ...orderData };
   } catch (error) {
     console.error('Error saving order to Firestore:', error);
     throw new Error('Error saving order to Firestore');
@@ -64,7 +61,7 @@ const addMenuItemToFirestore = async (menuItem) => {
     }
     
     // Sanitize itemId to ensure it's a valid Firestore document ID
-    const sanitizedItemId = newItem.itemId.replace(/[\/\\#?]/g, '_').replace(/\s+/g, '-');
+    const sanitizedItemId = newItem.itemId.replace(/[\/\\#?]/g, '_').replace(/\s+/g, ' ');
     
     // Use the sanitized itemId as the document ID
     const docRef = await db.collection('menuItems').doc(sanitizedItemId).set(newItem);

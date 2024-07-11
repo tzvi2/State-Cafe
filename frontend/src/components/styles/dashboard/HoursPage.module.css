@@ -1,0 +1,32 @@
+.hours {
+	color: #000;
+	width: 80%;
+	max-width: 400px;
+}
+
+.range {
+	display: flex;
+	justify-content: space-between;
+}
+
+.rangeHours {
+  white-space: nowrap;
+}
+
+.delete_range {
+	width: 30%;
+}
+
+.times {
+	display: flex;
+	justify-content: space-between;
+	column-gap: 5%;
+}
+
+.times input {
+	flex-grow: 2;
+}
+
+.save_range, .delete_range, .add_range, .times input, .rangeHours {
+	font-size: large;
+}
