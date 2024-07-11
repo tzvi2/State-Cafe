@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect} from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from '../styles/home page slides styles/ToggleImage.module.css';
 
 function ToggleImage({ type, src, alt, overlayText, category }) {
@@ -6,12 +6,13 @@ function ToggleImage({ type, src, alt, overlayText, category }) {
   const videoRef = useRef(null);
 
   const handleClick = () => {
-    setShowOverlay(!showOverlay); 
+    setShowOverlay(!showOverlay);
   };
 
   useEffect(() => {
     if (type === 'video' && videoRef.current) {
-      videoRef.current.playbackRate = .5; // Adjust this value to control the playback speed
+      videoRef.current.playbackRate = 0.35; // Adjust this value to control the playback speed
+      videoRef.current.play(); // Ensure the video starts playing
     }
   }, [type]);
 
@@ -22,7 +23,16 @@ function ToggleImage({ type, src, alt, overlayText, category }) {
         {type === 'image' ? (
           <img loading="lazy" src={src} alt={alt} />
         ) : (
-          <video ref={videoRef} className={styles.video} src={src} alt={alt} autoPlay loop muted />
+          <video
+            ref={videoRef}
+            className={styles.video}
+            src={src}
+            alt={alt}
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
         )}
         <div className={`${styles.overlay} ${showOverlay ? styles.show : styles.hide}`}>
           <span>{overlayText}</span>

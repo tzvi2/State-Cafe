@@ -99,7 +99,7 @@
 
 @media (min-width: 550px) {
 
-	.imageCard img {
+	.imageCard img, .imageCard video {
     width: 50vw;
     height: auto;
   }
