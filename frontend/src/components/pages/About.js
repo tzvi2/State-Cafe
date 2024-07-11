@@ -25,10 +25,12 @@ function About() {
         </p>
         
         <p>
-          🙏 Thank you for being a part of our journey. If you have any comments, questions, or concerns, we'd love to hear from you.<br></br><br></br> Email: support@statecafeteaneck.com <br></br><br></br> Call or Text: (551)-837-9907
-          
-          
+          🙏 Thank you for being a part of our journey. If you have any comments, questions, or concerns, we'd love to hear from you.
         </p>
+
+        <p className={styles.small}>Email: support@statecafeteaneck.com</p>
+        <p className={styles.small}>Call or Text: (551)-837-9907</p>
+
         <p className={styles.disclaimer}>
           *Delivery speed for one500 residents.
         </p>
