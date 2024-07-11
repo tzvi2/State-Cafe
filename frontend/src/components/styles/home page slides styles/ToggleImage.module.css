@@ -14,7 +14,7 @@
   margin: 0;
 }
 
-.imageCard img {
+.imageCard img, .imageCard video {
   width: 80vw; 
   height: auto;
   object-fit: cover;
@@ -112,7 +112,7 @@
     margin: 0;
   }
 
-	.imageCard img {
+	.imageCard img, .imageCard video {
     width: 22vw;
     height: auto;
 
