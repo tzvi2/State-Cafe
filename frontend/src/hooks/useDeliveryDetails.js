@@ -44,6 +44,7 @@ export default function DeliverySlotProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('deliveryDate', deliveryDate);
+    console.log('delivery date ', deliveryDate)
   }, [deliveryDate]);
 
   const clearDeliveryDetails = () => {

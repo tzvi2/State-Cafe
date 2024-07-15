@@ -122,7 +122,7 @@ const OrderConfirmation = () => {
               <tr key={idx}>
                 <td>{item.quantity}</td>
                 <td className={styles.itemDescription}>
-                  {item.itemId}
+                  {item.title}
                   {item.options.map((option, idx) => (
                     <div key={idx} className={styles.optionRow}>
                       <span>-{option.title}</span>

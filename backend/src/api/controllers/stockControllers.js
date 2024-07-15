@@ -6,7 +6,7 @@ const FieldValue = admin.firestore.FieldValue;
 
 exports.getFullStock = async (req, res) => {
   const { date } = req.query;
-
+  console.log('stock for ', date)
   try {
     const doc = await db.collection('stock').doc(date).get();
     if (doc.exists) {
@@ -62,17 +62,19 @@ exports.setAllProductQuantitiesToZero = async (req, res) => {
     let quantities = {};
     menuItemsSnapshot.forEach(doc => {
       const menuItem = doc.data();
+      const menuItemId = doc.id; // Ensure you get the document ID
+      
       if (menuItem.soldByWeight) {
-        quantities[menuItem.itemId] = [];
+        quantities[menuItemId] = []; // Ensure using the correct document ID
       } else {
-        quantities[menuItem.itemId] = {
-          quantity: 0
-        };
+        quantities[menuItemId] = { quantity: 0 }; // Ensure using the correct document ID
       }
     });
 
     const stockRef = db.collection('stock').doc(dateString);
     await stockRef.set(quantities, { merge: true });
+
+    console.log(`Set all product quantities to zero for ${dateString}:`, quantities);
 
     res.status(200).json({ message: `All product quantities set to zero for ${dateString}` });
   } catch (error) {
@@ -104,17 +106,17 @@ exports.updateStockLevels = async (req, res) => {
     console.log('stockData: ', stockData);
 
     cartItems.forEach(item => {
-      const itemStock = stockData[item.itemId]?.quantity;
+      const itemStock = stockData[item.title]?.quantity;
 
       if (itemStock != null && typeof itemStock === 'number') {
         const updatedQuantity = itemStock - item.quantity;
         if (updatedQuantity >= 0) {
-          batch.update(stockRef, { [`${item.itemId}.quantity`]: updatedQuantity });
+          batch.update(stockRef, { [`${item.title}.quantity`]: updatedQuantity });
         } else {
-          console.error(`Not enough stock for item ID ${item.itemId}. Current stock: ${itemStock}, required: ${item.quantity}`);
+          console.error(`Not enough stock for item ID ${item.title}. Current stock: ${itemStock}, required: ${item.quantity}`);
         }
       } else {
-        console.error(`Item ID ${item.itemId} does not exist in stock data or is not a number.`);
+        console.error(`Item ID ${item.title} does not exist in stock data or is not a number.`);
       }
     });
 

@@ -8,10 +8,12 @@ import { getMenuItemByItemId } from '../../api/menuRequests';
 import { getStockForDate } from '../../api/stockRequests'; // Import stock request
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { capitalizeFirstLetters } from '../../utils/stringUtilities';
+import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 
 function MenuItemExpanded() {
   const { itemId } = useParams();
   const { addToCart } = useCart();
+  const { deliveryDate } = useDeliveryDetails(); // Get delivery date from context
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
@@ -29,8 +31,7 @@ function MenuItemExpanded() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
-      const dateString = getLocalDate();
-      const stockData = await getStockForDate(dateString);
+      const stockData = await getStockForDate(deliveryDate); // Use the selected delivery date
 
       const weightOptionsGroup = data.soldByWeight ? {
         title: 'Available Portions',
@@ -53,7 +54,7 @@ function MenuItemExpanded() {
       }
     };
     fetchData();
-  }, [itemId]);
+  }, [itemId, deliveryDate]); // Depend on deliveryDate
 
   const totalItemPrice = useMemo(() => {
     if (menuItem.price === undefined) return 0;
@@ -90,10 +91,6 @@ function MenuItemExpanded() {
 
     return validationErrors;
   };
-
-  useEffect(() => {
-    //console.log('menu item ', menuItem);
-  }, [menuItem]);
 
   useEffect(() => {
     if (menuItem.price !== undefined) {

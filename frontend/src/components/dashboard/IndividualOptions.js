@@ -1,84 +1,41 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import styles from '../styles/dashboard/IndividualOptions.module.css';
 
-function IndividualOptions({ options, setOptions }) {
-  const [addingNewOption, setAddingNewOption] = useState(false);
-  const [newOption, setNewOption] = useState({
-    title: '',
-    timeToCook: '',
-    price: ''
-  });
-
-  const handleAddOption = () => {
-    setAddingNewOption(true);
+function IndividualOptions({ options, setOptions, removeOption }) {
+  const handleOptionChange = (index, field, value) => {
+    const newOptions = [...options];
+    newOptions[index][field] = value;
+    setOptions(newOptions);
   };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewOption((prevOption) => ({
-      ...prevOption,
-      [name]: value,
-    }));
-  };
-
-  const handleSaveOption = () => {
-    setOptions([...options, newOption]);
-    setNewOption({ title: '', timeToCook: '', price: '' });
-    setAddingNewOption(false);
-  };
-
-  useEffect(() => {
-    //console.log('options:', options);
-  }, [options]);
 
   return (
     <div>
-      
-
-      {addingNewOption && (
-        <div>
+      {options.map((option, index) => (
+        <div key={index} className={styles.option}>
           <input
             type="text"
-            name="title"
-            value={newOption.title}
-            onChange={handleChange}
             placeholder="Option Title"
+            value={option.title}
+            onChange={(e) => handleOptionChange(index, 'title', e.target.value)}
           />
           <input
             type="number"
-            name="price"
-            value={newOption.price}
-            onChange={handleChange}
-            placeholder="Option Price"
+            placeholder="Price"
+            value={option.price}
+            onChange={(e) => handleOptionChange(index, 'price', e.target.value)}
           />
           <input
             type="number"
-            name="timeToCook"
-            value={newOption.timeToCook}
-            onChange={handleChange}
             placeholder="Time to Cook"
+            value={option.timeToCook}
+            onChange={(e) => handleOptionChange(index, 'timeToCook', e.target.value)}
           />
-          <button type="button" onClick={() => setAddingNewOption(false)}>
-            Cancel
-          </button>
-          <button type="button" onClick={handleSaveOption}>
-            Save
-          </button>
-					
+          <button type="button" onClick={() => removeOption(index)}>Remove</button>
         </div>
-      )}
-      <ul>
-        {Array.isArray(options) && options.map((option, index) => (
-          <li key={index}>
-            {option.title} - {option.price} - {option.timeToCook}
-          </li>
-        ))}
-				{!addingNewOption && (
-        <button type="button" onClick={handleAddOption}>
-          Add New Option
-        </button>
-      )}
-      </ul>
-			
+      ))}
+      <button type="button" onClick={() => setOptions([...options, { title: '', price: '', timeToCook: '' }])}>
+        Add Option
+      </button>
     </div>
   );
 }

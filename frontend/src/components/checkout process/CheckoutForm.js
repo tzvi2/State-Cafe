@@ -89,7 +89,7 @@ export default function CheckoutForm() {
     const lowStockItems = [];
   
     cart.items.forEach(item => {
-      const availableQuantity = stockData[item.itemId]?.quantity || 0;
+      const availableQuantity = stockData[item.title]?.quantity || 0;
       if (availableQuantity === 0) {
         outOfStockItems.push(item.title);
       } else if (availableQuantity < item.quantity) {

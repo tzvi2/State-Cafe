@@ -2,18 +2,16 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useCart } from '../../hooks/useCart';
-import { formatIsoToTime, formatTimeTo12Hour } from '../../utils/timeUtilities';
 import { filterTimeSlots } from '../../utils/timeSlotUtilities';
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
 import Tooltip from './Tooltip';
-import { bookTimeSlot } from '../../api/timeslotRequests';
 import apiUrl from '../../config'
 
 function DeliveryPage() {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
   const [deliveryAvailable, setDeliveryAvailable] = useState(true);
   const { cart } = useCart();
-  const { setDeliverySlot, setUnitNumber, unitNumber, deliverySlot, setDeliveryDate, deliveryDate, phoneNumber, setPhoneNumber } = useDeliveryDetails();
+  const { setDeliverySlot, setUnitNumber, unitNumber, deliverySlot, deliveryDate, phoneNumber, setPhoneNumber } = useDeliveryDetails();
   const [apartmentNumberError, setApartmentNumberError] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const navigate = useNavigate();
@@ -24,37 +22,9 @@ function DeliveryPage() {
     hour12: true
   });
 
-  const getESTDate = useCallback(() => {
-    const now = new Date();
-    const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-    const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
-    return estDate;
-  }, []);
-
-  const formatDateToYYYYMMDD = (date) => {
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const formatDateToMDYYYY = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${month}-${day}-${year}`;
-  };
-
-  const todayEST = getESTDate();
-  const tomorrowEST = new Date(todayEST);
-  tomorrowEST.setDate(tomorrowEST.getDate() + 1);
-
-  const todayFormatted = formatDateToYYYYMMDD(todayEST);
-  const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
-
   const fetchTimeSlots = useCallback(async () => {
     const url = `${apiUrl}/timeslots/available-timeslots?date=${deliveryDate}&totalCookTime=${cart.totalCookTime}`;
-    //console.log(`Fetching time slots from: ${url}`);
+    console.log(`Fetching time slots from: ${url}, total cook time: ${cart.totalCookTime}`);
 
     try {
       const response = await fetch(url);
@@ -127,7 +97,7 @@ function DeliveryPage() {
 
   return (
     <div className={styles.deliveryPage}>
-      <h2>Delivery</h2>
+      {/* <h2>Delivery</h2> */}
 
       <div className={styles.errorRow}>
         {apartmentNumberError && <p className={styles.error}>{apartmentNumberError}</p>}
@@ -161,24 +131,13 @@ function DeliveryPage() {
           required
 
         />
-        
-        
-      </div>
-
-      <div className={`${styles.flexRow} ${styles.dateButtons}`}>
-        <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
-          <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
-        </button>
-        <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(tomorrowFormatted)}>
-          <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
-        </button>
       </div>
 
       {deliveryDate !== "" && (
         <>
           {deliveryAvailable ? (
             <select className={styles.wideBtn} value={deliverySlot} onChange={handleSlotSelection}>
-              <option value="">Select a time</option>
+              <option value="">Select a delivery time</option>
               {availableTimeSlots.map(slot => (
                 <option 
                   key={slot.time} 

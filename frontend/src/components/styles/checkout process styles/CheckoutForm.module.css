@@ -26,5 +26,13 @@
 }
 
 .soldOutItems {
-  color: rgb(212, 150, 35);
+  color: rgb(239, 90, 60);
+}
+
+@media (min-width: 780px) {
+  .message {
+    max-width: 500px;
+    align-self: center;
+    line-height: 1.75rem;
+  }
 }

@@ -3,6 +3,7 @@
   margin: 5%;
   color: rgb(5, 103, 31);
   font-weight: 500;
+  margin-bottom: 0;
 }
 
 .menu {
@@ -11,6 +12,64 @@
 	flex-direction: column;
 	align-items: center;
 }
+
+.deliveryPage h2 {
+	align-self: center;
+}
+
+.flexRow {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+  margin: 1rem;
+	max-width: 500px;
+	
+}
+
+
+
+
+.deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
+	font-size: 1.2rem;
+	border-radius: 5px;
+	box-sizing: border-box;
+}
+
+.flexRow label, .flexRow input, .flexRow button {
+	width: 48%;
+}
+
+.day {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: .5rem;
+	box-shadow: 1px 1px 6px rgba(96, 95, 95, 0.708);
+	cursor: pointer;
+  background-color: lightgray;
+  color: black;
+}
+
+.day:hover {
+	box-shadow: 1px 1px 9px rgba(96, 95, 95, 0.708);
+
+}
+
+.flexRow input {
+	text-align: center;
+}
+
+.selected {
+	border: 2px solid #82924B;
+	box-shadow: 1px 1px 3px rgba(96, 95, 95, 0.089);
+	color: #82924B;
+}
+
+.selected:hover {
+	box-shadow: 1px 1px 3px rgba(96, 95, 95, 0.089);
+
+}
+
 
 
 .temporaryBanner {
@@ -41,8 +100,20 @@
 	font-size: 1.25rem;
 }
 
+@media (min-width: 780px) {
+	.flexRow {
+		align-self: center;
+		width: 30%;
+	}
+
+	.flexRow button {
+		
+	}
+}
+
 @media (min-width: 1024px) {
 	.menu {
 		padding: 0;
 	}
+
 }

@@ -96,14 +96,14 @@
 	box-shadow: 1px 1px 3px rgba(96, 95, 95, 0.089);
 
 }
-
+/* 
 .morningHours {
 	color: #258faf;
 }
 
 .eveningHours {
 	color: rgb(79, 13, 79);
-}
+} */
 
 @media (max-width: 550px) {
 	.error {

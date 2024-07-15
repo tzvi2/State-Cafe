@@ -46,8 +46,10 @@ const app = express();
 console.log('Node Environment:', process.env.NODE_ENV);
 
 app.use((req, res, next) => {
-  res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-  res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
+  res.setHeader('Access-Control-Allow-Origin', '192.168.1.152:3000')
+  res.setHeader('Access-Control-Allow-Origin', 'http://192.168.1.152:3000');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 

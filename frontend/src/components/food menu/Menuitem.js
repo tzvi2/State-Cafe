@@ -31,7 +31,7 @@ const Menuitem = React.memo(function Menuitem({ item }) {
   };
 
   return (
-    <Link className={`${styles.menuItem} ${itemClass}`} to={`/menu/${item.itemId}`}>
+    <Link className={`${styles.menuItem} ${itemClass}`} to={`/menu/${item.id}`}>
       <img loading='lazy' className={styles.menuPhoto} src={item.img} alt={item.title} />
       <div className={styles.textBox}>
         <h2>{item.title}</h2>

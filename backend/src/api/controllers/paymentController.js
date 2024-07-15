@@ -5,7 +5,7 @@ const handleCreatePaymentIntent = async (req, res) => {
     const { items } = req.body;
     //console.log("items received for payment intent:", items);
 
-    console.log('request: ', req)
+    //console.log('request: ', req)
     const clientSecret = await createPaymentIntent(items);
     res.json({ clientSecret });
   } catch (err) {
@@ -20,7 +20,7 @@ const handleGetLastFour = async (req, res) => {
     const cardDetails = await getLastFourAndBrand(paymentIntentId);
     res.json(cardDetails);
   } catch (err) {
-    console.error("Error in handleGetLastFour:", err);
+    console.error("Error in handleGetLastFour:", err); 
     res.status(500).send({ error: err.message });
   }
 };

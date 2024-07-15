@@ -4,26 +4,13 @@ import { addMenuItem, getMenuItemByItemId, updateMenuItem } from '../../api/menu
 import uploadImage from '../../api/imageRequests';
 import styles from '../styles/dashboard/MenuItemForm.module.css';
 import IndividualOptions from './IndividualOptions';
+import OptionGroups from './OptionGroups';
 
 function MenuItemForm() {
   const navigate = useNavigate();
   const { itemId } = useParams(); // Get the itemId from URL parameters
-  const [menuItem, setMenuItem] = useState({
-    title: '', 
-    description: '',
-    price: '',
-    pieces: '', 
-    category: '',
-    tags: [],
-    timeToCook: '', 
-    options: [],
-    optionGroups: [],
-    soldByWeight: false,
-    weightOptions: [],
-    active: true,
-    img: null, // Add img property to hold the image URL
-  });
-
+  const [menuItem, setMenuItem] = useState(null); // Initialize as null
+  const [initialMenuItem, setInitialMenuItem] = useState(null);
   const [image, setImage] = useState(null);
   const fileInputRef = useRef(null);
 
@@ -34,12 +21,29 @@ function MenuItemForm() {
         try {
           const item = await getMenuItemByItemId(itemId);
           setMenuItem(item);
+          setInitialMenuItem(item); // Track the initial state
         } catch (error) {
           console.error("Error fetching menu item:", error);
         }
       };
 
       fetchMenuItem();
+    } else {
+      setMenuItem({
+        title: '',
+        description: '',
+        price: '',
+        pieces: '',
+        category: '',
+        tags: [],
+        timeToCook: '',
+        options: [],
+        optionGroups: [],
+        soldByWeight: false,
+        weightOptions: [],
+        active: true,
+        img: null, // Add img property to hold the image URL
+      });
     }
   }, [itemId]);
 
@@ -74,17 +78,31 @@ function MenuItemForm() {
     }));
   };
 
+  const handleRemoveOption = (index) => {
+    const newOptions = [...menuItem.options];
+    newOptions.splice(index, 1);
+    setMenuItem((prevMenuItem) => ({
+      ...prevMenuItem,
+      options: newOptions,
+    }));
+  };
+
+  const handleOptionGroupsChange = (optionGroups) => {
+    setMenuItem((prevMenuItem) => ({
+      ...prevMenuItem,
+      optionGroups: optionGroups,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const priceInCents = Math.round(menuItem.price);
     const timeToCookInSeconds = menuItem.timeToCook;
-    //const tagsArray = menuItem.tags.split(',').map(tag => tag.trim());
-    const tagsArray = []
+    const tagsArray = [];
     
     const newMenuItem = {
       ...menuItem,
-      itemId: menuItem.title,
       price: priceInCents,
       timeToCook: timeToCookInSeconds,
       tags: tagsArray,
@@ -105,8 +123,6 @@ function MenuItemForm() {
       })),
     }));
 
-		
-
     if (image) {
       try {
         const imageUrl = await uploadImage(image);
@@ -117,12 +133,11 @@ function MenuItemForm() {
       }
     }
 
-		console.log('new/updated menu item: ', newMenuItem)
-		
+    console.log('new/updated menu item: ', newMenuItem);
 
     try {
       if (itemId) {
-        await updateMenuItem({itemId, newMenuItem});
+        await updateMenuItem({ itemId, newMenuItem });
         console.log("Menu item updated successfully");
       } else {
         await addMenuItem(newMenuItem);
@@ -133,6 +148,10 @@ function MenuItemForm() {
       console.error("Error adding/updating menu item", error);
     }
   };
+
+  const hasChanges = initialMenuItem && JSON.stringify(initialMenuItem) !== JSON.stringify(menuItem);
+
+  if (!menuItem) return <div>Loading...</div>;
 
   return (
     <form onSubmit={handleSubmit} className={styles.form}>
@@ -152,12 +171,19 @@ function MenuItemForm() {
         type="file"
         ref={fileInputRef}
         onChange={handleImageChange}
-       
       />
 
       <div>
         <h4>Options</h4>
-        <IndividualOptions options={menuItem.options} setOptions={(newOptions) => setMenuItem((prevMenuItem) => ({ ...prevMenuItem, options: newOptions }))} />
+        <IndividualOptions 
+          options={menuItem.options} 
+          setOptions={(newOptions) => setMenuItem((prevMenuItem) => ({ ...prevMenuItem, options: newOptions }))}
+          removeOption={handleRemoveOption} // Pass remove function to IndividualOptions component
+        />
+        <OptionGroups 
+          optionGroups={menuItem.optionGroups}
+          setOptionGroups={handleOptionGroupsChange}
+        />
       </div>
 
       <label className={styles.toggleLabel}>
@@ -180,7 +206,7 @@ function MenuItemForm() {
         />
       </label>
 
-      <button type="submit">Submit</button>
+      <button type="submit">{hasChanges ? 'Save' : 'Submit'}</button>
     </form>
   );
 }

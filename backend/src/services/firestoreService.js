@@ -61,7 +61,7 @@ const addMenuItemToFirestore = async (menuItem) => {
     }
     
     // Sanitize itemId to ensure it's a valid Firestore document ID
-    const sanitizedItemId = newItem.itemId.replace(/[\/\\#?]/g, '_').replace(/\s+/g, ' ');
+    const sanitizedItemId = newItem.title.replace(/[\/\\#?]/g, '_').replace(/\s+/g, ' ');
     
     // Use the sanitized itemId as the document ID
     const docRef = await db.collection('menuItems').doc(sanitizedItemId).set(newItem);

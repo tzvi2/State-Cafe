@@ -16,6 +16,10 @@ function MenuPage() {
     fetchMenuItems();
   }, []);
 
+  useEffect(() => {
+    console.log(menuItems)
+  }, [menuItems])
+
   const handleDeleteMenuItem = async (documentId) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu item?');
     if (isConfirmed) {

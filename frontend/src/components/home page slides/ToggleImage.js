@@ -11,7 +11,7 @@ function ToggleImage({ type, src, alt, overlayText, category }) {
 
   useEffect(() => {
     if (type === 'video' && videoRef.current) {
-      videoRef.current.playbackRate = 0.35; // Adjust this value to control the playback speed
+      videoRef.current.playbackRate = 0.45; // Adjust this value to control the playback speed
       videoRef.current.play(); // Ensure the video starts playing
     }
   }, [type]);

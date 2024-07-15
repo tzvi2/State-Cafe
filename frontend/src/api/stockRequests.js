@@ -25,6 +25,7 @@ export const setAllStockToZero = async (dateString) => {
 };
 
 export const getStockForDate = async (dateString) => {
+  console.log('getting stock for ', dateString)
   try {
     const response = await fetch(`${apiUrl}/stock/get-remaining-quantity?date=${dateString}`);
     if (!response.ok) {
@@ -59,6 +60,7 @@ export const updateQuantityRemaining = async (date, menuItemId, quantity) => {
 };
 
 export const updateQuantityOfAllCartItems = async (date, cartItems) => {
+  console.log('updating stock for ', date, 'cart items: ', cartItems)
   try {
     const response = await fetch(`${apiUrl}/stock/update-stock-from-cart`, {
       method: 'PUT',

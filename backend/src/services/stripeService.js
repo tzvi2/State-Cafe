@@ -6,20 +6,21 @@ const calculateTotal = async (items) => {
   let total = 0;
 
   for (const item of items) {
-    const docRef = db.collection('menuItems').doc(item.itemId);
-    const doc = await docRef.get();
+    // Assuming each item has a title field that matches the title in Firestore
+    const querySnapshot = await db.collection('menuItems').where('title', '==', item.title).get();
 
-    if (doc.exists) {
-      const itemData = doc.data();
+    if (!querySnapshot.empty) {
+      const itemData = querySnapshot.docs[0].data(); // Assuming titles are unique and you only get one result
       const price = itemData.price;
       total += price * item.quantity;
     } else {
-      console.log(`Item not found in the database: ${item.itemId}`);
+      console.log(`Item not found in the database: ${item.title}`);
     }
   }
 
   return total;
 };
+
 
 const createPaymentIntent = async (items) => {
   console.log('creating payment intent')

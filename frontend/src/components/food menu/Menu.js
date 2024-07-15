@@ -1,20 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import "react-datepicker/dist/react-datepicker.css";
 import Menuitem from "./Menuitem";
 import CategoryBar from "./CategoryBar";
 import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
 import { getQuickViewMenu } from "../../api/menuRequests";
 import { getStockForDate } from "../../api/stockRequests";
+import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 
 const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", "soup", "coffee"];
-
-const getLocalDate = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
@@ -22,46 +16,76 @@ export default function Menu() {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const categoryRefs = useRef({});
   const categoryBarRef = useRef(null);
+  const { deliveryDate, setDeliveryDate } = useDeliveryDetails(); // Use context for delivery date
+  const timeFormatter = new Intl.DateTimeFormat([], {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
 
-  useEffect(() => {
-    setIsLoading(true);
-  
-    const fetchQuickView = async () => {
-      try {
-        const [items, stockData] = await Promise.all([
-          getQuickViewMenu(),
-          getStockForDate(getLocalDate())
-        ]);
-
-        const itemsWithStock = items.map(item => {
-          if (item.soldByWeight === true) {
-            return {
-              ...item,
-              weightOptions: stockData[item.itemId] || []
-            };
-          } else {
-            //console.log(stockData[item.itemId].quantity)
-            return {
-              ...item,
-              quantity: stockData[item.itemId]?.quantity || 0
-            };
-          }
-        });
-  
-        setMenuItems(itemsWithStock);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    fetchQuickView();
+  const getESTDate = useCallback(() => {
+    const now = new Date();
+    const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
+    const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
+    return estDate;
   }, []);
 
+  const formatDateToYYYYMMDD = (date) => {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const formatDateToMDYYYY = (date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${month}-${day}-${year}`;
+  };
+
+  const todayEST = getESTDate();
+  const tomorrowEST = new Date(todayEST);
+  tomorrowEST.setDate(tomorrowEST.getDate() + 1);
+
+  const todayFormatted = formatDateToYYYYMMDD(todayEST);
+  const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
+
+  const fetchQuickView = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const [items, stockData] = await Promise.all([
+        getQuickViewMenu(),
+        getStockForDate(deliveryDate) // Fetch stock based on selected date
+      ]);
+
+      const itemsWithStock = items.map(item => {
+        if (item.soldByWeight) {
+          return {
+            ...item,
+            weightOptions: stockData[item.id] || []
+          };
+        } else {
+          return {
+            ...item,
+            quantity: stockData[item.id]?.quantity || 0
+          };
+        }
+      });
+
+      setMenuItems(itemsWithStock);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [deliveryDate]);
+
   useEffect(() => {
-    //console.log('menu items: ', menuItems);
-  }, [menuItems]);
+    if (deliveryDate) {
+      fetchQuickView();
+    }
+  }, [deliveryDate, fetchQuickView]);
 
   const handleScroll = () => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
@@ -103,21 +127,32 @@ export default function Menu() {
   };
 
   useEffect(() => {
+    console.log('menu items ', menuItems)
+  }, [menuItems])
+
+  useEffect(() => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [activeCategory]);
 
+  const isDaySelected = (dateStr) => deliveryDate === dateStr;
+
   return (
     <>
-      {/* <CategoryBar 
-        categories={categories} 
-        activeCategory={activeCategory} 
-        setActiveCategory={handleCategoryClick} 
-        ref={categoryBarRef}
-      /> */}
-      <h2 className={styles.offering}>Breakfast coming soon...</h2>
+      <h2 className={styles.offering}>Select Delivery Date</h2>
+  
+      
+      <div className={`${styles.flexRow} ${styles.dateButtons}`}>
+        <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
+          <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
+        </button>
+        <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(tomorrowFormatted)}>
+          <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
+        </button>
+      </div>
+
       <div className={styles.menuContainer}>
-        {/* {categories.map((category) => (
+        {categories.map((category) => (
           <div
             key={category}
             id={category}
@@ -125,16 +160,15 @@ export default function Menu() {
             className={styles.categoryContainer}>
             <div className={styles.menu}>
               {isLoading ?
-                Array(3).fill(0).map((_, index) => (
+                Array(menuItems.length).fill(0).map((_, index) => (
                   <Shimmer key={index} />
                 )) :
-                menuItems.filter(item => item.category === category).map((item, index) => (
-                  <Menuitem key={index} item={item} />
+                menuItems.filter(item => item.category === category).map((item) => (
+                  <Menuitem key={item.id} item={item} />
                 ))}
             </div>
           </div>
-        ))} */}
-        {/* <h2 className={styles.temporaryBanner}>Coming soon...</h2> */}
+        ))}
       </div>
     </>
   );
