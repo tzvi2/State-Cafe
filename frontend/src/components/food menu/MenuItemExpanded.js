@@ -64,15 +64,27 @@ function MenuItemExpanded() {
 
   const handleOptionChange = (option, isChecked, groupTitle = null) => {
     setSelectedOptions(prev => {
-      let updatedOptions = prev.filter(opt => !(opt.group === groupTitle));
-
-      if (isChecked) {
-        updatedOptions.push({ ...option, group: groupTitle });
+      let updatedOptions = [...prev];
+  
+      if (groupTitle) {
+        // Handle group options
+        updatedOptions = updatedOptions.filter(opt => !(opt.group === groupTitle));
+        if (isChecked) {
+          updatedOptions.push({ ...option, group: groupTitle });
+        }
+      } else {
+        // Handle individual options
+        if (isChecked) {
+          updatedOptions.push(option);
+        } else {
+          updatedOptions = updatedOptions.filter(opt => opt.title !== option.title);
+        }
       }
-
+  
       return updatedOptions;
     });
   };
+  
 
   const validateOptionSelections = () => {
     const validationErrors = [];
