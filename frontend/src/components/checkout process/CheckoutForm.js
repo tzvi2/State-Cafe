@@ -6,6 +6,7 @@ import {
 } from "@stripe/react-stripe-js";
 import styles from '../styles/checkout process styles/CheckoutForm.module.css';
 import { useCart } from "../../hooks/useCart";
+import { useDeliveryDetails} from '../../hooks/useDeliveryDetails'
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
 import { getStockForDate } from "../../api/stockRequests";
 
@@ -14,6 +15,7 @@ export default function CheckoutForm() {
   const elements = useElements();
 
   const { cart, updateItemQuantity, removeFromCart, clearCart } = useCart();
+  const {deliveryDate} = useDeliveryDetails()
 
   const [message, setMessage] = useState("");
   const [formLoading, setFormLoading] = useState(true);
@@ -84,7 +86,7 @@ export default function CheckoutForm() {
 
   const checkCartItemsAgainstStock = async () => {
     const dateString = getLocalDate();
-    const stockData = await getStockForDate(dateString);
+    const stockData = await getStockForDate(deliveryDate);
     const outOfStockItems = [];
     const lowStockItems = [];
   
