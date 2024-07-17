@@ -97,7 +97,6 @@ function DeliveryPage() {
 
   return (
     <div className={styles.deliveryPage}>
-      {/* <h2>Delivery</h2> */}
 
       <div className={styles.errorRow}>
         {apartmentNumberError && <p className={styles.error}>{apartmentNumberError}</p>}
