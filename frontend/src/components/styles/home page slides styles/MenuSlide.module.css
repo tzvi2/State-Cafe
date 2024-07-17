@@ -76,4 +76,9 @@
 		padding: 1%;
 		margin: 0;
 	}
+	
+	.serving {
+		font-size: 2rem;
+		font-weight: 500;
+	}
 }

@@ -57,7 +57,7 @@ function MenuSlide() {
         ))}
       </div>
       <Link className={styles.button_full} to="menu">
-        Full Menu <MenuSquare />
+        Menu <MenuSquare />
       </Link>
     </div>
   );
