@@ -17,22 +17,22 @@ function MenuSlide() {
       overlayText: 'We offer a number of delicious breakfast options to get your day started right. Eggs, pancakes, paninis... Find something delicious now.',
       category: 'Breakfast'
     },
-    {
-      id: 'pasta',
-      type: 'image',
-      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fbowl_of_pasta_70.webp?alt=media&token=11287db0-511b-4ade-9e46-f21770fb0f1a',
-      alt: 'Pasta',
-      overlayText: 'All of our pasta is homemade and fresh because you deserve the best. Guaranteed to feel and taste the difference.',
-      category: 'Pasta'
-    },
-    {
-      id: 'coffee',
-      type: 'video',
-      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fmoving%20latte.mp4?alt=media&token=de788bcb-6385-4f9a-8fb0-66e4d0ccc355',
-      alt: 'lattes',
-      overlayText: 'Our coffee drinks are made from whole coffee beans and are freshly ground for your drink. Try one of our homemade lattes today.',
-      category: 'Coffee'
-    }
+    // {
+    //   id: 'pasta',
+    //   type: 'image',
+    //   src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fbowl_of_pasta_70.webp?alt=media&token=11287db0-511b-4ade-9e46-f21770fb0f1a',
+    //   alt: 'Pasta',
+    //   overlayText: 'All of our pasta is homemade and fresh because you deserve the best. Guaranteed to feel and taste the difference.',
+    //   category: 'Pasta'
+    // },
+    // {
+    //   id: 'coffee',
+    //   type: 'video',
+    //   src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fmoving%20latte.mp4?alt=media&token=de788bcb-6385-4f9a-8fb0-66e4d0ccc355',
+    //   alt: 'lattes',
+    //   overlayText: 'Our coffee drinks are made from whole coffee beans and are freshly ground for your drink. Try one of our homemade lattes today.',
+    //   category: 'Coffee'
+    // }
   ];
 
   const handleToggle = (id) => {
@@ -41,6 +41,7 @@ function MenuSlide() {
 
   return (
     <div className={styles.slide_centered}>
+      <p className={styles.serving}>Now serving</p>
       <div className={styles.featured_images}>
         {items.map((item) => (
           <ToggleImage

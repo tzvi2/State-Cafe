@@ -1,7 +1,7 @@
 .slide_centered {
 	display: flex;
 	flex-direction: column;
-	padding: 4rem .75rem;
+	padding: 3rem .75rem;
 	align-items: center;
 	/* margin-top: 10%; */
 }
@@ -34,6 +34,12 @@
 	align-items: center;
 	justify-content: space-around;
 	text-decoration: none;
+}
+
+.serving {
+	color: rgb(129, 155, 94);
+	font-size: 6vw;
+	font-weight: 500;
 }
 
 @media (min-width: 550px) {
