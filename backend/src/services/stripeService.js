@@ -29,6 +29,7 @@ const createPaymentIntent = async (items) => {
     amount: total,
     currency: 'usd',
   });
+  console.log('something unimportant')
   return paymentIntent.client_secret;
 };
 
