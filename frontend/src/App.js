@@ -51,9 +51,9 @@ function App() {
                 <Route
                   path="/dashboard"
                   element = {
-                    // <ProtectedRoute>
+                    <ProtectedRoute>
                       <DashboardLayout />
-                    // </ProtectedRoute>
+                    </ProtectedRoute>
                     }
                   >
                   <Route path="stock" element={<StockPage />} />
