@@ -1,84 +1,79 @@
 .cartHeader {
   text-align: center;
   margin: 1rem;
+  font-weight: 400;
 }
 
 .cartPage {
-  padding: 3% 4%;
+  padding: 2%;
   display: flex;
   flex-direction: column;
   border: 1px solid rgb(148, 145, 161);
   border-radius: 10px;
-  margin: 1rem;
+  margin: .5rem;
   max-width: 700px;
   min-width: 300px;
 }
 
 .cartItem {
   display: flex;
-  margin: 3% 0;
+  flex-direction: column;
+  row-gap: 8px;
+  padding: 5px;
+  margin-bottom: 24px;
+  box-shadow: 2px 2px 3px rgb(137, 143, 137);
+}
+
+.top {
+  display: flex;
   justify-content: space-between;
+  align-items: center;
 }
 
-.col1 {
-  display: flex; 
+select.quantity {
+  height: 2.25rem;
+  width: 2.25rem;
+  border-radius: 0;
+}
+
+svg.delete {
   border: 1px solid black;
-  border-radius: 10px;
-  padding: 2%;
-  width: 75%;
-	column-gap: .5rem;
-  min-width: 222px;
+  padding: 3px;
+  color: red;
+  height: 2.25rem;
+  width: 2.25rem;
+  box-sizing: border-box;
+  stroke-width: 1px;
 }
 
-.quantity {
-	font-size: 1rem;
-  align-self: center;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  /* border-top-right-radius: 0; */
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  column-gap: 16px;
 }
 
-.col2 {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-}
-
-.col2 > svg {
-	color: rgb(202, 13, 13);
-	border: 1px solid grey;
-	border-radius: 8px;
-	padding: 10%;
-	align-self: flex-end;
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.col2 > svg:active {
-	background: rgb(181, 175, 175);
-}
-
-.foodInfo {
-  flex-grow: 2;
-  text-align: center;
-}
-
-.foodTitle {
-  font-size: 1.15rem;
-  margin: 0; 
-  text-align: center;
-}
-
-.foodPic {
+img.itemImage {
+  height: 5rem;
+  width: 5rem;
+  border-radius: 0;
   margin: 0;
-  height: 4rem;
-  width: 4rem;
-  border-radius: 10px;
+  align-self: flex-start;
 }
 
-.optionsList {
+ul.options {
   list-style-type: none;
   padding-inline-start: 0;
+  flex-grow: 2;
+  margin: 0;
+}
+
+li.option {
+  margin-top: 5px;
+}
+
+p.itemPrice {
+  align-self: flex-end;
+  margin: 0;
 }
 
 .totalRow {
@@ -94,25 +89,10 @@
   font-weight: 500;
 }
 
-.option {
-  margin: 0;
-}
-
-
-.itemTotal {
-  font-size: 1.15rem;
-  margin: 0;
-}
-
 .checkoutButtonWrapper {
   display: flex;
   justify-content: center;
   width: 100%;
-}
-
-.font {
-  font-size: 1.25rem;
-  align-self: center;
 }
 
 .btn {

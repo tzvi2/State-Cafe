@@ -22,7 +22,7 @@ function CartItem({item}) {
 
 return (
 	<div className={styles.cartItem}>
-		<div className={styles.col1}>
+		<div className={styles.top}>
 			<select
 				className={styles.quantity}
 				value={item.quantity}
@@ -34,21 +34,18 @@ return (
 					</option>
 				))}
 			</select>
-			<img className={styles.foodPic} src={item.img} alt={item.title} />
-			<div className={styles.foodInfo}>
-				<p className={styles.foodTitle}>{item.title}</p>
-				<ul className={styles.optionsList}>
-					{item.options?.map((option) => (
-						<li className={styles.option} key={`${item.cartItemId} ${option.title}`}>+ {option.title}</li>
-					))}
-				</ul>
-			</div>
+			<p>{item.title}</p>
+			<Trash2 className={styles.delete} />
 		</div>
-		<div className={styles.col2}>
-			<Trash2 className={styles.deleteBtn} onClick={() => handleDeleteItem(item.cartItemId)} />
-			<p className={styles.itemTotal}>{centsToFormattedPrice(item.total)}</p>
+		<div className={styles.bottom}>
+			<img className={styles.itemImage} src={item.img}></img>
+			<ul className={styles.options}>
+				{item.options?.map((option) => (
+					<li className={styles.option} key={`${item.cartItemId} ${option.title}`}>+ {option.title}</li>
+				))}
+			</ul>
+			<p className={styles.itemPrice}>{centsToFormattedPrice(item.total)}</p>
 		</div>
-		
 	</div>
 );
 }
