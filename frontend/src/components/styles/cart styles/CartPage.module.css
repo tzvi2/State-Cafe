@@ -8,87 +8,125 @@
   padding: 2%;
   display: flex;
   flex-direction: column;
-  border: 1px solid rgb(148, 145, 161);
+  border: 1px solid #dcdcdc;
   border-radius: 10px;
-  margin: .5rem;
+  margin: 0 0.5rem;
   max-width: 700px;
   min-width: 300px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  margin-bottom: 70px; /* Add margin to avoid content being hidden behind the fixed button */
 }
 
 .cartItem {
   display: flex;
-  flex-direction: column;
-  row-gap: 2px;
-  padding: 5px;
   margin-bottom: 20px;
-  border-bottom: 1px solid grey;
+  justify-content: space-between;
+  column-gap: 15px;
+  background-color: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  box-shadow: 0 1px 2px #eaeaea;
 }
 
-.top {
+.col1, .col2, .col3 {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  row-gap: 5px;
+} 
+
+.col1 {
   align-items: center;
+  justify-content: center;
+}
+
+.col2 {
+  flex-grow: 2;
+  justify-content: flex-start;
+  row-gap: 10px;
+  margin-left: 5px;
+}
+
+.col3 {
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+img.itemImage {
+  margin: 0;
+  width: 4.5rem;
+  height: auto;
+  border-radius: 5px;
 }
 
 select.quantity {
-  height: 2.25rem;
-  width: 2.25rem;
-  border-radius: 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  text-align: center;
+  padding: 0.25rem;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s, border-color 0.3s;
+}
+
+select.quantity:hover {
+  background-color: #f0f0f0;
+  border-color: #b3b3b3;
 }
 
 p.itemTitle {
   font-weight: 600;
+  margin: 0;
+  font-size: 1rem;
+}
+
+ul.options {
+  list-style-type: none;
+  padding-inline-start: 0;
+  margin: 0;
+}
+
+li.option {
+  margin-bottom: 3px;
+  font-size: 0.9rem;
 }
 
 svg.delete {
-  border: 1px solid black;
+  border: 1px solid #ffdddd;
   padding: 3px;
-  color: red;
-  height: 2.25rem;
-  width: 2.25rem;
+  color: #ff6b6b;
+  height: 1.75rem;
+  width: 1.75rem;
   box-sizing: border-box;
-  stroke-width: 1px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+svg.delete:hover {
+  background-color: #ffdddd;
+  color: #ff4c4c;
+}
+
+p.itemPrice {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1rem;
 }
 
 .bottom {
   display: flex;
   justify-content: space-between;
   column-gap: 16px;
-}
-
-img.itemImage {
-  height: 5rem;
-  width: 5rem;
-  border-radius: 0;
-  margin: 0;
-  align-self: flex-start;
-}
-
-ul.options {
-  list-style-type: none;
-  padding-inline-start: 0;
-  flex-grow: 2;
-  margin: 0;
-}
-
-li.option {
-  margin-top: 5px;
-}
-
-p.itemPrice {
-  align-self: flex-end;
-  margin: 0;
+  align-items: center;
 }
 
 .totalRow {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid black;
-  padding: 2% 0;
-
-}
-
-.totalRow span {
+  border-top: 1px solid #ccc;
+  padding: 1rem 0;
   font-size: 1.15rem;
   font-weight: 500;
 }
@@ -96,28 +134,38 @@ p.itemPrice {
 .checkoutButtonWrapper {
   display: flex;
   justify-content: center;
-  width: 100%;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white; /* Ensure background to avoid content being seen behind button */
+  padding: 1rem;
+  box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .btn {
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
   border: 1px solid #718042;
   text-decoration: none;
   font-size: 1.25rem;
   border-radius: 10px;
-  color: #718042;
+  color: #fff;
+  background-color: #718042;
   font-weight: 500;
-  padding: .25rem;
-  box-shadow: 1px 1px 3px rgba(206, 200, 200, 1);
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .btn:hover {
-  box-shadow: 1px 1px 3px rgba(206, 200, 200, 1),
-              2px 2px 3px rgba(206, 200, 200, 1);
+  background-color: #5a6d34;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 @media (min-width: 550px) {
-
   .cartPage {
     width: 25rem;
     align-self: center;
@@ -125,16 +173,11 @@ p.itemPrice {
 }
 
 @media (min-width: 1024px) {
-
   .cartHeader {
     margin-top: 3rem;
   }
 
   .cartPage {
     align-self: center;
-  }
-
-  .cartItem {
-
   }
 }
