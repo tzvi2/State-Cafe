@@ -34,8 +34,8 @@ return (
 					</option>
 				))}
 			</select>
-			<p>{item.title}</p>
-			<Trash2 className={styles.delete} />
+			<p className={styles.itemTitle}>{item.title}</p>
+			<Trash2 className={styles.delete} onClick={() => handleDeleteItem(item.cartItemId)} />
 		</div>
 		<div className={styles.bottom}>
 			<img className={styles.itemImage} src={item.img}></img>

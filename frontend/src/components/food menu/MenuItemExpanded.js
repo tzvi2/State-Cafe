@@ -29,6 +29,10 @@ function MenuItemExpanded() {
   const timeoutId2Ref = useRef();
 
   useEffect(() => {
+    console.log('item ', menuItem)
+  }, [menuItem])
+
+  useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
       const stockData = await getStockForDate(deliveryDate); // Use the selected delivery date
@@ -120,15 +124,20 @@ function MenuItemExpanded() {
   }, [selectedOptions, quantity, menuItem, quantityLeft]);
 
   const handleAddToCart = async () => {
-    if (buttonLocked || !menuItem || quantityLeft === 0) return;
+    if (buttonLocked || !menuItem || quantityLeft === 0) {
+      console.log('not adding')
+      return;
+    } 
 
     const validationErrors = validateOptionSelections();
     if (validationErrors.length > 0) {
+      console.log('validation error')
       alert(validationErrors.join("\n"));
       return;
     }
 
     if (quantity > quantityLeft) {
+      console.log('quantity selected exceeds quantity left')
       const userConfirmed = window.confirm(`Only ${quantityLeft} left in stock. Would you like to add the remaining ${quantityLeft} to your cart?`);
       if (!userConfirmed) {
         return;
@@ -139,7 +148,16 @@ function MenuItemExpanded() {
 
     setButtonLocked(true);
 
+    console.log('menu item being added: ', 
+      {...menuItem,
+        options: selectedOptions,
+        quantity: Math.min(quantity, quantityLeft), 
+        total: totalItemPrice,
+      }
+    )
+
     const wasAdded = addToCart({
+      
       ...menuItem,
       options: selectedOptions,
       quantity: Math.min(quantity, quantityLeft), 

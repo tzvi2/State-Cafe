@@ -18,10 +18,10 @@
 .cartItem {
   display: flex;
   flex-direction: column;
-  row-gap: 8px;
+  row-gap: 2px;
   padding: 5px;
-  margin-bottom: 24px;
-  box-shadow: 2px 2px 3px rgb(137, 143, 137);
+  margin-bottom: 20px;
+  border-bottom: 1px solid grey;
 }
 
 .top {
@@ -34,6 +34,10 @@ select.quantity {
   height: 2.25rem;
   width: 2.25rem;
   border-radius: 0;
+}
+
+p.itemTitle {
+  font-weight: 600;
 }
 
 svg.delete {

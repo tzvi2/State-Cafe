@@ -49,6 +49,9 @@ export default function CartProvider({children}) {
 		localStorage.removeItem('totalCount')
 	}
 	
+	useEffect(() => {
+		console.log('cart items ', cartItems)
+	}, [cartItems])
 
 	useEffect(() => {
 
@@ -73,6 +76,7 @@ export default function CartProvider({children}) {
 
 	const addToCart = (newMenuItem) => {
 		// Finding if the item exists in the cart with the exact same options
+		console.log('adding to cart new menu item ', newMenuItem)
 		const existingItem = cartItems.find(item => 
 			item.firestoreId === newMenuItem.firestoreId && 
 			arraysAreTheSame(item.options.map(opt => opt.title), newMenuItem.options.map(opt => opt.title))
@@ -85,6 +89,7 @@ export default function CartProvider({children}) {
 		if (existingItem) {
 			const combinedQuantity = existingItem.quantity + newMenuItem.quantity;
 			if (combinedQuantity > 10) {
+				console.log('combined quantity exceeds 10')
 				// If combined quantity exceeds 10, do not add to cart
 			
 				return false

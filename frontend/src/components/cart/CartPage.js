@@ -9,9 +9,9 @@ import styles from '../styles/cart styles/CartPage.module.css'
 export default function CartPage() {
 	const {cart, removeFromCart, updateItemQuantity} = useCart()
 
-	useEffect(() => {
-		//console.log('cart items ', cart.items)
-	}, [])
+	// useEffect(() => {
+	// 	console.log('cart items ', cart.items)
+	// }, [cart])
 
 	return (
 		<>
