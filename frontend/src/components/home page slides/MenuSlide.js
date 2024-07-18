@@ -9,15 +9,23 @@ function MenuSlide() {
   const [activeImageId, setActiveImageId] = useState(null);
 
   const items = [
+    // {
+    //   id: 'breakfast',
+    //   type: 'image',
+    //   src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fgreen_table_70.webp?alt=media&token=3474212a-40e8-482e-93bf-02c4468d0a05',
+    //   alt: 'breakfast table',
+    //   //overlayText: 'We offer a number of delicious breakfast options to get your day started right. Eggs, pancakes, paninis... Find something delicious now.',
+    //   overlayText: 'Start your day on the right foot with our breakfast options. Perfectly cooked eggs with lots of add-ins, fluffy pancakes, and more. Have a look around.',
+    //   category: 'Breakfast'
+    // },
     {
-      id: 'breakfast',
+      id: 'sushi',
       type: 'image',
-      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fgreen_table_70.webp?alt=media&token=3474212a-40e8-482e-93bf-02c4468d0a05',
-      alt: 'breakfast table',
-      //overlayText: 'We offer a number of delicious breakfast options to get your day started right. Eggs, pancakes, paninis... Find something delicious now.',
-      overlayText: 'Start your day on the right foot with our breakfast options. Perfectly cooked eggs with lots of add-ins, fluffy pancakes, and more. Have a look around.',
-      category: 'Breakfast'
-    },
+      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fsushi.jpg?alt=media&token=f7645479-1a3f-4802-89a6-0c4138452a85',
+      alt: 'sushi on a plate',
+      overlayText: 'With five years of sushi-making experience, we deliver a difference you can taste. From selecting the perfect fish, to carefully measuring our rice-water ratio, to seasoning the rice with a delicate mirin blend, every step is taken with care. In each bite, you’ll experience the delight of a carefully crafted, high-quality sushi roll.',
+      category: 'Sushi'
+    }
     // {
     //   id: 'pasta',
     //   type: 'image',

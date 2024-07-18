@@ -19,7 +19,7 @@
 
 .flexRow {
 	display: flex;
-	justify-content: space-between;
+	justify-content: space-evenly;
 	align-items: center;
   margin: 1rem;
 	max-width: 500px;
@@ -35,7 +35,7 @@
 	box-sizing: border-box;
 }
 
-.flexRow label, .flexRow input, .flexRow button {
+.flexRow label, .flexRow input {
 	width: 48%;
 }
 
@@ -48,6 +48,7 @@
 	cursor: pointer;
   background-color: lightgray;
   color: black;
+	width: 40%;
 }
 
 .day:hover {

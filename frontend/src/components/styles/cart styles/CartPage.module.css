@@ -76,6 +76,11 @@
   border-radius: 10px;
 }
 
+.optionsList {
+  list-style-type: none;
+  padding-inline-start: 0;
+}
+
 .totalRow {
   display: flex;
   justify-content: space-between;

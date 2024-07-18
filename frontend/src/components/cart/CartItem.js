@@ -37,7 +37,7 @@ return (
 			<img className={styles.foodPic} src={item.img} alt={item.title} />
 			<div className={styles.foodInfo}>
 				<p className={styles.foodTitle}>{item.title}</p>
-				<ul>
+				<ul className={styles.optionsList}>
 					{item.options?.map((option) => (
 						<li className={styles.option} key={`${item.cartItemId} ${option.title}`}>+ {option.title}</li>
 					))}
