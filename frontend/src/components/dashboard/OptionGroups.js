@@ -25,6 +25,16 @@ const OptionGroups = ({ optionGroups, setOptionGroups }) => {
     setOptionGroups(updatedGroups);
   };
 
+  const handleBlur = (index, e) => {
+    const { name, value } = e.target;
+    const intValue = parseInt(value, 10);
+    const validValue = isNaN(intValue) ? 0 : intValue;
+    const updatedGroups = optionGroups.map((group, i) =>
+      i === index ? { ...group, [name]: validValue } : group
+    );
+    setOptionGroups(updatedGroups);
+  };
+
   const addOptionGroup = () => {
     const newGroup = { title: '', minSelection: 1, maxSelection: 3, options: [] };
     setOptionGroups([...optionGroups, newGroup]);
@@ -69,6 +79,7 @@ const OptionGroups = ({ optionGroups, setOptionGroups }) => {
             type="number"
             value={group.minSelection}
             onChange={(e) => handleOptionGroupChange(groupIndex, e)}
+            onBlur={(e) => handleBlur(groupIndex, e)}
             placeholder="Minimum Selection"
           />
           <input
@@ -76,6 +87,7 @@ const OptionGroups = ({ optionGroups, setOptionGroups }) => {
             type="number"
             value={group.maxSelection}
             onChange={(e) => handleOptionGroupChange(groupIndex, e)}
+            onBlur={(e) => handleBlur(groupIndex, e)}
             placeholder="Maximum Selection"
           />
           <h5>Options in this Group</h5>

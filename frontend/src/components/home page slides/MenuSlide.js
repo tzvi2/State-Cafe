@@ -14,7 +14,8 @@ function MenuSlide() {
       type: 'image',
       src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fgreen_table_70.webp?alt=media&token=3474212a-40e8-482e-93bf-02c4468d0a05',
       alt: 'breakfast table',
-      overlayText: 'We offer a number of delicious breakfast options to get your day started right. Eggs, pancakes, paninis... Find something delicious now.',
+      //overlayText: 'We offer a number of delicious breakfast options to get your day started right. Eggs, pancakes, paninis... Find something delicious now.',
+      overlayText: 'Start your day on the right foot with our breakfast options. Perfectly cooked eggs with lots of add-ins, fluffy pancakes, and more. Have a look around.',
       category: 'Breakfast'
     },
     // {

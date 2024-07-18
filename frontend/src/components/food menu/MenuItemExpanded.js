@@ -65,12 +65,18 @@ function MenuItemExpanded() {
   const handleOptionChange = (option, isChecked, groupTitle = null) => {
     setSelectedOptions(prev => {
       let updatedOptions = [...prev];
-  
+
       if (groupTitle) {
         // Handle group options
-        updatedOptions = updatedOptions.filter(opt => !(opt.group === groupTitle));
         if (isChecked) {
-          updatedOptions.push({ ...option, group: groupTitle });
+          // Add the new option if within the limit
+          const selectedInGroup = updatedOptions.filter(opt => opt.group === groupTitle);
+          if (selectedInGroup.length < menuItem.optionGroups.find(group => group.title === groupTitle).maxSelection) {
+            updatedOptions.push({ ...option, group: groupTitle });
+          }
+        } else {
+          // Remove the option if unchecked
+          updatedOptions = updatedOptions.filter(opt => !(opt.title === option.title && opt.group === groupTitle));
         }
       } else {
         // Handle individual options
@@ -80,11 +86,10 @@ function MenuItemExpanded() {
           updatedOptions = updatedOptions.filter(opt => opt.title !== option.title);
         }
       }
-  
+
       return updatedOptions;
     });
   };
-  
 
   const validateOptionSelections = () => {
     const validationErrors = [];
@@ -137,7 +142,7 @@ function MenuItemExpanded() {
     const wasAdded = addToCart({
       ...menuItem,
       options: selectedOptions,
-      quantity: Math.min(quantity, quantityLeft), // Add the minimum of desired quantity and quantity left
+      quantity: Math.min(quantity, quantityLeft), 
       total: totalItemPrice,
     });
 
@@ -160,6 +165,10 @@ function MenuItemExpanded() {
   };
 
   useEffect(() => {
+    console.log(' menu item ', menuItem)
+  }, [menuItem])
+
+  useEffect(() => {
     return () => {
       if (timeoutId1Ref.current) clearTimeout(timeoutId1Ref.current);
       if (timeoutId2Ref.current) clearTimeout(timeoutId2Ref.current);
@@ -178,6 +187,7 @@ function MenuItemExpanded() {
           menuItem={menuItem} 
           selectedOptions={selectedOptions} 
           handleOptionChange={handleOptionChange} 
+          optionGroups={menuItem.optionGroups} 
         />
 
         <div className={styles.footer}>
@@ -207,11 +217,3 @@ function MenuItemExpanded() {
 }
 
 export default MenuItemExpanded;
-
-function getLocalDate() {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, '0');
-  const day = String(today.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
