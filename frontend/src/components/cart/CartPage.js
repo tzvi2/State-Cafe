@@ -16,34 +16,37 @@ export default function CartPage() {
   return (
     <>
       <h2 className={styles.cartHeader}>My Cart</h2>
+
       <div className={styles.cartPage}>
         {cart.items.length > 0 ? (
-          <>
+          <div className={styles.cartItems}>
+
             {cart.items.map((item) => (
               <CartItem key={item.cartItemId} item={item} />
             ))}
+
             <p className={styles.totalRow}>
               <span>Total: </span>
               <span>${(cart.totalPrice / 100).toFixed(2)}</span>
             </p>
-          </>
+
+						<div className={styles.checkoutButtonWrapper}>
+							<Link className={styles.btn} to="/checkout">
+								<span>Checkout</span>
+								<span>${(cart.totalPrice / 100).toFixed(2)}</span>
+							</Link>
+        		</div>
+          </div>
         ) : (
           <>
             <p className={styles.font}>Your cart is empty 😶 </p>
-            <Link className={styles.btn} to="/menu">
-              Add something now
-            </Link>
+							<Link className={styles.emptyCartButton} to="/menu">
+								Add something now
+							</Link>
           </>
         )}
       </div>
-      {cart.items.length > 0 && (
-        <div className={styles.checkoutButtonWrapper}>
-          <Link className={styles.btn} to="/checkout">
-            <span>Checkout</span>
-            <span>${(cart.totalPrice / 100).toFixed(2)}</span>
-          </Link>
-        </div>
-      )}
+      
     </>
   );
 }

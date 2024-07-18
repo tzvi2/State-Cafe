@@ -165,6 +165,21 @@ p.itemPrice {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
+.emptyCartButton {
+  border: 1px solid #718042;
+  text-decoration: none;
+  font-size: 1.25rem;
+  border-radius: 10px;
+  color: #fff;
+  text-align: center;
+  background-color: #718042;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+}
+
 @media (min-width: 550px) {
   .cartPage {
     width: 25rem;
