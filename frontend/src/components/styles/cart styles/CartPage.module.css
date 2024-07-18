@@ -37,7 +37,7 @@
 
 .col1 {
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .col2 {
