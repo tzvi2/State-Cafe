@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { browserLocalPersistence, getAuth, setPersistence } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCXDV3K5RwgCgPVrvFRvusGoC0jh3jJqEc",
@@ -14,12 +14,18 @@ const firebaseConfig = {
   measurementId: "G-31B51YM5GG"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Cloud Firestore and get a reference to the service
 const db = getFirestore(app);
 
 const auth = getAuth(app)
+
+setPersistence(auth, browserLocalPersistence)
+  .then(() => {
+    console.log("Persistence set to LOCAL");
+  })
+  .catch((error) => {
+    console.error("Error setting persistence: ", error);
+  });
 
 export {db, auth}

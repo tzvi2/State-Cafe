@@ -9,6 +9,7 @@ const timeslotRoutes = require('./src/api/routes/timeslotRoutes');
 const editMenuRoutes = require('./src/api/routes/editMenuRoutes');
 const stockRoutes = require('./src/api/routes/stockRoutes');
 const cronController = require('./src/api/controllers/cron')
+const emails = require('./src/api/routes/emailRoutes')
 const morgan = require('morgan');
 const { handleFileUpload, upload } = require('./src/api/controllers/uploadHandler');
 const helmet = require('helmet');
@@ -53,6 +54,8 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.use('/api/check-email', emails)
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
