@@ -1,0 +1,50 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "terminal.integrated.tabs.enabled": true,
+    "terminal.integrated.profiles.windows": {
+      "frontend": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "args": ["/K", "cd frontend && npm run start"]
+      },
+      "backend": {
+        "path": "C:\\Windows\\System32\\cmd.exe",
+        "args": ["/K", "cd backend && nodemon"]
+      }
+    },
+    "terminal.integrated.defaultProfile.windows": "Frontend"
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Start Frontend",
+        "type": "shell",
+        "command": "npm run start",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "options": {
+          "cwd": "${workspaceFolder}/frontend"
+        }
+      },
+      {
+        "label": "Start Backend",
+        "type": "shell",
+        "command": "nodemon",
+        "presentation": {
+          "reveal": "always",
+          "panel": "shared"
+        },
+        "options": {
+          "cwd": "${workspaceFolder}/backend"
+        }
+      }
+    ]
+  }
+}

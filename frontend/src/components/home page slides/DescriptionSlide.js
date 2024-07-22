@@ -9,20 +9,19 @@ function DescriptionSlide() {
     const [fade, setFade] = useState(false); // Start with fade set to false
 
     useEffect(() => {
-        // Initial fade-in
         let timeoutId = setTimeout(() => {
             setFade(true);
-        }, 100); // Small delay before the first word fades in
+        }, 100); 
 
         let wordIndex = 0;
         const cycleWords = setInterval(() => {
             setFade(false); // Start fade out
             setTimeout(() => {
                 wordIndex = (wordIndex + 1) % words.length;
-                setCurrentWord(words[wordIndex]); // Update the word
-                setFade(true); // Trigger fade in
-            }, 1500); // This timeout should match the fade-out duration
-        }, 5000); // Change the word every 4.5 seconds, allowing for fade time
+                setCurrentWord(words[wordIndex]); 
+                setFade(true); 
+            }, 1500); 
+        }, 5000); 
 
         return () => {
             clearInterval(cycleWords);

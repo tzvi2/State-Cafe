@@ -1,4 +1,5 @@
 const handleCheckEmails = (req, res) => {
+  console.log('Checking email...');
   const allowedEmails = process.env.ALLOWED_EMAILS.split(',');
   const { email } = req.body;
 

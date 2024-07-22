@@ -16,7 +16,6 @@ import StockPage from './components/dashboard/StockPage';
 import HoursPage from './components/dashboard/HoursPage';
 import MenuPage from './components/dashboard/MenuPage';
 import OrdersPage from './components/dashboard/OrdersPage';
-import NewDashboard from './components/dashboard/NewDashboard';
 import MenuItemForm from './components/dashboard/MenuItemForm';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';

@@ -39,7 +39,7 @@ export default function DeliverySlotProvider({ children }) {
 
   useEffect(() => {
     localStorage.setItem('deliverySlot', JSON.stringify(deliverySlot));
-    //console.log('delivery slot: ', deliverySlot)
+    console.log('delivery slot: ', deliverySlot)
   }, [deliverySlot]);
 
   useEffect(() => {

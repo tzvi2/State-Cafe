@@ -55,7 +55,7 @@ app.use((req, res, next) => {
 });
 
 
-app.use('/api/check-email', emails)
+
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -93,6 +93,7 @@ app.use('/timeslots', timeslotRoutes);
 app.use('/stock', stockRoutes);
 app.post('/upload', upload.single('image'), handleFileUpload);
 app.get('/api/cron', cronController);
+app.use('/api/check-email', emails)
 
 app.listen(8000, () => {
   console.log('Server started on port 8000');

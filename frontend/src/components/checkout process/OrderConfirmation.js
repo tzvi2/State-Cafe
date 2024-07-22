@@ -24,6 +24,7 @@ const OrderConfirmation = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const saveOrderToDatabase = async (paymentIntentId, orderDetails) => {
+    console.log('order details: ', orderDetails)
     try {
       const definedOrderDetails = {
         ...orderDetails,

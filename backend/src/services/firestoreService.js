@@ -1,4 +1,5 @@
 const {db, FieldValue} = require('../../firebase/firebaseAdminConfig'); 
+const moment = require('moment-timezone'); // Import moment-timezone
 
 const getAllMenuItems = async (category) => {
   let query = db.collection('menuItems');
@@ -18,11 +19,15 @@ const getAllMenuItems = async (category) => {
 };
 
 const saveOrder = async (orderData) => {
-  console.log('received order ', orderData)
-  const deliveryTime = new Date(orderData.deliverySlot);
-  const dateString = deliveryTime.toISOString().split('T')[0];
+  console.log('received order ', orderData);
 
-  console.log('date string: ', dateString)
+  // Parse the delivery slot time and convert to the local time zone (EDT)
+  const deliveryTime = moment(orderData.deliverySlot).tz('America/New_York');
+
+  // Extract the local date string
+  const dateString = deliveryTime.format('YYYY-MM-DD');
+
+  console.log('date string: ', dateString);
 
   const docRef = db.collection('orders').doc(dateString);
 

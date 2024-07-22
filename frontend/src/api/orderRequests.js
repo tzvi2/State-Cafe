@@ -1,4 +1,6 @@
 import apiUrl from '../config';
+import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
 export const saveOrder = async (order) => {
   try {
@@ -19,7 +21,21 @@ export const saveOrder = async (order) => {
     console.error('Error saving order:', error);
     throw error;
   }
+}
+
+export const listenToOrdersForDate = (selectedDate, callback) => {
+  const orderDocRef = doc(db, 'orders', selectedDate);
+
+  return onSnapshot(orderDocRef, (docSnapshot) => {
+    if (docSnapshot.exists()) {
+      const orders = docSnapshot.data().orders || [];
+      callback(orders);
+    } else {
+      callback([]);
+    }
+  });
 };
+
 
 export const getOrdersForDate = async (date) => {
   try {
