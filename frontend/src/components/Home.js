@@ -1,15 +1,20 @@
 import React from 'react'
 import ContactSlide from './home page slides/ContactSlide'
 import DescriptionSlide from './home page slides/DescriptionSlide'
-import MenuSlide from './home page slides/MenuSlide'
+import FeaturedSlide from './home page slides/FeaturedSlide'
 import './styles/Home.css'
+import WelcomeSlide from './home page slides/WelcomeSlide'
+import StepsSlide from './home page slides/StepsSlide'
 
 function Home() {
 	return (
 		<div className='homePage'>
 			<DescriptionSlide />
-			<MenuSlide />
+			<WelcomeSlide />
+			<StepsSlide />
+			<FeaturedSlide />
 			<ContactSlide />
+
 		</div>
 	)
 }

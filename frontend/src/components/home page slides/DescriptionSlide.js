@@ -20,7 +20,7 @@ function DescriptionSlide() {
                 wordIndex = (wordIndex + 1) % words.length;
                 setCurrentWord(words[wordIndex]); 
                 setFade(true); 
-            }, 1500); 
+            }, 2300); 
         }, 5000); 
 
         return () => {

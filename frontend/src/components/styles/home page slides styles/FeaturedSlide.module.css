@@ -1,9 +1,18 @@
+.featured {
+	opacity: 0;
+	transition: opacity 1s ease-in;
+}
+
+.featured.visible {
+	opacity: 1;
+}
+
 .slide_centered {
 	display: flex;
 	flex-direction: column;
 	padding: 3rem .75rem;
 	align-items: center;
-	/* margin-top: 10%; */
+	row-gap: 24px;
 }
 
 .slide_centered h2 {
@@ -37,9 +46,13 @@
 }
 
 .serving {
-	color: rgb(129, 155, 94);
-	font-size: 6vw;
-	font-weight: 500;
+	font-size: 21px;
+	margin: 2rem 0;
+	margin-top: 0;
+}
+
+.header {
+	font-size: 21px;
 }
 
 @media (min-width: 550px) {

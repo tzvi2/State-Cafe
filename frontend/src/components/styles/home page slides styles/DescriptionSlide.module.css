@@ -46,7 +46,7 @@
 .heroButton {
 	border: 1px solid rgb(129, 155, 94);
 	display: flex;
-	font-size: 5.5vw;
+	font-size: 1.25rem;
 	font-weight: 500;
   padding: 1.5% 3%;
   border-radius: 8px;
@@ -57,6 +57,9 @@
 	align-items: center;
 	box-shadow: 1px 1px 3px rgb(129, 155, 94);
 	text-decoration: none;
+	padding: .75rem 2rem;
+    
+    
 }
 
 .heroArrow {

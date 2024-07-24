@@ -1,0 +1,31 @@
+.welcomeSlide {
+  margin: 8rem 0;
+}
+
+.welcomeSlide p {
+	margin: 3rem 1rem;
+}
+
+.welcomeSlide .header {
+	font-size: 42px;
+	opacity: 0;
+	animation: fadeIn 2s .4s forwards;
+}
+
+.welcomeSlide .sub_header {
+	opacity: 0;
+	animation: fadeIn 2.5s 1.1s forwards;
+	font-size: 21px;
+}
+
+.sub_header strong {
+	color: rgb(14, 99, 14);
+
+}
+
+
+@keyframes fadeIn {
+	to {
+			opacity: 1;
+	}
+}
