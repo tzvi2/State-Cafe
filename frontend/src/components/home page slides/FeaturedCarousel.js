@@ -8,7 +8,7 @@ const FeaturedCarousel = () => {
       id: 'breakfast',
 			title: 'Breakfast',
       type: 'image',
-      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fgreen_table_70.webp?alt=media&token=3474212a-40e8-482e-93bf-02c4468d0a05',
+      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fbreakfast.jpg?alt=media&token=910b6162-79dd-494c-9e10-775099ffcf94',
       alt: 'breakfast table',
     },
     {
@@ -22,7 +22,7 @@ const FeaturedCarousel = () => {
       id: 'pasta',
 			title: 'Pasta',
       type: 'image',
-      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fbowl_of_pasta_70.webp?alt=media&token=11287db0-511b-4ade-9e46-f21770fb0f1a',
+      src: 'https://firebasestorage.googleapis.com/v0/b/state-cafe.appspot.com/o/featured%2Fpasta.jpg?alt=media&token=4f6580a0-5b6d-45bb-8659-9026e0716da7',
       alt: 'Pasta',
     },
     {
