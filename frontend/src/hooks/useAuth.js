@@ -1,6 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
+import apiUrl from '../config'
 
 const AuthContext = createContext();
 
@@ -8,7 +9,7 @@ export const AuthContextProvider = ({ children }) => {
   const provider = new GoogleAuthProvider();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [isAllowed, setIsAllowed] = useState(null); // null = not checked, true/false = checked
+  const [isAllowed, setIsAllowed] = useState(null); 
 
   const signInWithGoogle = async () => {
     try {
@@ -31,7 +32,7 @@ export const AuthContextProvider = ({ children }) => {
 
       if (currentUser) {
         try {
-          const response = await fetch('http://localhost:8000/api/check-email', {
+          const response = await fetch(`${apiUrl}/api/check-email`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

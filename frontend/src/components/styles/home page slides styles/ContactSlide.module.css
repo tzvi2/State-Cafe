@@ -4,31 +4,46 @@
 }
 
 .slide h2 {
-	font-size: 7vw;
+	font-size: 1.5rem;
 	text-align: start;
 }
 
 .phoneLine {
 	display: flex;
-	column-gap: 4%;
+	column-gap: 2%;
 	align-items: center;
 	margin: 1rem 0;
 }
 
 .phoneLine a {
-	font-size: 5vw;
+	font-size: 1.25rem;
 	color: black;
 	text-decoration: underline;
 }
 
-.hours {
-	margin-top: 10%;
+.phoneLine p {
+	font-size: 1.25rem;
 }
 
-.hours h4, .hours p {
-	margin: 3% 0;
-	font-size: 5vw;
+.emailLine {
+	display: flex;
+	flex-wrap: wrap;
+	column-gap: 2%;
+	align-items: center;
+	margin: 0;
 }
+
+.emailLine a {
+	font-size: 1.25rem;
+	color: black;
+	text-decoration: underline;
+}
+
+.emailLine p {
+	font-size: 1.25rem;
+	margin: .1rem 0;
+}
+
 
 @media (min-width: 550px) {
 

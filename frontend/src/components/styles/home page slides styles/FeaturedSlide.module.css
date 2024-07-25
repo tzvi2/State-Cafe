@@ -37,7 +37,7 @@
 	width: 50%;
 	text-align: center;
 	box-shadow: 1px 1px 6px rgb(129, 155, 94);
-	margin: 5% 0;
+	margin: 0;
 	font-size: 1.6rem;
 	display: flex;
 	align-items: center;
@@ -53,6 +53,12 @@
 
 .header {
 	font-size: 21px;
+}
+
+.button_header {
+	font-size: 21px;
+	margin: 2rem 0;
+	margin-bottom: 0;
 }
 
 @media (min-width: 550px) {

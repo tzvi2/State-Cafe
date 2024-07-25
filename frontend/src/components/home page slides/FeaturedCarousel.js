@@ -64,7 +64,7 @@ const FeaturedCarousel = () => {
     const carousel = carouselRef.current;
     if (carousel) {
       carousel.addEventListener('scroll', handleScroll);
-      handleScroll(); // Initial call to set the correct active item
+      handleScroll(); 
     }
 
     return () => {

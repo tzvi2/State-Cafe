@@ -19,7 +19,7 @@
 }
 
 .carousel::-webkit-scrollbar {
-  display: none;  /* Safari and Chrome */
+  display: none;  
 }
 
 .carouselItem {
@@ -51,5 +51,20 @@
 
 .carouselItem.active {
   transform: scale(1.1);
-  border-radius: 5px;
+}
+
+@media (min-width: 760px) {
+
+  .carouselItem {
+    box-shadow: none;
+  }
+
+  .carouselItem.active {
+    transform: scale(1);
+    
+  }
+
+  .carouselItem:hover {
+    transform: scale(1.05);
+  }
 }

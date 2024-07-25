@@ -29,3 +29,9 @@
 			opacity: 1;
 	}
 }
+
+@media (min-width: 760px) {
+	.welcomeSlide {
+		text-align: center;
+	}
+}
