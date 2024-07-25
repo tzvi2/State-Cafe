@@ -58,7 +58,6 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
       ...prevData,
       [title]: { ...prevData[title], quantity: updatedQuantity }
     }));
-    setNewQuantity(updatedQuantity); // Reset newQuantity to hide the save button
   };
 
   return (
@@ -73,10 +72,14 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
               type="number"
               value={newQuantity}
               onChange={handleQuantityChange}
+              className={styles.inputField}
             />
-            {newQuantity !== data.quantity && (
-              <button onClick={handleUpdateQuantity}>Save</button>
-            )}
+            <button
+              className={`${styles.saveButton} ${newQuantity !== data.quantity ? styles.visible : ''}`}
+              onClick={handleUpdateQuantity}
+            >
+              Save
+            </button>
           </>
         )}
       </li>
