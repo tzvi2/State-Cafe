@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import styles from '../styles/home page slides styles/StepsSlide.module.css';
-import { CalendarCheck2, ShoppingCart, DoorClosed } from 'lucide-react';
+import { CalendarCheck2, ShoppingCart, DoorClosed, CookingPot } from 'lucide-react';
 
 function StepsSlide() {
     const [isVisible, setIsVisible] = useState(false);
@@ -41,6 +41,10 @@ function StepsSlide() {
                     <p>Choose your items and checkout</p>
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step3 : ''}`}>
+                    <CookingPot className={styles.icon}/>
+                    <p>We cook your food</p>
+                </div>
+                <div className={`${styles.step} ${isVisible ? styles.step4 : ''}`}>
                     <DoorClosed className={styles.icon}/>
                     <p>Your food is delivered</p>
                 </div>

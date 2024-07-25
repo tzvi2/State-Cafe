@@ -38,7 +38,8 @@
 
 .steps.isVisible .step1,
 .steps.isVisible .step2,
-.steps.isVisible .step3 {
+.steps.isVisible .step3,
+.steps.isVisible .step4 {
 	opacity: 1;
 }
 
@@ -56,6 +57,10 @@
 
 .step3 {
 	animation: slideIn 1s 1.5s forwards;
+}
+
+.step4 {
+	animation: slideIn 1s 2s forwards;
 }
 
 .icon {
