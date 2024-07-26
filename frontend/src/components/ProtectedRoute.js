@@ -1,39 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, isAllowed } = useAuth();
-  const [isChecking, setIsChecking] = useState(true);
-  const [authorized, setAuthorized] = useState(null);
+  const { user, isAllowed, signInWithGoogle } = useAuth();
 
-  useEffect(() => {
-    if (user && isAllowed !== null) {
-      setIsChecking(false);
-      setAuthorized(isAllowed);
-    } else if (!user) {
-      setIsChecking(false);
-      setAuthorized(false);
-    }
-  }, [user, isAllowed]);
-
-  console.log('ProtectedRoute - user:', user, 'isAllowed:', isAllowed, 'isChecking:', isChecking, 'authorized:', authorized);
-
-  if (isChecking) {
-    console.log('Checking permissions, showing loading...');
+  if (isAllowed === null) {
+    // Checking permissions or loading
     return <div>Loading...</div>; // or a loading spinner
   }
 
   if (!user) {
-    console.log('No user, redirecting to login...');
-    return <Navigate to="/login" />;
+    // If no user, show the sign-in button
+    return (
+      <div>
+        <p>Please sign in to access this page.</p>
+        <button onClick={signInWithGoogle}>Sign in with Google</button>
+      </div>
+    );
   }
 
-  if (authorized === false) {
-    console.log('User is not authorized, redirecting to unauthorized...');
+  if (!isAllowed) {
+    // User is signed in but not allowed
     return <Navigate to="/unauthorized" />;
   }
 
+  // User is signed in and allowed
   return children;
 };
 

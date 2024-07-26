@@ -8,13 +8,14 @@ const AuthContext = createContext();
 export const AuthContextProvider = ({ children }) => {
   const provider = new GoogleAuthProvider();
   const [user, setUser] = useState(null);
-  const [isAllowed, setIsAllowed] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(null);
 
   const signInWithGoogle = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       setUser(user);
+      await checkUserAccess(user); // Check access immediately after sign-in
     } catch (error) {
       console.log(error);
     }
@@ -22,31 +23,33 @@ export const AuthContextProvider = ({ children }) => {
 
   const signOutWithGoogle = () => {
     signOut(auth);
+    setUser(null);
+    setIsAllowed(null);
+  };
+
+  const checkUserAccess = async (currentUser) => {
+    if (currentUser) {
+      try {
+        const response = await fetch(`${apiUrl}/api/check-email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email: currentUser.email }),
+        });
+        const data = await response.json();
+        console.log('API response:', JSON.stringify(data));
+        setIsAllowed(data.allowed);
+      } catch (error) {
+        console.error('Error checking email:', error);
+        setIsAllowed(false);
+      }
+    } else {
+      setIsAllowed(false);
+    }
   };
 
   useEffect(() => {
-    const checkUserAccess = async (currentUser) => {
-      if (currentUser) {
-        try {
-          const response = await fetch(`${apiUrl}/api/check-email`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: currentUser.email }),
-          });
-          const data = await response.json();
-          console.log('API response:', JSON.stringify(data));
-          setIsAllowed(data.allowed);
-        } catch (error) {
-          console.error('Error checking email:', error);
-          setIsAllowed(false);
-        }
-      } else {
-        setIsAllowed(false);
-      }
-    };
-
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
       await checkUserAccess(currentUser);
@@ -54,10 +57,6 @@ export const AuthContextProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
-
-  useEffect(() => {
-    console.log('isAllowed state changed:', isAllowed);
-  }, [isAllowed]);
 
   return (
     <AuthContext.Provider
