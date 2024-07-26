@@ -1,7 +1,7 @@
 // stockRoutes.js
 const express = require('express');
 const router = express.Router();
-const cache = require('../../cache');
+const cache = require('../../../cache');
 const {
   getFullStock,
   updateQuantityRemaining,
