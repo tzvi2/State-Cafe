@@ -1,6 +1,5 @@
 import React from 'react'
 import styles from '../styles/home page slides styles/WelcomeSlide.module.css'
-import { useScroll } from "framer-motion"
 import { CalendarCheck2, ShoppingBasket, DoorClosed } from 'lucide-react';
 
 

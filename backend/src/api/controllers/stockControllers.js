@@ -11,6 +11,7 @@ exports.getFullStock = async (req, res) => {
     const doc = await db.collection('stock').doc(date).get();
     if (doc.exists) {
       const data = doc.data();
+      console.log('sending data')
       res.status(200).json(data);
     } else {
       res.status(200).json({ message: 'No stock data found for the given date' });
