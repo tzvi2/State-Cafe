@@ -15,10 +15,13 @@
 	row-gap: 24px;
 }
 
+
+
 .slide_centered h2 {
 	color: rgb(129, 155, 94);
 	margin-bottom: 1rem;
 	font-size: 9vw;
+	
 }
 
 .featured_images {
@@ -47,7 +50,7 @@
 
 .serving {
 	font-size: 21px;
-	margin: 2rem 0;
+	margin: 2rem auto;
 	margin-top: 0;
 }
 

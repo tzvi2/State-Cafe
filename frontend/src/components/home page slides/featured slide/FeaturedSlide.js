@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { HashLink as Link } from 'react-router-hash-link';
 import { MenuSquare } from 'lucide-react';
-import styles from '../styles/home page slides styles/FeaturedSlide.module.css';
-import FeaturedCarousel from './FeaturedCarousel';
+import styles from '../../styles/home page slides styles/FeaturedSlide.module.css';
+import FeaturedCarousel from './children/FeaturedCarousel';
 
 
 function FeaturedSlide() {
@@ -17,7 +17,7 @@ function FeaturedSlide() {
 					observer.disconnect();
 				}
 			},
-			{ threshold: 0.1 }
+			{ threshold: 0.3 }
 		);
 
 		if (featuredRef.current) {

@@ -12,6 +12,7 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
   });
 
   const [newQuantity, setNewQuantity] = useState(data.quantity);
+  const [showSaveButton, setShowSaveButton] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,6 +24,7 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
 
   const handleQuantityChange = (e) => {
     setNewQuantity(e.target.value);
+    setShowSaveButton(true);
   };
 
   const handleAddNewWeight = async () => {
@@ -58,6 +60,7 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
       ...prevData,
       [title]: { ...prevData[title], quantity: updatedQuantity }
     }));
+    setShowSaveButton(false); // Hide the Save button after clicking
   };
 
   return (
@@ -75,7 +78,7 @@ const ItemQuantity = ({ title, data, selectedDate, updateStockData }) => {
               className={styles.inputField}
             />
             <button
-              className={`${styles.saveButton} ${newQuantity !== data.quantity ? styles.visible : ''}`}
+              className={`${styles.saveButton} ${showSaveButton ? styles.visible : ''}`}
               onClick={handleUpdateQuantity}
             >
               Save

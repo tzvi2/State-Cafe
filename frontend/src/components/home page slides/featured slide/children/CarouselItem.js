@@ -1,5 +1,5 @@
 import React, {useRef, useEffect} from 'react';
-import styles from '../styles/home page slides styles/FeaturedCarousel.module.css';
+import styles from '../../../styles/home page slides styles/FeaturedCarousel.module.css';
 
 const CarouselItem = ({ item, isActive }) => {
   const videoRef = useRef(null);

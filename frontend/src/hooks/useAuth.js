@@ -1,15 +1,14 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import { signInWithPopup, signOut, onAuthStateChanged, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from "../firebaseConfig";
-import apiUrl from '../config'
+import apiUrl from '../config';
 
 const AuthContext = createContext();
 
 export const AuthContextProvider = ({ children }) => {
   const provider = new GoogleAuthProvider();
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAllowed, setIsAllowed] = useState(null); 
+  const [isAllowed, setIsAllowed] = useState(false);
 
   const signInWithGoogle = async () => {
     try {
@@ -26,10 +25,7 @@ export const AuthContextProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
-      setUser(currentUser);
-      setLoading(false);
-
+    const checkUserAccess = async (currentUser) => {
       if (currentUser) {
         try {
           const response = await fetch(`${apiUrl}/api/check-email`, {
@@ -40,22 +36,28 @@ export const AuthContextProvider = ({ children }) => {
             body: JSON.stringify({ email: currentUser.email }),
           });
           const data = await response.json();
+          console.log('API response:', JSON.stringify(data));
           setIsAllowed(data.allowed);
         } catch (error) {
           console.error('Error checking email:', error);
           setIsAllowed(false);
         }
       } else {
-        setIsAllowed(null);
+        setIsAllowed(false);
       }
+    };
+
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      setUser(currentUser);
+      await checkUserAccess(currentUser);
     });
 
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  useEffect(() => {
+    console.log('isAllowed state changed:', isAllowed);
+  }, [isAllowed]);
 
   return (
     <AuthContext.Provider

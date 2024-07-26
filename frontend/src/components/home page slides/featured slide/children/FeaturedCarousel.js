@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import styles from '../styles/home page slides styles/FeaturedCarousel.module.css';
+import styles from '../../../styles/home page slides styles/FeaturedCarousel.module.css';
 import CarouselItem from './CarouselItem';
 
 const FeaturedCarousel = () => {
