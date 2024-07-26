@@ -6,7 +6,7 @@ import './styles/BackArrow.css'
 function BackArrow() {
 	const navigate = useNavigate()
 	return (
-		<MoveLeft className='arrow' onClick={() => navigate(-1)}/>
+		<MoveLeft className='arrow' onClick={() => navigate('/menu')}/>
 	)
 }
 

@@ -5,7 +5,7 @@ import BackArrow from '../BackArrow';
 import styles from '../styles/food menu styles/MenuItemExpanded.module.css';
 import { useCart } from '../../hooks/useCart';
 import { getMenuItemByItemId } from '../../api/menuRequests';
-import { getStockForDate } from '../../api/stockRequests'; // Import stock request
+import { getStockForDate } from '../../api/stockRequests'; 
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { capitalizeFirstLetters } from '../../utils/stringUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
@@ -13,12 +13,12 @@ import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 function MenuItemExpanded() {
   const { itemId } = useParams();
   const { addToCart } = useCart();
-  const { deliveryDate } = useDeliveryDetails(); // Get delivery date from context
+  const { deliveryDate } = useDeliveryDetails(); 
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [quantityLeft, setQuantityLeft] = useState(0); // State to track quantity left
+  const [quantityLeft, setQuantityLeft] = useState(0); 
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Cart",
@@ -35,7 +35,7 @@ function MenuItemExpanded() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
-      const stockData = await getStockForDate(deliveryDate); // Use the selected delivery date
+      const stockData = await getStockForDate(deliveryDate); 
 
       const weightOptionsGroup = data.soldByWeight ? {
         title: 'Available Portions',
@@ -142,7 +142,7 @@ function MenuItemExpanded() {
       if (!userConfirmed) {
         return;
       } else {
-        setQuantity(quantityLeft); // Set quantity to the remaining quantity
+        setQuantity(quantityLeft); 
       }
     }
 
