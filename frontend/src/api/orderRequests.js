@@ -3,6 +3,7 @@ import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/f
 import { db } from '../firebaseConfig';
 
 export const saveOrder = async (order) => {
+  console.log('saving order ', order)
   try {
     const response = await fetch(`${apiUrl}/api/orders`, {
       method: 'POST',
