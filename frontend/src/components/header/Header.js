@@ -31,6 +31,9 @@ function Header() {
         <div className={styles.topBar}>
           <Hamburger className={styles.hamburgerReact} toggled={isOpen} toggle={() => setIsOpen(!isOpen)}/>
           <NavLink onClick={() => setIsOpen(false)} className={styles.logo} to="/">State Cafe</NavLink>
+          {/* <NavLink onClick={() => setIsOpen(false)} className={styles.logo} to="/">
+            <img src={logo}></img>
+          </NavLink> */}
           <NavLink to="cart" className={({ isActive }) => getNavLinkClass(isActive, styles.cart)}>
             <ShoppingCart onClick={() => setIsOpen(false)} className={styles.cartIcon}/>
             {cart.totalCount > 0 && <span className={styles.cartItemCount}>{cart.totalCount}</span>}

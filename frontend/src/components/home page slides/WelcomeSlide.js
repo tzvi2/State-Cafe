@@ -1,6 +1,7 @@
 import React from 'react'
 import styles from '../styles/home page slides styles/WelcomeSlide.module.css'
 import { CalendarCheck2, ShoppingBasket, DoorClosed } from 'lucide-react';
+import logo from '../../images/logo.png'
 
 
 function WelcomeSlide() {
@@ -14,6 +15,7 @@ function WelcomeSlide() {
 	return (
 		<div className={styles.welcomeSlide}>
 			<p className={styles.header}>Welcome to State Cafe.</p> 
+			{/* <img src={logo} className={styles.logo}></img> */}
 			<p className={styles.sub_header}>We deliver <strong>ready-to-eat kosher food</strong> in the Teaneck area.</p>
 			
 			{/* <div className={styles.scrolling_steps_animation}>

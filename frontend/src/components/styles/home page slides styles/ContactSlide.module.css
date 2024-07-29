@@ -1,11 +1,26 @@
 .slide {
 	padding: 2rem .75rem;
 	background: #D3DBBA;
+	padding-bottom: 1rem;
 }
 
 .slide h2 {
 	font-size: 1.5rem;
 	text-align: start;
+	font-weight: 500;
+	margin: 0;
+}
+
+.contact {
+	display: flex;
+	flex-direction: column;
+	row-gap: 1rem;
+}
+
+.contact img {
+	height: 7rem;
+	width: 7rem;
+	
 }
 
 .phoneLine {
@@ -16,13 +31,15 @@
 }
 
 .phoneLine a {
-	font-size: 1.25rem;
+	font-size: 1.1rem;
 	color: black;
 	text-decoration: underline;
+	margin: 0;
 }
 
 .phoneLine p {
-	font-size: 1.25rem;
+	font-size: 1.1rem;
+	margin: 0;
 }
 
 .emailLine {
@@ -34,13 +51,13 @@
 }
 
 .emailLine a {
-	font-size: 1.25rem;
+	font-size: 1.1rem;
 	color: black;
 	text-decoration: underline;
 }
 
 .emailLine p {
-	font-size: 1.25rem;
+	font-size: 1.1rem;
 	margin: .1rem 0;
 }
 
@@ -76,9 +93,15 @@
 
 	.contact {
 		display: flex;
-		flex-direction: column;
-		width: 30%;
+		flex-direction: row;
 		row-gap: 1vw;
+		width: 100%;
+		justify-content: space-around;
+	}
+
+	.contact div {
+		display: flex;
+		flex-direction: column;
 	}
 
 	.phoneLine {
@@ -95,11 +118,11 @@
 	}
 
 	.phoneLine a {
-		font-size: 2rem;
+		font-size: 1.25rem;
 	}
 
 	.hours h4, .hours p {
-		font-size: 2rem;
+		font-size: 1.25rem;
 		margin: 0;
 	}
 
