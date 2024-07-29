@@ -19,7 +19,7 @@ textarea {
   height: 100px; /* Adjust the height as needed */
 }
 
-button {
+.form button {
   margin-top: 10px;
   padding: 10px;
   font-size: 1rem;

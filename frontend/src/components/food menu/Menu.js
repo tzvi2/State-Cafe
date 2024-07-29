@@ -44,6 +44,14 @@ export default function Menu() {
     return `${month}-${day}-${year}`;
   };
 
+  const YMDtoDMY = (str) => {
+    const [year, month, day] = str.split('-');
+  
+    const monthNumber = parseInt(month, 10);
+    const dayNumber = parseInt(day, 10);
+
+    return `${monthNumber}-${dayNumber}-${year}`;
+  }
   const todayEST = getESTDate();
   const tomorrowEST = new Date(todayEST);
   tomorrowEST.setDate(tomorrowEST.getDate() + 1);
@@ -134,7 +142,7 @@ export default function Menu() {
           </>
         ) : (
           <button className={styles.minimizedButton} onClick={toggleDateButtons}>
-            Delivery Date: {formatDateToMDYYYY(new Date(deliveryDate))} &#x25BC;
+            Delivery Date: {YMDtoDMY(deliveryDate)} &#x25BC;
           </button>
         )}
       </div>

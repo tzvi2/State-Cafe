@@ -9,7 +9,8 @@
 .deliveryDateSelection {
 	display: flex;
 	flex-direction: column;
-	margin: 0 1rem;
+	margin: 1rem;
+	background: #ebefe1;
 }
 
 .minimizedButton {
@@ -17,6 +18,7 @@
 	font-size: 1.2rem;
 	background-color: #ebefe1;
 	color: rgb(5, 103, 31);
+	padding: .5rem;
 }
 
 .menu {
