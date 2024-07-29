@@ -4,8 +4,7 @@ import Menuitem from "./Menuitem";
 import CategoryBar from "./CategoryBar";
 import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
-import { getQuickViewMenu } from "../../api/menuRequests";
-import { getStockForDate } from "../../api/stockRequests";
+import { getMenuAndStockForDate } from "../../api/menuRequests";
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 
 const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", "soup", "coffee"];
@@ -51,41 +50,18 @@ export default function Menu() {
   const todayFormatted = formatDateToYYYYMMDD(todayEST);
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
-  const fetchQuickView = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const [items, stockData] = await Promise.all([
-        getQuickViewMenu(),
-        getStockForDate(deliveryDate) // Fetch stock based on selected date
-      ]);
-
-      const itemsWithStock = items.map(item => {
-        if (item.soldByWeight) {
-          return {
-            ...item,
-            weightOptions: stockData[item.id] || []
-          };
-        } else {
-          return {
-            ...item,
-            quantity: stockData[item.id]?.quantity || 0
-          };
-        }
-      });
-
-      setMenuItems(itemsWithStock);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
+  useEffect(() => {
+    const getStockData = async () => {
+      setIsLoading(true);
+      const data = await getMenuAndStockForDate(deliveryDate);
+      setMenuItems(data);
       setIsLoading(false);
+    };
+    if (deliveryDate) {
+      getStockData();
     }
   }, [deliveryDate]);
 
-  useEffect(() => {
-    if (deliveryDate) {
-      fetchQuickView();
-    }
-  }, [deliveryDate, fetchQuickView]);
 
   const handleScroll = () => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
@@ -164,7 +140,7 @@ export default function Menu() {
                   <Shimmer key={index} />
                 )) :
                 menuItems.filter(item => item.category === category).map((item) => (
-                  <Menuitem key={item.id} item={item} />
+                  <Menuitem key={item.title} item={item} />
                 ))}
             </div>
           </div>

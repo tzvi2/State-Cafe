@@ -3,6 +3,7 @@ const router = express.Router();
 const { addMenuItemToFirestore, updateMenuItemActiveStatusInFirestore, updateMenuItemDetailsInFirestore, deleteMenuItem } = require('../../services/firestoreService');
 
 router.post('/add-menu-item', async (req, res) => {
+  console.log('donkeykong')
   try {
     const menuItem = req.body;
     const response = await addMenuItemToFirestore(menuItem);

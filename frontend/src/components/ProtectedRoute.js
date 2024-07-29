@@ -1,32 +1,28 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import LoginPage from './LoginPage';
 
-const ProtectedRoute = ({ children }) => {
-  const { user, isAllowed, signInWithGoogle } = useAuth();
+const ProtectedRoute = ({ element }) => {
+  const { currentUser, isAllowed, loading } = useAuth();
+  const navigate = useNavigate()
 
-  if (isAllowed === null) {
-    // Checking permissions or loading
-    return <div>Loading...</div>; // or a loading spinner
+  console.log('ProtectedRoute - currentUser:', currentUser);
+  console.log('ProtectedRoute - isAllowed:', isAllowed);
+
+  if (loading) {
+    return <div>Loading...</div>; // or a spinner
   }
 
-  if (!user) {
-    // If no user, show the sign-in button
-    return (
-      <div>
-        <p>Please sign in to access this page.</p>
-        <button onClick={signInWithGoogle}>Sign in with Google</button>
-      </div>
-    );
+  if (!currentUser) {
+    return <LoginPage />;
   }
 
-  if (!isAllowed) {
-    // User is signed in but not allowed
+  if (isAllowed === false) {
     return <Navigate to="/unauthorized" />;
   }
 
-  // User is signed in and allowed
-  return children;
+  return element;
 };
 
 export default ProtectedRoute;

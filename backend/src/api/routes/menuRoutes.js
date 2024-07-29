@@ -1,5 +1,14 @@
 const express = require('express');
-const { fetchMenuData, getItemByDocumentId, getItemByItemId, getItemPrice, fetchQuickView, updateMenuItemIds } = require('../controllers/menuController');
+const { 
+  fetchMenuData, 
+  getItemByDocumentId, 
+  getItemByItemId, 
+  getItemPrice, 
+  fetchQuickView, 
+  updateMenuItemIds,
+  getMenuWithStock
+} = require('../controllers/menuController');
+
 const router = express.Router();
 const cache = require('../../../cache');
 
@@ -19,7 +28,8 @@ const cacheMiddleware = (req, res, next) => {
 };
 
 router.get('/', fetchMenuData);
-router.get('/quickView', cacheMiddleware, fetchQuickView);
+router.get('/quickView', fetchQuickView);
+router.get('/menuWithStock', getMenuWithStock);
 router.get('/by-document-id/:documentId', getItemByDocumentId)
 router.get('/by-item-id/:itemId', getItemByItemId)
 router.get('/price/by-document-id/:documentId', getItemPrice)

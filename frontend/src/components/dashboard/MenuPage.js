@@ -8,8 +8,12 @@ function MenuPage() {
   const navigate = useNavigate();
 
   const fetchMenuItems = async () => {
-    const items = await getMenuItems();
-    setMenuItems(items);
+    try {
+      const items = await getMenuItems();
+      setMenuItems(items);
+    } catch (error) {
+      console.error('Failed to fetch menu items:', error);
+    }
   };
 
   useEffect(() => {
@@ -17,27 +21,29 @@ function MenuPage() {
   }, []);
 
   useEffect(() => {
-    console.log(menuItems)
-  }, [menuItems])
+    console.log(menuItems);
+  }, [menuItems]);
 
   const handleDeleteMenuItem = async (documentId) => {
     const isConfirmed = window.confirm('Are you sure you want to delete this menu item?');
     if (isConfirmed) {
-      await deleteMenuItem(documentId);
-      fetchMenuItems();
+      try {
+        await deleteMenuItem(documentId);
+        setMenuItems((prevItems) => prevItems.filter(item => item.id !== documentId));
+      } catch (error) {
+        console.error('Failed to delete menu item:', error);
+      }
     }
   };
 
   const handleToggleActiveStatus = async (itemId, isActive) => {
     try {
       await updateMenuItemActiveStatus(itemId, !isActive);
-      const updatedMenuItems = menuItems.map((item) => {
-        if (item.id === itemId) {
-          return { ...item, active: !isActive };
-        }
-        return item;
-      });
-      setMenuItems(updatedMenuItems);
+      setMenuItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === itemId ? { ...item, active: !isActive } : item
+        )
+      );
     } catch (error) {
       console.error(`Failed to update active status for item: ${itemId}`, error);
       alert(`Failed to update active status for ${itemId}. Please try again.`);

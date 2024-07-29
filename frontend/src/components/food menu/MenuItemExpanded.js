@@ -5,7 +5,7 @@ import BackArrow from '../BackArrow';
 import styles from '../styles/food menu styles/MenuItemExpanded.module.css';
 import { useCart } from '../../hooks/useCart';
 import { getMenuItemByItemId } from '../../api/menuRequests';
-import { getStockForDate } from '../../api/stockRequests'; 
+import { getStockForDate } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { capitalizeFirstLetters } from '../../utils/stringUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
@@ -13,12 +13,12 @@ import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 function MenuItemExpanded() {
   const { itemId } = useParams();
   const { addToCart } = useCart();
-  const { deliveryDate } = useDeliveryDetails(); 
+  const { deliveryDate } = useDeliveryDetails();
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const [quantityLeft, setQuantityLeft] = useState(0); 
+  const [quantityLeft, setQuantityLeft] = useState(0);
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Cart",
@@ -35,7 +35,13 @@ function MenuItemExpanded() {
   useEffect(() => {
     const fetchData = async () => {
       const data = await getMenuItemByItemId(itemId);
-      const stockData = await getStockForDate(deliveryDate); 
+
+      let stockData;
+      if (deliveryDate) {
+        stockData = await getStockForDate(deliveryDate);
+      } else {
+        stockData = {}; // Initialize as empty object if no delivery date is set
+      }
 
       const weightOptionsGroup = data.soldByWeight ? {
         title: 'Available Portions',
@@ -43,8 +49,8 @@ function MenuItemExpanded() {
         minSelection: 1
       } : null;
 
-      data.optionGroups = weightOptionsGroup 
-        ? [weightOptionsGroup, ...(data.optionGroups || [])] 
+      data.optionGroups = weightOptionsGroup
+        ? [weightOptionsGroup, ...(data.optionGroups || [])]
         : data.optionGroups;
 
       data.quantity = data.quantity || []; // Initialize quantity as an empty array if undefined
@@ -127,7 +133,7 @@ function MenuItemExpanded() {
     if (buttonLocked || !menuItem || quantityLeft === 0) {
       console.log('not adding')
       return;
-    } 
+    }
 
     const validationErrors = validateOptionSelections();
     if (validationErrors.length > 0) {
@@ -142,25 +148,24 @@ function MenuItemExpanded() {
       if (!userConfirmed) {
         return;
       } else {
-        setQuantity(quantityLeft); 
+        setQuantity(quantityLeft);
       }
     }
 
     setButtonLocked(true);
 
-    console.log('menu item being added: ', 
-      {...menuItem,
+    console.log('menu item being added: ',
+      { ...menuItem,
         options: selectedOptions,
-        quantity: Math.min(quantity, quantityLeft), 
+        quantity: Math.min(quantity, quantityLeft),
         total: totalItemPrice,
       }
     )
 
     const wasAdded = addToCart({
-      
       ...menuItem,
       options: selectedOptions,
-      quantity: Math.min(quantity, quantityLeft), 
+      quantity: Math.min(quantity, quantityLeft),
       total: totalItemPrice,
     });
 
@@ -201,17 +206,17 @@ function MenuItemExpanded() {
         <img src={menuItem.img} alt={menuItem.title} className={styles.menuItemImage}></img>
         <p className={styles.description}>{menuItem.description}</p>
 
-        <RenderOptions 
-          menuItem={menuItem} 
-          selectedOptions={selectedOptions} 
-          handleOptionChange={handleOptionChange} 
-          optionGroups={menuItem.optionGroups} 
+        <RenderOptions
+          menuItem={menuItem}
+          selectedOptions={selectedOptions}
+          handleOptionChange={handleOptionChange}
+          optionGroups={menuItem.optionGroups}
         />
 
         <div className={styles.footer}>
-          {!menuItem.soldByWeight && <select 
-            className={styles.quantity} 
-            defaultValue={1} 
+          {!menuItem.soldByWeight && quantityLeft > 0 && <select
+            className={styles.quantity}
+            defaultValue={1}
             onChange={(e) => setQuantity(parseInt(e.target.value))}
             disabled={quantityLeft === 0} // Disable if out of stock
           >
@@ -219,8 +224,8 @@ function MenuItemExpanded() {
               <option key={n} value={n + 1}>{n + 1}</option>
             ))}
           </select>}
-          <button 
-            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${quantityLeft === 0 ? styles.outOfStock : ''}`} 
+          <button
+            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${quantityLeft === 0 ? styles.outOfStock : ''}`}
             disabled={buttonLocked || quantityLeft === 0} // Disable if out of stock
             onClick={handleAddToCart}
           >

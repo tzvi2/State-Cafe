@@ -20,6 +20,7 @@ export const getMenuItems = async (category = '') => {
       return []
   }
 }
+
 export const getQuickViewMenu = async () => {
   try {
     const response = await fetch(`${apiUrl}/menu-data/quickView`)
@@ -30,7 +31,18 @@ export const getQuickViewMenu = async () => {
     console.error(err)
     return []
   }
-  
+}
+
+export const getMenuAndStockForDate = async (date) => {
+  console.log('getting menu and stock for date ', date)
+  try {
+    const response = await fetch(`${apiUrl}/menu-data/menuWithStock?date=${date}}`)
+    const data = await response.json()
+    return data
+  } catch (error) {
+    console.error(error)
+    return []
+  }
 }
 
 export const getMenuItemByItemId = async (itemId) => {

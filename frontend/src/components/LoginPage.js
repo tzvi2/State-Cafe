@@ -1,4 +1,3 @@
-// LoginPage.js
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
