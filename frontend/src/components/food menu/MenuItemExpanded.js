@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import RenderOptions from './RenderOptions';
 import BackArrow from '../BackArrow';
@@ -7,12 +7,11 @@ import { useCart } from '../../hooks/useCart';
 import { getMenuItemByItemId } from '../../api/menuRequests';
 import { getStockForDate } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
-import { capitalizeFirstLetters } from '../../utils/stringUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 
-function MenuItemExpanded() {
+const MenuItemExpanded = () => {
   const { itemId } = useParams();
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
   const { deliveryDate } = useDeliveryDetails();
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -29,84 +28,60 @@ function MenuItemExpanded() {
   const timeoutId2Ref = useRef();
 
   useEffect(() => {
-    console.log('item ', menuItem)
-  }, [menuItem])
+    const fetchMenuItem = async () => {
+      const data = await getMenuItemByItemId(itemId);
+      setMenuItem(data);
+    };
+
+    fetchMenuItem();
+  }, [itemId]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const data = await getMenuItemByItemId(itemId);
-
-      let stockData;
+    const fetchStockData = async () => {
       if (deliveryDate) {
-        stockData = await getStockForDate(deliveryDate);
-      } else {
-        stockData = {}; // Initialize as empty object if no delivery date is set
-      }
-
-      const weightOptionsGroup = data.soldByWeight ? {
-        title: 'Available Portions',
-        options: stockData[itemId] || [],
-        minSelection: 1
-      } : null;
-
-      data.optionGroups = weightOptionsGroup
-        ? [weightOptionsGroup, ...(data.optionGroups || [])]
-        : data.optionGroups;
-
-      data.quantity = data.quantity || []; // Initialize quantity as an empty array if undefined
-      setMenuItem(data);
-
-      if (data.soldByWeight) {
-        const totalQuantity = stockData[itemId]?.reduce((total, option) => total + option.quantity, 0) || 0;
-        setQuantityLeft(totalQuantity);
-      } else {
+        const stockData = await getStockForDate(deliveryDate);
         setQuantityLeft(stockData[itemId]?.quantity || 0);
       }
     };
-    fetchData();
-  }, [itemId, deliveryDate]); // Depend on deliveryDate
+
+    fetchStockData();
+  }, [deliveryDate, itemId]);
 
   const totalItemPrice = useMemo(() => {
-    if (menuItem.price === undefined) return 0;
+    if (!menuItem.price) return 0;
     const optionsPrice = selectedOptions.reduce((acc, option) => acc + option.price, 0);
     return (menuItem.price + optionsPrice) * quantity;
-  }, [selectedOptions, quantity, menuItem]);
+  }, [selectedOptions, quantity, menuItem.price]);
 
-  const handleOptionChange = (option, isChecked, groupTitle = null) => {
-    setSelectedOptions(prev => {
+  const handleOptionChange = useCallback((option, isChecked, groupTitle = null) => {
+    setSelectedOptions((prev) => {
       let updatedOptions = [...prev];
-
       if (groupTitle) {
-        // Handle group options
         if (isChecked) {
-          // Add the new option if within the limit
-          const selectedInGroup = updatedOptions.filter(opt => opt.group === groupTitle);
-          if (selectedInGroup.length < menuItem.optionGroups.find(group => group.title === groupTitle).maxSelection) {
+          const selectedInGroup = updatedOptions.filter((opt) => opt.group === groupTitle);
+          const group = menuItem.optionGroups.find((group) => group.title === groupTitle);
+          if (selectedInGroup.length < group.maxSelection) {
             updatedOptions.push({ ...option, group: groupTitle });
           }
         } else {
-          // Remove the option if unchecked
-          updatedOptions = updatedOptions.filter(opt => !(opt.title === option.title && opt.group === groupTitle));
+          updatedOptions = updatedOptions.filter((opt) => !(opt.title === option.title && opt.group === groupTitle));
         }
       } else {
-        // Handle individual options
         if (isChecked) {
           updatedOptions.push(option);
         } else {
-          updatedOptions = updatedOptions.filter(opt => opt.title !== option.title);
+          updatedOptions = updatedOptions.filter((opt) => opt.title !== option.title);
         }
       }
-
       return updatedOptions;
     });
-  };
+  }, [menuItem.optionGroups]);
 
   const validateOptionSelections = () => {
     const validationErrors = [];
-
     if (menuItem.optionGroups) {
-      menuItem.optionGroups.forEach(group => {
-        const selectedInGroup = selectedOptions.filter(option => option.group === group.title);
+      menuItem.optionGroups.forEach((group) => {
+        const selectedInGroup = selectedOptions.filter((option) => option.group === group.title);
         if (selectedInGroup.length < group.minSelection) {
           validationErrors.push(`Please select at least ${group.minSelection} option(s) for the group "${group.title}".`);
         }
@@ -115,52 +90,39 @@ function MenuItemExpanded() {
         }
       });
     }
-
     return validationErrors;
   };
 
-  useEffect(() => {
+  const updateButtonContent = useCallback(() => {
     if (menuItem.price !== undefined) {
-      let newButtonContent = {
+      const newButtonContent = {
         text: quantityLeft === 0 ? "Out of Stock" : "Add to Cart ",
         amount: quantityLeft === 0 ? "" : centsToFormattedPrice(totalItemPrice)
       };
       setButtonContent(newButtonContent);
     }
-  }, [selectedOptions, quantity, menuItem, quantityLeft]);
+  }, [menuItem.price, quantityLeft, totalItemPrice]);
+
+  useEffect(() => {
+    updateButtonContent();
+  }, [selectedOptions, quantity, updateButtonContent]);
 
   const handleAddToCart = async () => {
-    if (buttonLocked || !menuItem || quantityLeft === 0) {
-      console.log('not adding')
-      return;
-    }
+    if (buttonLocked || !menuItem || quantityLeft === 0) return;
 
     const validationErrors = validateOptionSelections();
     if (validationErrors.length > 0) {
-      console.log('validation error')
       alert(validationErrors.join("\n"));
       return;
     }
 
     if (quantity > quantityLeft) {
-      console.log('quantity selected exceeds quantity left')
       const userConfirmed = window.confirm(`Only ${quantityLeft} left in stock. Would you like to add the remaining ${quantityLeft} to your cart?`);
-      if (!userConfirmed) {
-        return;
-      } else {
-        setQuantity(quantityLeft);
-      }
+      if (!userConfirmed) return;
+      setQuantity(quantityLeft);
     }
 
     setButtonLocked(true);
-
-    console.log('menu item being added: ',
-      { ...menuItem,
-        options: selectedOptions,
-        quantity: Math.min(quantity, quantityLeft),
-        total: totalItemPrice,
-      }
-    )
 
     const wasAdded = addToCart({
       ...menuItem,
@@ -181,15 +143,8 @@ function MenuItemExpanded() {
         });
         setButtonLocked(false);
       }, 2000);
-    } else {
-      alert("We are currently accepting a maximum of 10 of any item.");
-      setButtonLocked(false);
     }
   };
-
-  useEffect(() => {
-    console.log(' menu item ', menuItem)
-  }, [menuItem])
 
   useEffect(() => {
     return () => {
@@ -198,12 +153,19 @@ function MenuItemExpanded() {
     };
   }, []);
 
+  const availableQuantity = useMemo(() => {
+    const currentQuantityInCart = cart.items
+      .filter((cartItem) => cartItem.title === menuItem.title)
+      .reduce((total, cartItem) => total + cartItem.quantity, 0);
+    return Math.max(quantityLeft - currentQuantityInCart, 0);
+  }, [cart.items, menuItem.title, quantityLeft]);
+
   return (
     <div className={styles.expandedContainer}>
       <div className={styles.menuItemExpanded}>
         <BackArrow className={styles.arrow} />
         <h2 className={styles.title}>{menuItem.title}</h2>
-        <img src={menuItem.img} alt={menuItem.title} className={styles.menuItemImage}></img>
+        <img src={menuItem.img} alt={menuItem.title} className={styles.menuItemImage} />
         <p className={styles.description}>{menuItem.description}</p>
 
         <RenderOptions
@@ -214,19 +176,21 @@ function MenuItemExpanded() {
         />
 
         <div className={styles.footer}>
-          {!menuItem.soldByWeight && quantityLeft > 0 && <select
-            className={styles.quantity}
-            defaultValue={1}
-            onChange={(e) => setQuantity(parseInt(e.target.value))}
-            disabled={quantityLeft === 0} // Disable if out of stock
-          >
-            {[...Array(Math.min(10, quantityLeft)).keys()].map(n => (
-              <option key={n} value={n + 1}>{n + 1}</option>
-            ))}
-          </select>}
+          {!menuItem.soldByWeight && availableQuantity > 0 && (
+            <select
+              className={styles.quantity}
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value))}
+              disabled={availableQuantity === 0}
+            >
+              {[...Array(Math.min(10, availableQuantity)).keys()].map((n) => (
+                <option key={n} value={n + 1}>{n + 1}</option>
+              ))}
+            </select>
+          )}
           <button
-            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${quantityLeft === 0 ? styles.outOfStock : ''}`}
-            disabled={buttonLocked || quantityLeft === 0} // Disable if out of stock
+            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 ? styles.outOfStock : ''}`}
+            disabled={buttonLocked || availableQuantity === 0}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>
@@ -237,6 +201,6 @@ function MenuItemExpanded() {
       <Link className={styles.checkoutButton} to={"/cart"}>Go to Cart</Link>
     </div>
   );
-}
+};
 
 export default MenuItemExpanded;

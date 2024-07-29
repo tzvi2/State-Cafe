@@ -4,6 +4,29 @@ const admin = require('firebase-admin');
 
 const FieldValue = admin.firestore.FieldValue;
 
+exports.getItemStock = async (req, res) => {
+  const { date, id } = req.query;
+
+  if (!date || !id) {
+    return res.status(400).send("Error: 'date' and 'id' query parameters are required.");
+  }
+
+  try {
+    const stockDoc = await db.collection('stock').doc(date).get();
+    if (!stockDoc.exists) {
+      return res.status(404).send("Error: Stock document not found.");
+    }
+
+    const stock = stockDoc.data();
+    const quantity = stock[id]?.quantity || 0;
+
+    res.json({ quantity });
+  } catch (error) {
+    console.error("Error fetching stock data:", error);
+    res.status(500).send("Error fetching stock data");
+  }
+};
+
 exports.getFullStock = async (req, res) => {
   const { date } = req.query;
   console.log('stock for ', date)

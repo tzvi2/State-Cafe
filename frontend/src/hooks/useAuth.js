@@ -49,8 +49,8 @@ export const AuthContextProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Auth state - currentUser:', currentUser);
-    console.log('Auth state - isAllowed:', isAllowed);
+    //console.log('Auth state - currentUser:', currentUser);
+    //console.log('Auth state - isAllowed:', isAllowed);
   }, [currentUser, isAllowed]);
 
   const value = {

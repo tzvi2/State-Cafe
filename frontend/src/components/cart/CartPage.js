@@ -14,7 +14,8 @@ export default function CartPage() {
   // }, [cart])
 
   return (
-    <>
+    <div className={styles.cartContainer}>
+    {cart.items.length > 0 && <BackArrow />}
       <h2 className={styles.cartHeader}>My Cart</h2>
 
       <div className={styles.cartPage}>
@@ -47,6 +48,6 @@ export default function CartPage() {
         )}
       </div>
       
-    </>
+    </div>
   );
 }

@@ -9,10 +9,12 @@ const {
   updateStockLevels,
   saveWeightData,
   deleteWeightData,
-  updateWeightQuantity
+  updateWeightQuantity,
+  getItemStock
 } = require('../controllers/stockControllers');
 
 router.get('/get-remaining-quantity', getFullStock);
+router.get('/get-item-stock', getItemStock)
 router.post('/initialize-quantities', setAllProductQuantitiesToZero);
 router.put('/update-quantity-remaining', updateQuantityRemaining);
 router.put('/update-stock-from-cart', updateStockLevels);

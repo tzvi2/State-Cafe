@@ -15,7 +15,7 @@ export default function Menu() {
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const categoryRefs = useRef({});
   const categoryBarRef = useRef(null);
-  const { deliveryDate, setDeliveryDate } = useDeliveryDetails(); // Use context for delivery date
+  const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
   const timeFormatter = new Intl.DateTimeFormat([], {
     hour: 'numeric',
     minute: '2-digit',
@@ -51,6 +51,7 @@ export default function Menu() {
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
   useEffect(() => {
+    console.log('delivery date', deliveryDate);
     const getStockData = async () => {
       setIsLoading(true);
       const data = await getMenuAndStockForDate(deliveryDate);
@@ -61,7 +62,6 @@ export default function Menu() {
       getStockData();
     }
   }, [deliveryDate]);
-
 
   const handleScroll = () => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
@@ -87,7 +87,7 @@ export default function Menu() {
 
   const handleCategoryClick = (category) => {
     const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
-    const extraOffset = 120; // Additional margin for better visibility
+    const extraOffset = 120;
     const categoryElement = categoryRefs.current[category];
     const elementPosition = categoryElement.getBoundingClientRect().top + window.pageYOffset;
     const offsetPosition = elementPosition - categoryBarHeight - extraOffset;
@@ -98,13 +98,12 @@ export default function Menu() {
       behavior: 'smooth'
     });
 
-    // Set active category immediately on click
     setActiveCategory(category);
   };
 
   useEffect(() => {
-    console.log('menu items ', menuItems)
-  }, [menuItems])
+    console.log('menu items', menuItems);
+  }, [menuItems]);
 
   useEffect(() => {
     window.addEventListener('scroll', handleScroll);
@@ -116,8 +115,7 @@ export default function Menu() {
   return (
     <>
       <h2 className={styles.offering}>Select Delivery Date</h2>
-  
-      
+
       <div className={`${styles.flexRow} ${styles.dateButtons}`}>
         <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
           <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
@@ -136,11 +134,11 @@ export default function Menu() {
             className={styles.categoryContainer}>
             <div className={styles.menu}>
               {isLoading ?
-                Array(menuItems.length).fill(0).map((_, index) => (
+                Array(10).fill(0).map((_, index) => (
                   <Shimmer key={index} />
                 )) :
                 menuItems.filter(item => item.category === category).map((item) => (
-                  <Menuitem key={item.title} item={item} />
+                  <Menuitem key={item.id} item={item} />
                 ))}
             </div>
           </div>

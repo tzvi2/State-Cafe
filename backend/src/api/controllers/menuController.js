@@ -13,9 +13,9 @@ const fetchMenuData = async (req, res) => {
 };
 
 const getMenuWithStock = async (req, res) => {
-  const selectedDate = req.query.date; // Ensure the key matches 'date' as used in the frontend
-
-  if (!selectedDate) {
+  const {date} = req.query
+  console.log('selected Date' ,date)
+  if (!date) {
     return res.status(400).send("Error: 'date' query parameter is required.");
   }
 
@@ -27,13 +27,19 @@ const getMenuWithStock = async (req, res) => {
       menuItems[doc.id] = doc.data();
     });
 
-    const stockDoc = await db.collection('stock').doc(selectedDate).get();
+    const stockDoc = await db.collection('stock').doc(date).get();
+    //console.log('stock Doc', stockDoc)
     const stock = stockDoc.exists ? stockDoc.data() : {};
 
+    console.log('stock ', stock)
+
     const menuItemsWithStock = Object.keys(menuItems).map(id => ({
+      id, // Adding the document ID as the id property
       ...menuItems[id],
-      quantity: stock[id] ? stock[id].quantity : 0
+      quantity: stock[id]?.quantity || 0 // Accessing quantity correctly
     }));
+
+    //console.log('menu items with stock', menuItemsWithStock);
 
     res.json(menuItemsWithStock);
   } catch (error) {
@@ -41,6 +47,7 @@ const getMenuWithStock = async (req, res) => {
     res.status(500).send("Error fetching data");
   }
 };
+
 
 const fetchQuickView = async (req, res) => {
   try {

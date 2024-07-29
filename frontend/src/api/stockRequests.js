@@ -147,3 +147,14 @@ export const updateWeightQuantity = async (date, itemId, weightIndex, newQuantit
     throw error;
   }
 };
+
+export const getItemStockLeft = async (date, id) => {
+  try {
+    const res = await fetch(`${apiUrl}/stock/get-item-stock?date=${date}&id=${id}`);
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    return { quantity: 0 };
+  }
+};

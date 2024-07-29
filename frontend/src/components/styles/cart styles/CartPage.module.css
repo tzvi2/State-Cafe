@@ -1,3 +1,8 @@
+.cartContainer {
+  display: flex;
+  flex-direction: column;
+}
+
 .cartHeader {
   text-align: center;
   margin: 1rem;
@@ -188,11 +193,18 @@ p.itemPrice {
 }
 
 @media (min-width: 1024px) {
+
+  .cartContainer {
+    width: 40%;
+    align-self: center;
+  }
+
   .cartHeader {
     margin-top: 3rem;
   }
 
   .cartPage {
     align-self: center;
+    width: 100%;
   }
 }
