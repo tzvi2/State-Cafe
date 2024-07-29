@@ -6,6 +6,19 @@
   margin-bottom: 0;
 }
 
+.deliveryDateSelection {
+	display: flex;
+	flex-direction: column;
+	margin: 0 1rem;
+}
+
+.minimizedButton {
+	width: 100%;
+	font-size: 1.2rem;
+	background-color: #ebefe1;
+	color: rgb(5, 103, 31);
+}
+
 .menu {
 	padding: 4%;
 	display: flex;

@@ -13,6 +13,7 @@ export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [showDateButtons, setShowDateButtons] = useState(false);
   const categoryRefs = useRef({});
   const categoryBarRef = useRef(null);
   const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
@@ -112,17 +113,30 @@ export default function Menu() {
 
   const isDaySelected = (dateStr) => deliveryDate === dateStr;
 
+  const toggleDateButtons = () => {
+    setShowDateButtons(!showDateButtons);
+  };
+
   return (
     <>
-      <h2 className={styles.offering}>Select Delivery Date</h2>
-
-      <div className={`${styles.flexRow} ${styles.dateButtons}`}>
-        <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(todayFormatted)}>
-          <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
-        </button>
-        <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => setDeliveryDate(tomorrowFormatted)}>
-          <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
-        </button>
+      <div className={styles.deliveryDateSelection}>
+        {!deliveryDate || showDateButtons ? (
+          <>
+            <h2 className={styles.offering}>Select Delivery Date</h2>
+            <div className={`${styles.flexRow} ${styles.dateButtons}`}>
+              <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => { setDeliveryDate(todayFormatted); setShowDateButtons(false); }}>
+                <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
+              </button>
+              <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => { setDeliveryDate(tomorrowFormatted); setShowDateButtons(false); }}>
+                <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
+              </button>
+            </div>
+          </>
+        ) : (
+          <button className={styles.minimizedButton} onClick={toggleDateButtons}>
+            Delivery Date: {formatDateToMDYYYY(new Date(deliveryDate))} &#x25BC;
+          </button>
+        )}
       </div>
 
       <div className={styles.menuContainer}>
