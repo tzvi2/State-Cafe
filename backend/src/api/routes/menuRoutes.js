@@ -10,22 +10,6 @@ const {
 } = require('../controllers/menuController');
 
 const router = express.Router();
-const cache = require('../../../cache');
-
-const cacheMiddleware = (req, res, next) => {
-  const key = req.originalUrl;
-  const cachedResponse = cache.get(key);
-  if (cachedResponse) {
-    return res.json(cachedResponse);
-  } else {
-    res.sendResponse = res.json;
-    res.json = (body) => {
-      cache.set(key, body);
-      res.sendResponse(body);
-    };
-    next();
-  }
-};
 
 router.get('/', fetchMenuData);
 router.get('/quickView', fetchQuickView);
