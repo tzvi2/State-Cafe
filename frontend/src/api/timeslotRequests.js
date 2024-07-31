@@ -2,6 +2,20 @@ import { format } from 'date-fns';
 import { db } from '../firebaseConfig';
 import apiUrl from '../config';
 
+export const availableSlotsRemain = async () => {
+  try {
+    const response = await fetch(`${apiUrl}/timeslots/available-slots-remain`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
+    const data = await response.json();
+    return data.available;
+  } catch (error) {
+    console.error('Error checking open hours:', error);
+    return false; // Or handle the error appropriately
+  }
+};
+
 export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
   const formattedTime = new Date(time).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
   //console.log("Booking time slot, totalCookTime", totalCookTime, "date", date, "formatted time: ", formattedTime)

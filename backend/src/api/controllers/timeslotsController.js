@@ -5,6 +5,34 @@ const moment = require("moment-timezone")
 
 const timeZone = 'America/New_York';
 
+const does_today_have_more_open_hours = async (req, res) => {
+  try {
+    const currentDate = moment().tz(timeZone).format('YYYY-MM-DD');
+    const currentTime = moment().tz(timeZone).toDate();
+
+    const docRef = db.collection('time_slots').doc(currentDate);
+    const doc = await docRef.get();
+
+    if (!doc.exists) {
+      return res.status(404).json({ available: false });
+    }
+
+    const slots = doc.data().slots || [];
+    
+    for (const slot of slots) {
+      const slotTime = slot.time.toDate();
+      if (slotTime > currentTime && slot.isAvailable) {
+        return res.status(200).json({ available: true });
+      }
+    }
+
+    return res.status(200).json({ available: false });
+  } catch (error) {
+    console.error('Error checking open hours:', error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
   const timeZone = 'America/New_York';
@@ -355,5 +383,6 @@ module.exports = {
 	handleGetOpenHours,
 	handleAddTimeslot,
 	handleRemoveTimeslot,
-	handleUpdateTimeslot
+	handleUpdateTimeslot,
+  does_today_have_more_open_hours
 }

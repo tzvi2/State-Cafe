@@ -42,7 +42,10 @@
 }
 
 
-
+.ordersMessage {
+	margin: 0 3rem;
+	font-size: 1.25rem;
+}
 
 .deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
 	font-size: 1.2rem;
@@ -125,6 +128,12 @@
 	.flexRow button {
 		
 	}
+
+	.ordersMessage {
+		text-align: center;
+		margin: 1rem 0;
+	}
+	
 }
 
 @media (min-width: 1024px) {

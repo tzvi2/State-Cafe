@@ -6,6 +6,7 @@ import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
 import { getMenuAndStockForDate } from "../../api/menuRequests";
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
+import { availableSlotsRemain } from '../../api/timeslotRequests';
 
 const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", "soup", "coffee"];
 
@@ -14,6 +15,7 @@ export default function Menu() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [showDateButtons, setShowDateButtons] = useState(false);
+  const [areAvailableSlots, setAreAvailableSlots] = useState(true)
   const categoryRefs = useRef({});
   const categoryBarRef = useRef(null);
   const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
@@ -58,6 +60,15 @@ export default function Menu() {
 
   const todayFormatted = formatDateToYYYYMMDD(todayEST);
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
+
+  useEffect(() => {
+    const checkIfSlotsRemain = async () => {
+      const res = await availableSlotsRemain()
+      console.log('res ', res)
+      setAreAvailableSlots(res)
+    }
+    checkIfSlotsRemain()
+  })
 
   useEffect(() => {
     console.log('delivery date', deliveryDate);
@@ -148,6 +159,7 @@ export default function Menu() {
       </div>
 
       <div className={styles.menuContainer}>
+        {!areAvailableSlots && <p className={styles.ordersMessage}>We are not accepting orders for the selected date.</p>}
         {categories.map((category) => (
           <div
             key={category}
