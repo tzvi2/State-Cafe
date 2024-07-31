@@ -3,7 +3,7 @@ const { addMinutes, isSameMinute, parse, format } = require('date-fns');
 const { toDate, fromZonedTime, toZonedTime, formatInTimeZone, getTimezoneOffset } = require('date-fns-tz');
 const moment = require("moment-timezone")
 
-const timeZone = 'America/New_York'; // Define your desired time zone here
+const timeZone = 'America/New_York';
 
 const handleGetOpenHours = async (req, res) => {
   const { date } = req.query;
@@ -131,50 +131,6 @@ function generateTimeSlots(dateString, startTime, endTime, timeZone = 'America/N
   return slots;
 }
 
-
-const parseTimeInZone = (date, time, timeZone) => {
-  const [hours, minutesPart] = time.split(':');
-  const minutes = minutesPart.slice(0, 2);
-  const isPM = time.includes('PM');
-  let hours24 = parseInt(hours, 10);
-  if (isPM && hours24 < 12) {
-    hours24 += 12;
-  } else if (!isPM && hours24 === 12) {
-    hours24 = 0;
-  }
-
-  const dateTimeString = `${date}T${hours24.toString().padStart(2, '0')}:${minutes}:00`;
-  const zonedDate = new Date(dateTimeString);
-
-  const zonedTime = toZonedTime(zonedDate, timeZone);
-  const offset = getTimezoneOffset(timeZone, zonedDate);
-  const utcTime = new Date(zonedDate.getTime() - offset);
-
-  console.log('Parsed time:', format(zonedTime, "yyyy-MM-dd'T'HH:mm:ssXXX", { timeZone }));
-
-  return utcTime;
-};
-
-function parseTime(date, timeString) {
-  const [time, modifier] = timeString.split(' ');
-  let [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    return null;
-  }
-
-  if (modifier === 'PM' && hours !== 12) {
-    hours += 12;
-  }
-  if (modifier === 'AM' && hours === 12) {
-    hours = 0;
-  }
-
-  const parsedDate = new Date(date);
-  parsedDate.setHours(hours, minutes, 0, 0);
-  return parsedDate;
-}
-
 const handleRemoveTimeslot = async (req, res) => {
   const { date, startHour, endHour } = req.body;
   const timeZone = 'America/New_York';
@@ -232,7 +188,7 @@ function getCurrentTimeInEST() {
   return moment.tz(timeZone).toISOString();
 }
 
-const handle_get_available_timeslots = async (req, res) => {
+const get_available_delivery_slots_for_order = async (req, res) => {
   // return timeslots as array of ISO strings 
   try {
     const { date, totalCookTime } = req.query;
@@ -380,23 +336,6 @@ const handleBookTimeslot = async (req, res) => {
   }
 };
 
-
-
-
-async function populateSlotsForDate(date, startHour, endHour) {
-  const dateId = date.toISOString().split('T')[0];
-  const docRef = db.collection('time_slots').doc(dateId);
-  const doc = await docRef.get();
-
-  if (!doc.exists) {
-    const slots = generateTimeSlots(date, startHour, endHour);
-    await docRef.set({ slots });
-    console.log(`Populated slots for ${dateId}`);
-  } else {
-    console.log(`Slots for ${dateId} already exist.`);
-  }
-}
-
 const handleUpdateTimeslot = async (req, res) => {
   const { date, oldStartHour, oldEndHour, newStartHour, newEndHour } = req.body;
 
@@ -411,7 +350,7 @@ const handleUpdateTimeslot = async (req, res) => {
 };
 
 module.exports = {
-	handle_get_available_timeslots,
+	get_available_delivery_slots_for_order,
 	handleBookTimeslot,
 	handleGetOpenHours,
 	handleAddTimeslot,
