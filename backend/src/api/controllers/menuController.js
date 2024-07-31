@@ -31,7 +31,7 @@ const getMenuWithStock = async (req, res) => {
     //console.log('stock Doc', stockDoc)
     const stock = stockDoc.exists ? stockDoc.data() : {};
 
-    console.log('stock ', stock)
+    //console.log('stock ', stock)
 
     const menuItemsWithStock = Object.keys(menuItems).map(id => ({
       id, // Adding the document ID as the id property

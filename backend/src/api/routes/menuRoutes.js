@@ -11,8 +11,13 @@ const {
 
 const router = express.Router();
 
+const loggerMiddleware = (req, res, next) => {
+  console.log('requested quick view')
+  next()
+}
+
 router.get('/', fetchMenuData);
-router.get('/quickView', fetchQuickView);
+router.get('/quickView', loggerMiddleware, fetchQuickView);
 router.get('/menuWithStock', getMenuWithStock);
 router.get('/by-document-id/:documentId', getItemByDocumentId)
 router.get('/by-item-id/:itemId', getItemByItemId)
