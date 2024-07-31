@@ -92,6 +92,7 @@ th, td {
 .title {
   display: flex;
   justify-content: space-between;
+  font-weight: 500;
 }
 
 .description {
