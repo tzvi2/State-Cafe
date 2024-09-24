@@ -1,9 +1,9 @@
 .offering {
-  text-align: center;
-  margin: 5%;
-  color: rgb(5, 103, 31);
-  font-weight: 500;
-  margin-bottom: 0;
+	text-align: center;
+	margin: 5%;
+	color: rgb(5, 103, 31);
+	font-weight: 500;
+	margin-bottom: 0;
 }
 
 .deliveryDateSelection {
@@ -36,24 +36,33 @@
 	display: flex;
 	justify-content: space-evenly;
 	align-items: center;
-  margin: 1rem;
+	margin: 1rem;
 	max-width: 500px;
-	
+
 }
 
 
 .ordersMessage {
 	margin: 0 3rem;
-	font-size: 1.25rem;
+	font-size: 1rem;
 }
 
-.deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
+.loadingMessage {
+	text-align: center;
+}
+
+.deliveryPage select,
+.deliveryPage button,
+.flexRow label,
+.flexRow input,
+.flexRow button {
 	font-size: 1.2rem;
 	border-radius: 5px;
 	box-sizing: border-box;
 }
 
-.flexRow label, .flexRow input {
+.flexRow label,
+.flexRow input {
 	width: 48%;
 }
 
@@ -64,8 +73,8 @@
 	padding: .5rem;
 	box-shadow: 1px 1px 6px rgba(96, 95, 95, 0.708);
 	cursor: pointer;
-  background-color: lightgray;
-  color: black;
+	background-color: lightgray;
+	color: black;
 	width: 40%;
 }
 
@@ -93,22 +102,25 @@
 
 .temporaryBanner {
 	text-align: center;
-	font-size: 3em; /* Adjust as needed */
-  font-weight: bold; /* Adjust as needed */
-  background: linear-gradient(270deg, rgb(53, 142, 53), rgb(39, 86, 39), rgb(169, 190, 49), rgb(227, 199, 78));
-  background-size: 1400% 1400%;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: rainbow 5s alternate infinite;
+	font-size: 3em;
+	/* Adjust as needed */
+	font-weight: bold;
+	/* Adjust as needed */
+	background: linear-gradient(270deg, rgb(53, 142, 53), rgb(39, 86, 39), rgb(169, 190, 49), rgb(227, 199, 78));
+	background-size: 1400% 1400%;
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: rainbow 5s alternate infinite;
 }
 
 @keyframes rainbow {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+	0% {
+		background-position: 0% 50%;
+	}
+
+	100% {
+		background-position: 100% 50%;
+	}
 }
 
 .loadingContainer {
@@ -125,15 +137,13 @@
 		width: 30%;
 	}
 
-	.flexRow button {
-		
-	}
+	.flexRow button {}
 
 	.ordersMessage {
 		text-align: center;
 		margin: 1rem 0;
 	}
-	
+
 }
 
 @media (min-width: 1024px) {

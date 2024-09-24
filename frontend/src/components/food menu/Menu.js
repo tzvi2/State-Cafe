@@ -12,7 +12,7 @@ const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", 
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [showDateButtons, setShowDateButtons] = useState(false);
   const [areAvailableSlots, setAreAvailableSlots] = useState(true)
@@ -48,7 +48,7 @@ export default function Menu() {
 
   const YMDtoDMY = (str) => {
     const [year, month, day] = str.split('-');
-  
+
     const monthNumber = parseInt(month, 10);
     const dayNumber = parseInt(day, 10);
 
@@ -159,7 +159,11 @@ export default function Menu() {
       </div>
 
       <div className={styles.menuContainer}>
-        {!areAvailableSlots && <p className={styles.ordersMessage}>We are not accepting orders for the selected date.</p>}
+        {!areAvailableSlots && !isLoading && <p className={styles.ordersMessage}>We are not accepting orders for the selected date.</p>}
+
+        {/* Show "Loading, please wait" when data is loading */}
+        {isLoading && <p className={styles.loadingMessage}>Loading, please wait...</p>}
+
         {categories.map((category) => (
           <div
             key={category}
