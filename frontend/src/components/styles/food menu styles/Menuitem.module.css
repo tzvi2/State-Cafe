@@ -1,83 +1,81 @@
 .menuItem {
-    text-decoration: none;
-    display: flex;
-    border: 1px solid #515B2F;
-    border-radius: 15px;
-    padding: .75rem;
-    margin: 3% 0;
-    width: 80%;
-    height: 128px;
-    box-shadow: 1px 1px 3px rgba(81, 91, 47, .4);
-    color: black;
+  text-decoration: none;
+  display: flex;
+  border-radius: 5px;
+  margin: 3% 0;
+  width: 80%;
+  box-shadow: 1px 2px 4px rgba(81, 91, 47, .4);
+  color: black;
+}
+
+.menuItem.inactiveItem {
+  opacity: 0.5;
+  pointer-events: none;
+  color: #a0a0a0;
+  background-color: #f0f0f0;
+  display: none;
+}
+
+.menuPhoto {
+  height: 14vh;
+  width: 14vh;
+  border-top-left-radius: 5px;
+  border-bottom-left-radius: 5px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  margin: 0;
+}
+
+.textBox {
+  flex-grow: 2;
+  text-align: center;
+  font-size: 1rem;
+  padding: 0 .5rem;
+}
+
+.textBox h2 {
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.textBox h4 {
+  margin: 0;
+}
+
+.stockMessage {
+  font-weight: normal;
+  margin: 0;
+  margin-top: 5%;
+}
+
+.outOfStock {
+  color: red;
+}
+
+.lowStock {
+  color: green;
+}
+
+@media (min-width: 550px) {
+  .menuItem {
+    width: 60%;
   }
-  
-  .menuItem.inactiveItem {
-    opacity: 0.5;
-    pointer-events: none;
-    color: #a0a0a0;
-    background-color: #f0f0f0;
-    display: none;
+}
+
+@media (min-width: 1024px) {
+  .menuItem {
+    width: 30%;
+    margin: .75rem;
+    padding: .5rem;
   }
-  
+
   .menuPhoto {
-    height: 15vh;
-    width: 15vh;
-    border-radius: 5px;
-    box-shadow: 1px 1px 4px grey;
-    margin: 0;
+    border-radius: 10px;
+    height: 8rem;
+    width: 8rem;
   }
-  
+
   .textBox {
-    flex-grow: 2;
-    text-align: center;
-    font-size: 1rem;
-    padding-left: .75rem;
+    padding-left: .5rem;
   }
-  
-  .textBox h2 {
-    font-weight: 500;
-    font-size: 1.25rem;
-  }
-  
-  .textBox h4 {
-    margin: 0;
-  }
-  
-  .stockMessage {
-    font-weight: normal;
-    margin: 0;
-    margin-top: 5%;
-  }
-  
-  .outOfStock {
-    color: red;
-  }
-  
-  .lowStock {
-    color: green;
-  }
-  
-  @media (min-width: 550px) {
-    .menuItem {
-      width: 60%;
-    }
-  }
-  
-  @media (min-width: 1024px) {
-    .menuItem {
-      width: 30%;
-      margin: .75rem;
-      padding: .5rem;
-    }
-  
-    .menuPhoto {
-      border-radius: 10px;
-      height: 8rem;
-      width: 8rem;
-    }
-  
-    .textBox {
-      padding-left: .5rem;
-    }
-  }
-  
+}
