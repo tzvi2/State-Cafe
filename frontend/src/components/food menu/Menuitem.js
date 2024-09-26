@@ -8,9 +8,9 @@ const Menuitem = React.memo(function Menuitem({ item }) {
 
   const getStockMessage = (quantity) => {
     if (Array.isArray(quantity)) {
-      return quantity.length === 0 ? "Out of stock" : `${quantity.length} options available`;
+      return quantity.length === 0 ? "Sold out" : `${quantity.length} options available`;
     } else if (quantity === 0) {
-      return "Out of stock";
+      return "Sold out";
     } else if (quantity <= 3) {
       return `${quantity} left`;
     } else {

@@ -32,14 +32,19 @@
 
 .textBox {
   flex-grow: 2;
-  text-align: center;
   font-size: 1rem;
   padding: 0 .5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin: .5rem 0;
 }
 
 .textBox h2 {
   font-weight: 500;
   font-size: 1rem;
+  margin: 0;
 }
 
 .textBox h4 {
@@ -49,7 +54,6 @@
 .stockMessage {
   font-weight: normal;
   margin: 0;
-  margin-top: 5%;
 }
 
 .outOfStock {
@@ -70,11 +74,11 @@
   .menuItem {
     width: 30%;
     margin: .75rem;
-    padding: .5rem;
+
   }
 
   .menuPhoto {
-    border-radius: 10px;
+
     height: 8rem;
     width: 8rem;
   }
