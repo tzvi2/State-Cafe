@@ -48,12 +48,11 @@ export default function Menu() {
 
   const YMDtoDMY = (str) => {
     const [year, month, day] = str.split('-');
-
     const monthNumber = parseInt(month, 10);
     const dayNumber = parseInt(day, 10);
-
     return `${monthNumber}-${dayNumber}-${year}`;
   }
+
   const todayEST = getESTDate();
   const tomorrowEST = new Date(todayEST);
   tomorrowEST.setDate(tomorrowEST.getDate() + 1);
@@ -63,12 +62,19 @@ export default function Menu() {
 
   useEffect(() => {
     const checkIfSlotsRemain = async () => {
-      const res = await availableSlotsRemain()
-      console.log('res ', res)
-      setAreAvailableSlots(res)
+      const res = await availableSlotsRemain();
+      console.log('res ', res);
+      setAreAvailableSlots(res);
+    };
+    checkIfSlotsRemain();
+  }, []);
+
+  useEffect(() => {
+    // Set the default delivery date to today if no date is selected
+    if (!deliveryDate) {
+      setDeliveryDate(todayFormatted);
     }
-    checkIfSlotsRemain()
-  })
+  }, [deliveryDate, todayFormatted, setDeliveryDate]);
 
   useEffect(() => {
     console.log('delivery date', deliveryDate);

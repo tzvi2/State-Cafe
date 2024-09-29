@@ -9,15 +9,15 @@ export const getMenuItems = async (category = '') => {
     //const res = await fetch(`http://localhost:8000/menu-data${categoryParam}`);
 
     if (!res.ok) {
-        throw new Error('Couldn\'t retrieve menu data.');
+      throw new Error('Couldn\'t retrieve menu data.');
     }
 
     const data = await res.json();
     return data;
-    
+
   } catch (err) {
-      console.error(err);
-      return []
+    console.error(err);
+    return []
   }
 }
 
@@ -34,18 +34,18 @@ export const getMenuAndStockForDate = async (date) => {
 }
 
 export const getMenuItemByItemId = async (itemId) => {
-	try {
-			
-			const res = await fetch(`${apiUrl}/menu-data/by-item-id/${itemId}`);
-			if (!res.ok) {
-					throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
-			}
-			const data = await res.json();
-			return data;
-	} catch (err) {
-			console.error('Error getting menu item by itemId:', err);
-			return null;
-	}
+  try {
+
+    const res = await fetch(`${apiUrl}/menu-data/by-item-id/${itemId}`);
+    if (!res.ok) {
+      throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
+    }
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Error getting menu item by itemId:', err);
+    return null;
+  }
 }
 
 export const addMenuItem = async (menuItem) => {
@@ -63,10 +63,10 @@ export const addMenuItem = async (menuItem) => {
     }
 
     const data = await response.json();
-    return data; 
+    return data;
   } catch (error) {
     console.error("Error adding menu item:", error);
-    throw error; 
+    throw error;
   }
 };
 
@@ -88,10 +88,10 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
     }
 
     const data = await response.json();
-    return data; 
+    return data;
   } catch (error) {
     console.error('Error updating menu item status:', error);
-    throw error; 
+    throw error;
   }
 };
 
@@ -111,10 +111,10 @@ export const updateMenuItem = async (menuItemDetails) => {
     }
 
     const data = await response.json();
-    return data; 
+    return data;
   } catch (error) {
     console.error('Error updating menu item:', error);
-    throw error; 
+    throw error;
   }
 };
 
