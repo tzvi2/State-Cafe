@@ -21,6 +21,26 @@ export const getMenuItems = async (category = '') => {
   }
 }
 
+export const getActiveMenuItems = async () => {
+  console.log('getting active menu items')
+  try {
+    const res = await fetch('https://api-v3nds5fhrq-uc.a.run.app/menu/active-items')
+
+    if (!res.ok) {
+      throw new Error('Failed to fetch active menu items.')
+    }
+
+    const data = res.json()
+    console.log('data: ', data)
+
+    return data
+
+  } catch (error) {
+    console.error('Error fetching menu items:', error);
+    return [];
+  }
+}
+
 export const getMenuAndStockForDate = async (date) => {
   console.log('getting menu and stock for date ', date)
   try {
@@ -36,7 +56,7 @@ export const getMenuAndStockForDate = async (date) => {
 export const getMenuItemByItemId = async (itemId) => {
   try {
 
-    const res = await fetch(`${apiUrl}/menu-data/by-item-id/${itemId}`);
+    const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/menu/${itemId}`);
     if (!res.ok) {
       throw new Error(`Couldn't retrieve menu item data for itemId: ${itemId}`);
     }

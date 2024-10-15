@@ -4,7 +4,9 @@ import Menuitem from "./Menuitem";
 import CategoryBar from "./CategoryBar";
 import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
-import { getMenuAndStockForDate } from "../../api/menuRequests";
+import { getESTDate, formatDateToYYYYMMDD, formatDateToMDYYYY, YMDtoDMY } from '../../utils/dateUtilities';
+import { getActiveMenuItems } from "../../api/menuRequests";
+import { getStockForDate } from '../../api/stockRequests';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { availableSlotsRemain } from '../../api/timeslotRequests';
 
@@ -12,46 +14,13 @@ const categories = ["breakfast", "pasta", "sushi", "sandwiches", "baked goods", 
 
 export default function Menu() {
   const [menuItems, setMenuItems] = useState([]);
+  const [stock, setStock] = useState({})
   const [isLoading, setIsLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
   const [showDateButtons, setShowDateButtons] = useState(false);
   const [areAvailableSlots, setAreAvailableSlots] = useState(true)
-  const categoryRefs = useRef({});
-  const categoryBarRef = useRef(null);
   const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
-  const timeFormatter = new Intl.DateTimeFormat([], {
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true
-  });
 
-  const getESTDate = useCallback(() => {
-    const now = new Date();
-    const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-    const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
-    return estDate;
-  }, []);
 
-  const formatDateToYYYYMMDD = (date) => {
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const formatDateToMDYYYY = (date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${month}-${day}-${year}`;
-  };
-
-  const YMDtoDMY = (str) => {
-    const [year, month, day] = str.split('-');
-    const monthNumber = parseInt(month, 10);
-    const dayNumber = parseInt(day, 10);
-    return `${monthNumber}-${dayNumber}-${year}`;
-  }
 
   const todayEST = getESTDate();
   const tomorrowEST = new Date(todayEST);
@@ -61,13 +30,36 @@ export default function Menu() {
   const tomorrowFormatted = formatDateToYYYYMMDD(tomorrowEST);
 
   useEffect(() => {
-    const checkIfSlotsRemain = async () => {
-      const res = await availableSlotsRemain();
-      console.log('res ', res);
-      setAreAvailableSlots(res);
+    const fetchMenuItems = async () => {
+      try {
+        const activeItems = await getActiveMenuItems(); // Fetch active menu items
+        setMenuItems(activeItems); // Set menu items in state
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error fetching menu items:', error);
+      }
     };
-    checkIfSlotsRemain();
-  }, []);
+
+    fetchMenuItems();
+  }, [])
+
+  useEffect(() => {
+    const fetchStockForSelectedDate = async () => {
+      if (deliveryDate) {
+        try {
+          console.log('Fetching stock for delivery date:', deliveryDate); // Log the delivery date
+          const stockData = await getStockForDate(deliveryDate);
+          console.log('Stock data returned from API for', deliveryDate, ':', stockData); // Log stock data
+          setStock(stockData);
+        } catch (error) {
+          console.error('Error fetching stock data for', deliveryDate, error);
+        }
+      }
+    };
+
+    fetchStockForSelectedDate();
+  }, [deliveryDate]);
+
 
   useEffect(() => {
     // Set the default delivery date to today if no date is selected
@@ -76,65 +68,17 @@ export default function Menu() {
     }
   }, [deliveryDate, todayFormatted, setDeliveryDate]);
 
-  useEffect(() => {
-    console.log('delivery date', deliveryDate);
-    const getStockData = async () => {
-      setIsLoading(true);
-      const data = await getMenuAndStockForDate(deliveryDate);
-      setMenuItems(data);
-      setIsLoading(false);
-    };
-    if (deliveryDate) {
-      getStockData();
-    }
-  }, [deliveryDate]);
 
-  const handleScroll = () => {
-    const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
-    const scrollTop = window.scrollY;
-    const highlightPosition = scrollTop + categoryBarHeight + 130;
-
-    let newActiveCategory = null;
-
-    categories.forEach(category => {
-      const el = categoryRefs.current[category];
-      if (el) {
-        const { offsetTop } = el;
-        if (offsetTop <= highlightPosition) {
-          newActiveCategory = category;
-        }
-      }
-    });
-
-    if (newActiveCategory && newActiveCategory !== activeCategory) {
-      setActiveCategory(newActiveCategory);
-    }
-  };
-
-  const handleCategoryClick = (category) => {
-    const categoryBarHeight = categoryBarRef.current ? categoryBarRef.current.offsetHeight : 0;
-    const extraOffset = 120;
-    const categoryElement = categoryRefs.current[category];
-    const elementPosition = categoryElement.getBoundingClientRect().top + window.pageYOffset;
-    const offsetPosition = elementPosition - categoryBarHeight - extraOffset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      left: 0,
-      behavior: 'smooth'
-    });
-
-    setActiveCategory(category);
-  };
 
   useEffect(() => {
     console.log('menu items', menuItems);
   }, [menuItems]);
 
   useEffect(() => {
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [activeCategory]);
+    console.log('stock updated ', stock)
+  }, [stock])
+
+
 
   const isDaySelected = (dateStr) => deliveryDate === dateStr;
 
@@ -167,26 +111,22 @@ export default function Menu() {
       <div className={styles.menuContainer}>
         {!areAvailableSlots && !isLoading && <p className={styles.ordersMessage}>We are not accepting orders for the selected date.</p>}
 
-        {/* Show "Loading, please wait" when data is loading */}
         {isLoading && <p className={styles.loadingMessage}>Loading, please wait...</p>}
-
-        {categories.map((category) => (
-          <div
-            key={category}
-            id={category}
-            ref={(el) => categoryRefs.current[category] = el}
-            className={styles.categoryContainer}>
-            <div className={styles.menu}>
-              {isLoading ?
-                Array(10).fill(0).map((_, index) => (
-                  <Shimmer key={index} />
-                )) :
-                menuItems.filter(item => item.category === category).map((item) => (
-                  <Menuitem key={item.id} item={item} />
-                ))}
-            </div>
-          </div>
-        ))}
+        <div className={styles.menu}>
+          {isLoading ? (
+            Array(10).fill(0).map((_, index) => (
+              <Shimmer key={index} />
+            ))
+          ) : (
+            menuItems.map((item) => (
+              <Menuitem
+                key={item.id}
+                item={item}
+                stock={stock[item.id]?.quantity} // Pass the stock for each item
+              />
+            ))
+          )}
+        </div>
       </div>
     </>
   );

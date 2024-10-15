@@ -1,5 +1,24 @@
 import apiUrl from '../config';
 
+export const getStockForDate = async (dateString) => {
+  console.log('Fetching stock for', dateString);
+  try {
+    const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/stock?date=${dateString}`);
+
+    if (!res.ok) {
+      console.error(`Failed to fetch stock for date ${dateString}, Status Code: ${res.status}`);
+      return {}; // Return an empty object if no stock is found
+    }
+
+    const stockData = await res.json();
+    return stockData;
+  } catch (error) {
+    console.error('Error fetching stock data', error);
+    return {}; // Return empty object on error
+  }
+};
+
+
 export const setAllStockToZero = async (dateString) => {
   console.log('initializing all to Zero ', dateString);
   try {
@@ -10,7 +29,7 @@ export const setAllStockToZero = async (dateString) => {
       },
       body: JSON.stringify({ dateString })
     });
-    
+
     if (!response.ok) {
       throw new Error('Network response was not ok');
     }
@@ -18,25 +37,25 @@ export const setAllStockToZero = async (dateString) => {
     const result = await response.json();
     console.log(result.message);
     return result
-    
+
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
-export const getStockForDate = async (dateString) => {
-  console.log('getting stock for ', dateString)
-  try {
-    const response = await fetch(`${apiUrl}/stock/get-remaining-quantity?date=${dateString}`);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    throw error;
-  }
-};
+// export const getStockForDate = async (dateString) => {
+//   console.log('getting stock for ', dateString)
+//   try {
+//     const response = await fetch(`${apiUrl}/stock/get-remaining-quantity?date=${dateString}`);
+//     if (!response.ok) {
+//       throw new Error('Network response was not ok');
+//     }
+//     const data = await response.json();
+//     return data;
+//   } catch (error) {
+//     throw error;
+//   }
+// };
 
 export const updateQuantityRemaining = async (date, menuItemId, quantity) => {
   try {

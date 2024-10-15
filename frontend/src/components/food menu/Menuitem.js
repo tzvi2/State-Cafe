@@ -3,25 +3,19 @@ import styles from '../styles/food menu styles/Menuitem.module.css';
 import { Link } from 'react-router-dom';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 
-const Menuitem = React.memo(function Menuitem({ item }) {
+const Menuitem = ({ item, stock }) => {
   const itemClass = item.active ? styles.activeItem : styles.inactiveItem;
 
   const getStockMessage = (quantity) => {
-    if (Array.isArray(quantity)) {
-      return quantity.length === 0 ? "Sold out" : `${quantity.length} options available`;
-    } else if (quantity === 0) {
+    if (quantity === 0) {
       return "Sold out";
     } else if (quantity <= 3) {
       return `${quantity} left`;
-    } else {
-      return null;
     }
   };
 
   const getStockMessageClass = (quantity) => {
-    if (Array.isArray(quantity)) {
-      return quantity.length === 0 ? styles.outOfStock : '';
-    } else if (quantity === 0) {
+    if (quantity === 0) {
       return styles.outOfStock;
     } else if (quantity <= 3) {
       return styles.lowStock;
@@ -36,14 +30,12 @@ const Menuitem = React.memo(function Menuitem({ item }) {
       <div className={styles.textBox}>
         <h2>{item.title}</h2>
         <h4>{centsToFormattedPrice(item.price)}</h4>
-        {getStockMessage(item.soldByWeight ? item.weightOptions : item.quantity) && (
-          <p className={`${styles.stockMessage} ${getStockMessageClass(item.soldByWeight ? item.weightOptions : item.quantity)}`}>
-            {getStockMessage(item.soldByWeight ? item.weightOptions : item.quantity)}
-          </p>
-        )}
+        <p className={`${styles.stockMessage} ${getStockMessageClass(stock)}`}>
+          {getStockMessage(stock)}
+        </p>
       </div>
     </Link>
   );
-});
+};
 
 export default Menuitem;
