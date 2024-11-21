@@ -18,7 +18,7 @@ export const AuthContextProvider = ({ children }) => {
       setCurrentUser(user);
       if (user) {
         try {
-          const response = await fetch(`${apiUrl}/api/check-email`, {
+          const response = await fetch(`${apiUrl}/check-email`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

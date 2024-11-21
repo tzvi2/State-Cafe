@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { addMenuItem, getMenuItemByItemId, updateMenuItem } from '../../api/menuRequests';
-import uploadImage from '../../api/imageRequests';
 import styles from '../styles/dashboard/MenuItemForm.module.css';
 import IndividualOptions from './IndividualOptions';
 import OptionGroups from './OptionGroups';
@@ -53,12 +52,19 @@ function MenuItemForm() {
   };
 
   const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-    setMenuItem((prevMenuItem) => ({
-      ...prevMenuItem,
-      img: URL.createObjectURL(e.target.files[0]), // Update img URL for preview
-    }));
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setMenuItem((prevMenuItem) => ({
+          ...prevMenuItem,
+          img: reader.result, // Base64 encoded image
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
   };
+
 
   const handleImageClick = () => {
     fileInputRef.current.click();
@@ -97,10 +103,11 @@ function MenuItemForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Prepare new menu item data
     const priceInCents = Math.round(menuItem.price);
     const timeToCookInSeconds = menuItem.timeToCook;
     const tagsArray = [];
-    
+
     const newMenuItem = {
       ...menuItem,
       price: priceInCents,
@@ -108,6 +115,7 @@ function MenuItemForm() {
       tags: tagsArray,
     };
 
+    // Ensure all numeric fields are properly parsed
     newMenuItem.options = menuItem.options.map(option => ({
       ...option,
       price: option.price ? parseFloat(option.price) : 0,
@@ -123,23 +131,13 @@ function MenuItemForm() {
       })),
     }));
 
-    if (image) {
-      try {
-        const imageUrl = await uploadImage(image);
-        newMenuItem.img = imageUrl;
-      } catch (error) {
-        console.error("Error during the image upload", error);
-        return;
-      }
-    }
-
-    console.log('new/updated menu item: ', newMenuItem);
-
     try {
       if (itemId) {
+        // Update existing menu item
         await updateMenuItem({ itemId, newMenuItem });
         console.log("Menu item updated successfully");
       } else {
+        // Add a new menu item
         await addMenuItem(newMenuItem);
         console.log("Menu item added successfully");
       }
@@ -160,7 +158,7 @@ function MenuItemForm() {
       <input name="price" type="text" value={menuItem.price} onChange={handleChange} placeholder="Price (in cents)" />
       <input name="category" value={menuItem.category} onChange={handleChange} placeholder="Category" />
       <input name="timeToCook" type="text" value={menuItem.timeToCook} onChange={handleChange} placeholder="Time to Cook (in seconds)" />
-      
+
       <label>Image:</label>
       {menuItem.img && (
         <div onClick={handleImageClick} className={styles.imageContainer}>
@@ -175,12 +173,12 @@ function MenuItemForm() {
 
       <div>
         <h4>Options</h4>
-        <IndividualOptions 
-          options={menuItem.options} 
+        <IndividualOptions
+          options={menuItem.options}
           setOptions={(newOptions) => setMenuItem((prevMenuItem) => ({ ...prevMenuItem, options: newOptions }))}
           removeOption={handleRemoveOption} // Pass remove function to IndividualOptions component
         />
-        <OptionGroups 
+        <OptionGroups
           optionGroups={menuItem.optionGroups}
           setOptionGroups={handleOptionGroupsChange}
         />

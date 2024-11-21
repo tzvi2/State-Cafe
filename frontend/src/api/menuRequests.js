@@ -5,7 +5,7 @@ export const getMenuItems = async (category = '') => {
   try {
     // Encode the category to ensure it's a valid URL component
     const categoryParam = category ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`${apiUrl}/menu-data${categoryParam}`);
+    const res = await fetch('https://api-v3nds5fhrq-uc.a.run.app/menu');
     //const res = await fetch(`http://localhost:8000/menu-data${categoryParam}`);
 
     if (!res.ok) {
@@ -24,7 +24,8 @@ export const getMenuItems = async (category = '') => {
 export const getActiveMenuItems = async () => {
   console.log('getting active menu items')
   try {
-    const res = await fetch('https://api-v3nds5fhrq-uc.a.run.app/menu/active-items')
+    //const res = await fetch('https://api-v3nds5fhrq-uc.a.run.app/menu/active-items')
+    const res = await fetch('http://localhost:5001/state-cafe/us-central1/api/menu/active')
 
     if (!res.ok) {
       throw new Error('Failed to fetch active menu items.')
@@ -70,7 +71,7 @@ export const getMenuItemByItemId = async (itemId) => {
 
 export const addMenuItem = async (menuItem) => {
   try {
-    const response = await fetch(`${apiUrl}/edit-menu/add-menu-item`, {
+    const response = await fetch('http://localhost:5001/state-cafe/us-central1/api/menu', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -79,7 +80,8 @@ export const addMenuItem = async (menuItem) => {
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+
     }
 
     const data = await response.json();
@@ -140,21 +142,20 @@ export const updateMenuItem = async (menuItemDetails) => {
 
 export const deleteMenuItem = async (documentId) => {
   try {
-    const response = await fetch(`${apiUrl}/edit-menu/delete-menu-item`, {
-      method: 'POST',
+    const response = await fetch(`http://localhost:5001/state-cafe/us-central1/api/menu/${documentId}`, { // Corrected URL
+      method: 'DELETE', // Changed to DELETE
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ documentId }),
     });
 
     if (!response.ok) {
       throw new Error('Failed to delete menu item');
     }
 
-    // Check if the response has content before parsing it as JSON
-    const text = await response.text(); // Get the response body as text
-    const data = text ? JSON.parse(text) : {}; // Parse text as JSON if not empty, otherwise return an empty object
+    // Parse response body if present
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : {}; // Handle empty responses gracefully
 
     return data;
   } catch (error) {
@@ -162,4 +163,5 @@ export const deleteMenuItem = async (documentId) => {
     throw error;
   }
 };
+
 
