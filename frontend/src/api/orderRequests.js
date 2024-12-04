@@ -24,19 +24,25 @@ export const saveOrder = async (order) => {
   }
 }
 
-export const listenToOrdersForDate = (selectedDate, callback) => {
-  const orderDocRef = doc(db, 'orders', selectedDate);
-
-  return onSnapshot(orderDocRef, (docSnapshot) => {
-    if (docSnapshot.exists()) {
-      const orders = docSnapshot.data().orders || [];
-      callback(orders);
-    } else {
-      callback([]);
-    }
-  });
+export const listenToOrdersForDate = (date, callback) => {
+  const unsubscribe = db.collection('orders')
+    .where('date', '==', date)
+    .orderBy('deliverySlot', 'asc') // Orders by deliverySlot in ascending order
+    .onSnapshot(
+      (snapshot) => {
+        const orders = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        callback(orders);
+      },
+      (error) => {
+        console.error('Error listening to orders:', error);
+        callback([]); // Send empty array on error
+      }
+    );
+  return unsubscribe; // Allows cleanup on component unmount
 };
-
 
 export const getOrdersForDate = async (date) => {
   try {
@@ -48,9 +54,9 @@ export const getOrdersForDate = async (date) => {
 
     const orders = await response.json()
     return orders
-    
-  } catch (error) {   
+
+  } catch (error) {
     //console.log(error)
-    return {error: error.message}
+    return { error: error.message }
   }
 }

@@ -6,7 +6,6 @@ import { saveOrder } from '../../api/orderRequests';
 import { getLastFourDigits } from '../../api/paymentRequests';
 import { bookTimeSlot } from '../../api/timeslotRequests';
 import styles from '../styles/checkout process styles/OrderConfirmation.module.css';
-import { updateQuantityOfAllCartItems } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { formatIsoToTime } from '../../utils/timeUtilities';
 
@@ -70,7 +69,7 @@ const OrderConfirmation = () => {
           };
 
           await saveOrderToDatabase(paymentIntentId, orderDetails);
-          await updateQuantityOfAllCartItems(deliveryDate, cart.items);
+          //await updateQuantityOfAllCartItems(deliveryDate, cart.items);
         } catch (error) {
           console.error('Error processing order:', error);
         } finally {

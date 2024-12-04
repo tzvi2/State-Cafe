@@ -11,17 +11,18 @@ function Checkout(props) {
   const [clientSecret, setClientSecret] = useState(null);
 
   useEffect(() => {
-    fetch(`${apiUrl}/config`).then(async (res) => {
+    fetch(`${apiUrl}/payment/config`).then(async (res) => {
       const { publishableKey } = await res.json();
       setStripePromise(loadStripe(publishableKey));
     });
   }, []);
 
   useEffect(() => {
-    fetch(`${apiUrl}/api/payment/create-payment-intent`, {
+    console.log('fetching payment intent secret')
+    fetch(`${apiUrl}/payment/create-payment-intent`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart.items }), 
+      body: JSON.stringify({ items: cart.items }),
     }).then(async (res) => {
       const { clientSecret } = await res.json();
       setClientSecret(clientSecret);

@@ -15,7 +15,6 @@ const HoursPage = () => {
       try {
         const openHours = await getOpenHours(selectedDate);
         setOpenHours(openHours);
-        //console.log("Open Hours: ", openHours);
       } catch (error) {
         console.error("Error fetching open hours:", error);
       }
@@ -26,7 +25,6 @@ const HoursPage = () => {
 
   const handleSaveRange = async () => {
     try {
-      //console.log("start", startTime, "end", endTime);
       await addTimeSlot(selectedDate, startTime, endTime);
       const openHours = await getOpenHours(selectedDate);
       setOpenHours(openHours);
@@ -48,30 +46,54 @@ const HoursPage = () => {
     }
   };
 
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const hoursInt = parseInt(hours, 10);
+    const amPm = hoursInt >= 12 ? 'pm' : 'am';
+    const formattedHours = hoursInt % 12 || 12; // Convert 0 to 12 for midnight
+    return `${formattedHours}:${minutes}${amPm}`;
+  };
+
   return (
     <div className={styles.hours}>
       {openHours.length > 0 ? (
         openHours.map((range, index) => (
           <div key={index} className={styles.range}>
-            <p className={styles.rangeHours}>{range.start} - {range.end}</p>
-            <input className={styles.delete_range} type='button' value={"delete"} onClick={() => handleDeleteRange(range.start, range.end)} />
+            <p className={styles.rangeHours}>
+              {formatTime(range.start)} - {formatTime(range.end)}
+            </p>
+            <input
+              className={styles.delete_range}
+              type="button"
+              value="delete"
+              onClick={() => handleDeleteRange(range.start, range.end)}
+            />
           </div>
         ))
       ) : (
         <p>No open times</p>
       )}
 
-      {showNewRange && <div className={styles.newRange}>
-        <div className={styles.times}>
-          <input type='time' value={startTime} onChange={e => setStartTime(e.target.value)}></input>
-          <input type='time' value={endTime} onChange={e => setEndTime(e.target.value)}></input>
+      {showNewRange && (
+        <div className={styles.newRange}>
+          <div className={styles.times}>
+            <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+          </div>
+          <input className={styles.save_range} type="button" value="save" onClick={() => handleSaveRange()} />
+          <input className={styles.cancel_range} type="button" value="cancel" onClick={() => setShowNewRange(false)} />
         </div>
-        <input className={styles.save_range} type='button' value={"save"} onClick={() => handleSaveRange()}></input>
-        <input className={styles.cancel_range} type='button' value={"cancel"} onClick={() => setShowNewRange(false)}></input>
-      </div>}
-      {!showNewRange && <input className={styles.add_range} type='button' value={"add range"} onClick={() => setShowNewRange(!showNewRange)}></input>}
+      )}
+      {!showNewRange && (
+        <input
+          className={styles.add_range}
+          type="button"
+          value="add range"
+          onClick={() => setShowNewRange(!showNewRange)}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default HoursPage;

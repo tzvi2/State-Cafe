@@ -1,179 +1,146 @@
 import apiUrl from '../config';
 
-export const getStockForDate = async (dateString) => {
-  console.log('Fetching stock for', dateString);
+// Retrieve all stock data for a specific date
+export const getStockForDate = async (date) => {
+  console.log('Fetching stock for', date);
   try {
-    const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/stock?date=${dateString}`);
-
+    const res = await fetch(`${apiUrl}/stock/${date}`);
     if (!res.ok) {
-      console.error(`Failed to fetch stock for date ${dateString}, Status Code: ${res.status}`);
+      console.error(`Failed to fetch stock for date ${date}, Status Code: ${res.status}`);
       return {}; // Return an empty object if no stock is found
     }
-
-    const stockData = await res.json();
-    return stockData;
+    return await res.json();
   } catch (error) {
-    console.error('Error fetching stock data', error);
+    console.error('Error fetching stock data:', error);
     return {}; // Return empty object on error
   }
 };
 
-
+// Initialize stock for a given date
 export const setAllStockToZero = async (dateString) => {
-  console.log('initializing all to Zero ', dateString);
+  console.log('Initializing all stock to zero for', dateString);
   try {
-    const response = await fetch(`${apiUrl}/stock/initialize-quantities`, {
+    const response = await fetch(`${apiUrl}/stock/initialize`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ dateString })
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const result = await response.json();
-    console.log(result.message);
-    return result
-
-  } catch (error) {
-    console.error('Error:', error);
-  }
-};
-
-// export const getStockForDate = async (dateString) => {
-//   console.log('getting stock for ', dateString)
-//   try {
-//     const response = await fetch(`${apiUrl}/stock/get-remaining-quantity?date=${dateString}`);
-//     if (!response.ok) {
-//       throw new Error('Network response was not ok');
-//     }
-//     const data = await response.json();
-//     return data;
-//   } catch (error) {
-//     throw error;
-//   }
-// };
-
-export const updateQuantityRemaining = async (date, menuItemId, quantity) => {
-  try {
-    const response = await fetch(`${apiUrl}/stock/update-quantity-remaining`, {
-      method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ date, menuItemId, quantity }),
+      body: JSON.stringify({ dateString }),
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Failed to initialize stock');
     }
 
     return await response.json();
   } catch (error) {
-    console.error('Error updating quantity:', error);
+    console.error('Error initializing stock:', error);
+  }
+};
+
+// Retrieve stock for a specific item on a specific date
+export const getItemStockLeft = async (date, itemId) => {
+  console.log('Fetching stock for item', itemId, 'on date', date);
+  try {
+    const res = await fetch(`${apiUrl}/stock/${date}/${itemId}`);
+    if (!res.ok) {
+      console.error(`Failed to fetch stock for item ${itemId}, Status Code: ${res.status}`);
+      return { quantity: 0 };
+    }
+    return await res.json();
+  } catch (error) {
+    console.error('Error fetching item stock:', error);
+    return { quantity: 0 };
+  }
+};
+
+// Update stock for a specific item on a specific date
+export const updateQuantityRemaining = async (date, itemId, quantity) => {
+  console.log('Updating stock for item', itemId, 'on date', date, 'to quantity', quantity);
+  try {
+    const response = await fetch(`${apiUrl}/stock/${date}/${itemId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ quantity }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update quantity remaining');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating quantity remaining:', error);
     throw error;
   }
 };
 
-export const updateQuantityOfAllCartItems = async (date, cartItems) => {
-  console.log('updating stock for ', date, 'cart items: ', cartItems)
-  try {
-    const response = await fetch(`${apiUrl}/stock/update-stock-from-cart`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ date, cartItems }),
-    });
-
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
-    }
-
-    const result = await response.json();
-    //console.log('Stock levels updated successfully:', result);
-  } catch (error) {
-    console.error('Error updating stock levels:', error);
-  }
-};
-
+// Save weight data for an item
 export const saveWeightData = async (date, itemId, weightData) => {
+  console.log('Saving weight data for item', itemId, 'on date', date);
   try {
-    const response = await fetch(`${apiUrl}/stock/save-weight-data`, {
-      method: 'PUT',
+    const response = await fetch(`${apiUrl}/stock/${date}/${itemId}/weights`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ date, itemId, weightData }),
+      body: JSON.stringify({ weightData }),
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Failed to save weight data');
     }
 
-    const result = await response.json();
-    console.log('Weight data saved successfully:', result);
+    return await response.json();
   } catch (error) {
     console.error('Error saving weight data:', error);
     throw error;
   }
 };
 
-export const deleteWeightData = async (date, itemId, weightData) => {
+// Delete weight data for an item
+export const deleteWeightData = async (date, itemId, weightIndex) => {
+  console.log('Deleting weight data for item', itemId, 'on date', date, 'index', weightIndex);
   try {
-    const response = await fetch(`${apiUrl}/stock/delete-weight-data`, {
+    const response = await fetch(`${apiUrl}/stock/${date}/${itemId}/weights/${weightIndex}`, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ date, itemId, weightData }),
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Failed to delete weight data');
     }
 
-    const result = await response.json();
-    console.log('Weight data deleted successfully:', result);
+    return await response.json();
   } catch (error) {
     console.error('Error deleting weight data:', error);
     throw error;
   }
 };
 
+// Update weight quantity for an item
 export const updateWeightQuantity = async (date, itemId, weightIndex, newQuantity) => {
-  console.log('Updating weight quantity:', { date, itemId, weightIndex, newQuantity });
+  console.log('Updating weight quantity for item', itemId, 'on date', date, 'index', weightIndex, 'to quantity', newQuantity);
   try {
-    const response = await fetch(`${apiUrl}/stock/update-weight-quantity`, {
+    const response = await fetch(`${apiUrl}/stock/${date}/${itemId}/weights/${weightIndex}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ date, itemId, weightIndex, newQuantity }),
+      body: JSON.stringify({ quantity: newQuantity }),
     });
 
     if (!response.ok) {
-      throw new Error('Network response was not ok');
+      throw new Error('Failed to update weight quantity');
     }
 
-    const result = await response.json();
-    console.log('Weight quantity updated successfully:', result);
+    return await response.json();
   } catch (error) {
     console.error('Error updating weight quantity:', error);
     throw error;
-  }
-};
-
-export const getItemStockLeft = async (date, id) => {
-  try {
-    const res = await fetch(`${apiUrl}/stock/get-item-stock?date=${date}&id=${id}`);
-    const data = await res.json();
-    return data;
-  } catch (error) {
-    console.error(error);
-    return { quantity: 0 };
   }
 };
