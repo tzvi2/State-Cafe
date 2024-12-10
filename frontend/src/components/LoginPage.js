@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuth, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import styles from '../components/styles/route styles/LoginPage.module.css'
 
 const LoginPage = () => {
   const navigate = useNavigate();
@@ -17,8 +18,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className={styles.page}>
+      <p>Sign in to peep this page👀</p>
       <button onClick={signInWithGoogle}>Sign in with Google</button>
     </div>
   );

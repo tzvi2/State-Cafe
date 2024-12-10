@@ -1,10 +1,12 @@
 import React from 'react';
+import styles from '../components/styles/route styles/UnauthorizedPage.module.css'
+
 
 const UnauthorizedPage = () => {
   return (
-    <div>
+    <div className={styles.page}>
       <h1>Unauthorized</h1>
-      <p>You do not have access to this page.</p>
+      <p>You're in the wrong neighborhood son😤</p>
     </div>
   );
 };
