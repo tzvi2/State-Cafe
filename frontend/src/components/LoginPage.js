@@ -19,8 +19,8 @@ const LoginPage = () => {
 
   return (
     <div className={styles.page}>
-      <p>Sign in to peep this page👀</p>
-      <button onClick={signInWithGoogle}>Sign in with Google</button>
+      <p className={styles.loginText}>Sign in to peep this page👀</p>
+      <button className={styles.signInButton} onClick={signInWithGoogle}>Sign in with Google</button>
     </div>
   );
 };
