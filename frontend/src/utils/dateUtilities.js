@@ -6,12 +6,24 @@ export function getCurrentDateString() {
   return `${year}-${month}-${day}`;
 }
 
-export const getESTDate = () => {
+export function getESTDate() {
   const now = new Date();
-  const utcDate = new Date(now.getTime() + now.getTimezoneOffset() * 60000);
-  const estDate = new Date(utcDate.getTime() - (5 * 60 * 60 * 1000));
-  return estDate;
-};
+
+  // Get the current time in EST
+  const estTime = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/New_York", // Set timezone to Eastern Time
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(now);
+
+  const year = estTime.find((part) => part.type === "year").value;
+  const month = estTime.find((part) => part.type === "month").value;
+  const day = estTime.find((part) => part.type === "day").value;
+
+  // Construct a new Date object representing the start of the day in EST
+  return new Date(`${year}-${month}-${day}T00:00:00-05:00`);
+}
 
 export const formatDateToYYYYMMDD = (date) => {
   const year = date.getFullYear();

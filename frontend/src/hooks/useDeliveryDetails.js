@@ -1,10 +1,14 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { getESTDate, formatDateToYYYYMMDD } from '../../src/utils/dateUtilities'; // Import utility functions if not already
 
 const DeliveryDetailsContext = createContext();
 
 export const useDeliveryDetails = () => useContext(DeliveryDetailsContext);
 
 export default function DeliverySlotProvider({ children }) {
+  const todayEST = getESTDate(); // Get current date in EST
+  const todayFormatted = formatDateToYYYYMMDD(todayEST); // Format as YYYY-MM-DD
+
   const [deliverySlot, setDeliverySlot] = useState(() => {
     const savedSlot = localStorage.getItem('deliverySlot');
     return savedSlot ? JSON.parse(savedSlot) : "";
@@ -17,7 +21,7 @@ export default function DeliverySlotProvider({ children }) {
 
   const [deliveryDate, setDeliveryDate] = useState(() => {
     const savedDate = localStorage.getItem('deliveryDate');
-    return savedDate || "";
+    return savedDate || todayFormatted; // Default to today if no saved date exists
   });
 
   const [phoneNumber, setPhoneNumber] = useState(() => {
@@ -34,41 +38,33 @@ export default function DeliverySlotProvider({ children }) {
   }, [phoneNumber]);
 
   useEffect(() => {
-    //console.log('number', phoneNumber)
-  }, [phoneNumber])
-
-  useEffect(() => {
     localStorage.setItem('deliverySlot', JSON.stringify(deliverySlot));
-    console.log('delivery slot: ', deliverySlot)
   }, [deliverySlot]);
 
   useEffect(() => {
     localStorage.setItem('deliveryDate', deliveryDate);
-    console.log('delivery date ', deliveryDate)
   }, [deliveryDate]);
 
   const clearDeliveryDetails = () => {
-    //console.log("clearing delivery details")
     setDeliverySlot("");
     setUnitNumber("");
-    setDeliveryDate("");
-    setPhoneNumber(""); // Clear phone number as well
+    setDeliveryDate(todayFormatted); // Reset to today when clearing
+    setPhoneNumber("");
     localStorage.removeItem('deliverySlot');
     localStorage.removeItem('unitNumber');
     localStorage.removeItem('deliveryDate');
-    localStorage.removeItem('phoneNumber'); // Don't forget to clear from localStorage
-};
-
+    localStorage.removeItem('phoneNumber');
+  };
 
   return (
-    <DeliveryDetailsContext.Provider 
-      value={{ 
-        deliverySlot, 
-        setDeliverySlot, 
-        unitNumber, 
+    <DeliveryDetailsContext.Provider
+      value={{
+        deliverySlot,
+        setDeliverySlot,
+        unitNumber,
         setUnitNumber,
-        deliveryDate, 
-        setDeliveryDate, 
+        deliveryDate,
+        setDeliveryDate,
         clearDeliveryDetails,
         phoneNumber,
         setPhoneNumber
