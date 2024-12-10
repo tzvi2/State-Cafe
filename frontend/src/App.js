@@ -48,8 +48,7 @@ function App() {
                 <Route path="confirmation" element={<OrderConfirmation />} />
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                {/* <Route path="/dashboard" element={<ProtectedRoute element={<DashboardLayout />} />}> */}
-                <Route path="/dashboard" element={<DashboardLayout />}>
+                <Route path="/dashboard" element={<ProtectedRoute element={<DashboardLayout />} />}>
                   <Route path="stock" element={<StockPage />} />
                   <Route path="hours" element={<HoursPage />} />
                   <Route path="menu" element={<MenuPage />} />

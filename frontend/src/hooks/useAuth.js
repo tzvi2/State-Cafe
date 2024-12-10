@@ -1,67 +1,44 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { auth } from '../firebaseConfig';
-import apiUrl from '../config';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth } from '../firebaseConfig'; // Firebase auth import
+import { onAuthStateChanged } from 'firebase/auth';
+import { checkUserPermissions } from '../api/authRequests'; // Example API request to check permissions
 
 const AuthContext = createContext();
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
-
+export const useAuth = () => useContext(AuthContext);
 
 export const AuthContextProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [isAllowed, setIsAllowed] = useState(null);
-
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged(async (user) => {
-  //     setCurrentUser(user);
-  //     if (user) {
-  //       try {
-  //         const response = await fetch(`${apiUrl}/check-email`, {
-  //           method: 'POST',
-  //           headers: {
-  //             'Content-Type': 'application/json',
-  //           },
-  //           body: JSON.stringify({ email: user.email }),
-  //         });
-
-  //         if (!response.ok) {
-  //           throw new Error('Failed to check email');
-  //         }
-
-  //         const data = await response.json();
-  //         console.log('Email check response:', data);
-  //         setIsAllowed(data.allowed);
-  //       } catch (error) {
-  //         console.error('Error checking email:', error);
-  //         setIsAllowed(null);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     } else {
-  //       setIsAllowed(null);
-  //       setLoading(false);
-  //     }
-  //   });
-
-  //   return unsubscribe;
-  // }, []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    //console.log('Auth state - currentUser:', currentUser);
-    //console.log('Auth state - isAllowed:', isAllowed);
-  }, [currentUser, isAllowed]);
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log('User logged in:', user);
+        setCurrentUser(user);
 
-  const value = {
-    currentUser,
-    isAllowed,
-    loading,
-  };
+        try {
+          const allowed = await checkUserPermissions(user.email);
+          setIsAllowed(allowed);
+        } catch (error) {
+          console.error('Error checking permissions:', error);
+          setIsAllowed(false);
+        }
+      } else {
+        console.log('No user logged in');
+        setCurrentUser(null);
+        setIsAllowed(null);
+      }
+
+      setLoading(false); // Ensure loading state transitions to false
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider value={{ currentUser, isAllowed, loading }}>
       {children}
     </AuthContext.Provider>
   );
