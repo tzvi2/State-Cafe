@@ -67,7 +67,16 @@ function DeliveryPage() {
     console.log('available slots', availableTimeSlots)
   }, [availableTimeSlots])
 
-  const handlePhoneNumberChange = (e) => setPhoneNumber(e.target.value);
+  const handlePhoneNumberChange = (e) => {
+    let input = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
+    if (input.length > 3 && input.length <= 6) {
+      input = input.replace(/(\d{3})(\d+)/, "$1-$2"); // Add dash after first 3 digits
+    } else if (input.length > 6) {
+      input = input.replace(/(\d{3})(\d{3})(\d+)/, "$1-$2-$3"); // Add dashes after first 3 and next 3 digits
+    }
+    setPhoneNumber(input);
+  };
+
 
   const handleSlotSelection = (e) => setDeliverySlot(e.target.value);
 
