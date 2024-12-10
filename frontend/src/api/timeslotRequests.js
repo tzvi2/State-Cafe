@@ -18,9 +18,8 @@ export const availableSlotsRemain = async () => {
 };
 
 // Book a time slot for delivery
-export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
-  console.log('Booking time slot:', { totalCookTime, date, time });
-
+export const bookTimeSlot = async (date, time, timeToCook) => {
+  console.log('sending book request')
   try {
     const response = await fetch(`${apiUrl}/hours/${date}/book-slot`, {
       method: 'POST',
@@ -29,17 +28,17 @@ export const bookTimeSlot = async ({ totalCookTime, date, time }) => {
       },
       body: JSON.stringify({
         time,
-        timeToCook: totalCookTime,
+        timeToCook,
       }),
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Response error:', errorText);
-      throw new Error('Failed to book time slot');
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to book the time slot');
     }
 
     const data = await response.json();
+    console.log('Time slot booked:', data);
     return data;
   } catch (error) {
     console.error('Error booking time slot:', error);

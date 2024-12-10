@@ -29,36 +29,34 @@ function DeliveryPage() {
       return;
     }
 
-    const url = `${apiUrl}/hours/${deliveryDate}/available-slots?timeToCook=${cart.totalCookTime}`;
+    const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
+    const url = `${apiUrl}/hours/${formattedDate}/available-slots?timeToCook=${cart.totalCookTime}`;
     console.log(`Fetching time slots from: ${url}, total cook time: ${cart.totalCookTime}`);
 
     try {
       const response = await fetch(url);
-      if (!response.ok) throw new Error('Failed to fetch available delivery slots');
+      if (!response.ok) throw new Error("Failed to fetch available delivery slots");
 
       const { available_slots: slots } = await response.json();
-      console.log('Raw time slots from backend:', slots);
-
       const formattedSlots = slots.map(slot => ({
         time: slot,
         displayTime: new Intl.DateTimeFormat([], {
-          hour: 'numeric',
-          minute: '2-digit',
+          hour: "numeric",
+          minute: "2-digit",
           hour12: true,
-          timeZone: 'UTC', // Ensure consistent timezone formatting
+          timeZone: "UTC",
         }).format(new Date(`1970-01-01T${slot}:00Z`)),
       }));
-
-      console.log('Formatted slots:', formattedSlots);
 
       setAvailableTimeSlots(formattedSlots);
       setDeliveryAvailable(formattedSlots.length > 0);
     } catch (error) {
-      console.error('Error fetching time slots:', error);
+      console.error("Error fetching time slots:", error);
       setAvailableTimeSlots([]);
       setDeliveryAvailable(false);
     }
   }, [deliveryDate, cart.totalCookTime]);
+
 
 
   useEffect(() => {

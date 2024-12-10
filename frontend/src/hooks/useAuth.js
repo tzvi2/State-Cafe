@@ -14,40 +14,40 @@ export const AuthContextProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAllowed, setIsAllowed] = useState(null);
 
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      setCurrentUser(user);
-      if (user) {
-        try {
-          const response = await fetch(`${apiUrl}/check-email`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: user.email }),
-          });
+  // useEffect(() => {
+  //   const unsubscribe = auth.onAuthStateChanged(async (user) => {
+  //     setCurrentUser(user);
+  //     if (user) {
+  //       try {
+  //         const response = await fetch(`${apiUrl}/check-email`, {
+  //           method: 'POST',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //           },
+  //           body: JSON.stringify({ email: user.email }),
+  //         });
 
-          if (!response.ok) {
-            throw new Error('Failed to check email');
-          }
+  //         if (!response.ok) {
+  //           throw new Error('Failed to check email');
+  //         }
 
-          const data = await response.json();
-          console.log('Email check response:', data);
-          setIsAllowed(data.allowed);
-        } catch (error) {
-          console.error('Error checking email:', error);
-          setIsAllowed(null);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setIsAllowed(null);
-        setLoading(false);
-      }
-    });
+  //         const data = await response.json();
+  //         console.log('Email check response:', data);
+  //         setIsAllowed(data.allowed);
+  //       } catch (error) {
+  //         console.error('Error checking email:', error);
+  //         setIsAllowed(null);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     } else {
+  //       setIsAllowed(null);
+  //       setLoading(false);
+  //     }
+  //   });
 
-    return unsubscribe;
-  }, []);
+  //   return unsubscribe;
+  // }, []);
 
   useEffect(() => {
     //console.log('Auth state - currentUser:', currentUser);

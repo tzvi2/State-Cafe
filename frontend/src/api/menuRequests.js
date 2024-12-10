@@ -94,7 +94,7 @@ export const addMenuItem = async (menuItem) => {
 
 export const updateMenuItemActiveStatus = async (itemId, isActive) => {
   try {
-    const response = await fetch(`${apiUrl}/edit-menu/update-status`, {
+    const response = await fetch(`${apiUrl}/menu/update-status`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

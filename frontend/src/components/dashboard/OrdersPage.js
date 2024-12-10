@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useOutletContext } from 'react-router-dom';
-import styles from '../styles/dashboard/OrdersPage.module.css';
-import { listenToOrdersForDate } from '../../api/orderRequests';
-import { formatPhoneNumber } from '../../utils/stringUtilities';
+import React, { useState, useEffect } from "react";
+import { useOutletContext } from "react-router-dom";
+import styles from "../styles/dashboard/OrdersPage.module.css";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db, Timestamp } from "../../firebaseConfig";
+import { formatPhoneNumber } from "../../utils/stringUtilities";
 
 function OrdersPage() {
   const [selectedDate] = useOutletContext();
@@ -12,32 +13,71 @@ function OrdersPage() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 760);
 
   function formatTime(isoString) {
-    if (!isoString) return '';
+    if (!isoString) return "";
 
     const date = new Date(isoString);
-    return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', hour12: true }).toLowerCase();
+    return date
+      .toLocaleTimeString([], { hour: "numeric", minute: "2-digit", hour12: true })
+      .toLowerCase();
   }
 
-  useEffect(() => {
-    if (!selectedDate) return;
-
-    setIsLoading(true);
-    setError(null);
-    const unsubscribe = listenToOrdersForDate(selectedDate, (fetchedOrders) => {
-      setOrders(fetchedOrders);
-      setIsLoading(false);
-    });
-
-    return () => unsubscribe();
-  }, [selectedDate]);
+  // useEffect(() => {
+  //   console.log('orders ', orders)
+  // }, [orders])
 
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 760);
     };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  useEffect(() => {
+    if (!selectedDate) return;
+
+    console.log("Selected date:", selectedDate);
+
+    // Parse selectedDate as a UTC date
+    const [year, month, day] = selectedDate.split("-").map(Number);
+    const startOfDay = new Date(Date.UTC(year, month - 1, day, 0, 0, 0)); // Use UTC
+    const endOfDay = new Date(Date.UTC(year, month - 1, day, 23, 59, 59, 999)); // Use UTC
+
+    console.log("Start of day (UTC):", startOfDay);
+    console.log("End of day (UTC):", endOfDay);
+
+    const ordersRef = collection(db, "orders");
+
+    setIsLoading(true);
+
+    const unsubscribe = onSnapshot(
+      ordersRef,
+      (snapshot) => {
+        const fetchedOrders = snapshot.docs
+          .map((doc) => {
+            const order = doc.data();
+            const dueDate = new Date(order.dueDate); // Convert dueDate string to Date
+            console.log("Order ID:", doc.id, "dueDate (UTC):", dueDate);
+            return { id: doc.id, ...order, dueDate };
+          })
+          .filter(
+            (order) => order.dueDate >= startOfDay && order.dueDate <= endOfDay
+          );
+
+        console.log("Filtered orders:", fetchedOrders);
+        setOrders(fetchedOrders);
+        setIsLoading(false);
+      },
+      (error) => {
+        console.error("Error fetching orders:", error);
+        setError("Failed to fetch orders. Please try again.");
+        setIsLoading(false);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [selectedDate]);
+
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -59,15 +99,15 @@ function OrdersPage() {
             <li className={styles.order} key={order.id || orderIndex}>
               <div className={styles.detailRow}>
                 <span>Unit</span>
-                <span>{order.deliveryAddress}</span>
+                <span>{order.customerDetails.unitNumber}</span>
               </div>
               <div className={styles.detailRow}>
                 <span>Delivery</span>
-                <span>{formatTime(order.deliverySlot)}</span>
+                <span>{formatTime(order.dueDate)}</span>
               </div>
               <div className={styles.detailRow}>
                 <span>Phone</span>
-                <span>{formatPhoneNumber(order.phoneNumber)}</span>
+                <span>{formatPhoneNumber(order.customerDetails.phoneNumber)}</span>
               </div>
               <div className={styles.detailRow}>
                 <span>Ordered</span>
@@ -79,11 +119,15 @@ function OrdersPage() {
                     <div className={styles.description}>
                       <p className={styles.title}>{item.title}</p>
                       <ul className={styles.options}>
-                        {item.options && item.options.map((option, optionIndex) => (
-                          <li className={styles.option} key={`${order.id || orderIndex}_${itemIndex}_${optionIndex}`}>
-                            + {option.title}
-                          </li>
-                        ))}
+                        {item.options &&
+                          item.options.map((option, optionIndex) => (
+                            <li
+                              className={styles.option}
+                              key={`${order.id || orderIndex}_${itemIndex}_${optionIndex}`}
+                            >
+                              + {option.title}
+                            </li>
+                          ))}
                       </ul>
                     </div>
                     <div className={styles.quantity}>
@@ -123,20 +167,24 @@ function OrdersPage() {
                             <span className={styles.qty}>{item.quantity}</span>
                           </p>
                           <ul className={styles.options}>
-                            {item.options && item.options.map((option, optionIndex) => (
-                              <li className={styles.option} key={`${order.id || orderIndex}_${itemIndex}_${optionIndex}`}>
-                                + {option.title}
-                              </li>
-                            ))}
+                            {item.options &&
+                              item.options.map((option, optionIndex) => (
+                                <li
+                                  className={styles.option}
+                                  key={`${order.id || orderIndex}_${itemIndex}_${optionIndex}`}
+                                >
+                                  + {option.title}
+                                </li>
+                              ))}
                           </ul>
                         </div>
                       </li>
                     ))}
                   </ul>
                 </td>
-                <td className={styles.topAlign}>{formatPhoneNumber(order.phoneNumber)}</td>
-                <td className={styles.topAlign}>{order.deliveryAddress}</td>
-                <td className={styles.topAlign}>{formatTime(order.deliverySlot)}</td>
+                <td className={styles.topAlign}>{formatPhoneNumber(order.customerDetails.phoneNumber)}</td>
+                <td className={styles.topAlign}>{order.customerDetails.unitNumber}</td>
+                <td className={styles.topAlign}>{formatTime(order.dueDate)}</td>
               </tr>
             ))}
           </tbody>

@@ -3,7 +3,7 @@ import styles from '../styles/food menu styles/RenderOptions.module.css';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 
 const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange, optionGroups }) => {
-  
+
   const handleCheckboxChange = (option, isChecked, groupTitle) => {
     const group = optionGroups.find(g => g.title === groupTitle);
     const selectedCount = selectedOptions.filter(opt => opt.group === groupTitle).length;
@@ -32,7 +32,7 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange, optionGr
                   checked={selectedOptions.some(selectedOption => selectedOption.title === option.title && selectedOption.group === group.title)}
                   onChange={(e) => handleCheckboxChange(option, e.target.checked, group.title)}
                 />
-                <label 
+                <label
                   className={styles.optionTitle}
                   htmlFor={`group-${groupIndex}-option-${optionIndex}`}>{option.title || option.weight}
                 </label>
@@ -45,8 +45,8 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange, optionGr
 
       {/* Render individual options */}
       <div className={styles.optionGroup}>
-      {menuItem.options && menuItem.options.map((option, optionIndex) => (
-        
+        {menuItem.options && menuItem.options.map((option, optionIndex) => (
+
           <div key={`individual-${optionIndex}`} className={styles.optionRow}>
             <div className={styles.checkbox_and_label}>
               <input
@@ -56,15 +56,15 @@ const RenderOptions = ({ menuItem, selectedOptions, handleOptionChange, optionGr
                 checked={selectedOptions.some(selectedOption => selectedOption.title === option.title && !selectedOption.group)}
                 onChange={(e) => handleOptionChange(option, e.target.checked)}
               />
-              <label 
+              <label
                 className={styles.optionTitle}
                 htmlFor={`individual-option-${optionIndex}`}>{option.title}
               </label>
             </div>
             <span className={styles.optionPrice}>+{centsToFormattedPrice(option.price)}</span>
           </div>
-        
-      ))}
+
+        ))}
       </div>
     </div>
   );

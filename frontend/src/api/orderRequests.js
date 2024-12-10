@@ -2,15 +2,15 @@ import apiUrl from '../config';
 import { collection, query, where, onSnapshot, Timestamp, doc } from 'firebase/firestore';
 import { db } from '../firebaseConfig';
 
-export const saveOrder = async (order) => {
-  console.log('saving order ', order)
+export const placeOrder = async (order) => {
+  console.log('Sending order to backend:', order); // Debugging
   try {
-    const response = await fetch(`${apiUrl}/api/orders`, {
+    const response = await fetch(`${apiUrl}/orders/place-order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(order),
+      body: JSON.stringify({ orderDetails: order }),
     });
 
     if (!response.ok) {
@@ -22,7 +22,8 @@ export const saveOrder = async (order) => {
     console.error('Error saving order:', error);
     throw error;
   }
-}
+};
+
 
 export const listenToOrdersForDate = (date, callback) => {
   const unsubscribe = db.collection('orders')
@@ -46,7 +47,7 @@ export const listenToOrdersForDate = (date, callback) => {
 
 export const getOrdersForDate = async (date) => {
   try {
-    const response = await fetch(`${apiUrl}/api/orders/get-orders-for-date?date=${date}`)
+    const response = await fetch(`${apiUrl}/orders/get-orders-for-date?date=${date}`)
 
     if (!response.ok) {
       throw new Error('error getting orders for date: ', date)
