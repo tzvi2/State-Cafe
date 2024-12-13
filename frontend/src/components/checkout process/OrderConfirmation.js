@@ -20,12 +20,44 @@ const OrderConfirmation = () => {
 
   const { clearCart } = useCart();
 
+  const getRequiredData = () => {
+    try {
+      const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
+      const deliveryDate = sessionStorage.getItem("deliveryDate");
+      const deliverySlot = sessionStorage.getItem("deliverySlot");
+      const totalPrice = Number(localStorage.getItem("totalPrice"));
+      const phoneNumber = sessionStorage.getItem("phoneNumber");
+      const unitNumber = sessionStorage.getItem("unitNumber");
+
+      if (!cartItems.length || !deliveryDate || !deliverySlot || !totalPrice || !phoneNumber || !unitNumber) {
+        throw new Error("Missing or invalid data from storage.");
+      }
+
+      const dueDate = calculateDueDate(deliveryDate, deliverySlot); // Combine date and slot
+
+      return { cartItems, dueDate, totalPrice, phoneNumber, unitNumber };
+    } catch (error) {
+      console.error("Error validating storage data:", error);
+      return null;
+    }
+  };
+
+
+  const calculateDueDate = (deliveryDate, deliverySlot) => {
+    const [hour, minute] = deliverySlot.split(":").map(Number);
+    const dueDate = new Date(deliveryDate);
+
+    // Set the delivery time in local time
+    dueDate.setHours(hour, minute, 0, 0);
+
+    return dueDate.toISOString(); // Return ISO format expected by the backend
+  };
+
+
   useEffect(() => {
     const fetchAndSaveOrder = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const clientSecret = urlParams.get("payment_intent_client_secret");
-
-      console.log("clientSecret from URL:", clientSecret);
 
       if (!clientSecret) {
         setMessage("No payment details found. Please contact support.");
@@ -35,14 +67,11 @@ const OrderConfirmation = () => {
 
       try {
         const paymentIntentId = clientSecret.split("_secret_")[0];
-        console.log("Extracted paymentIntentId:", paymentIntentId);
 
         // Fetch card details
         const response = await fetch(`${apiUrl}/payment/get-last-four`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ paymentIntentId }),
         });
 
@@ -51,75 +80,45 @@ const OrderConfirmation = () => {
         }
 
         const { lastFour, brand } = await response.json();
-        console.log("Card details fetched:", { lastFour, brand });
 
-        // Retrieve stored data
-        const cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
-        const dueDate = new Date(localStorage.getItem("dueDate"));
-        const totalPrice = Number(localStorage.getItem("totalPrice"));
-        const phoneNumber = localStorage.getItem("phoneNumber");
-        const unitNumber = localStorage.getItem("unitNumber");
-
-        if (!cartItems || !dueDate || !totalPrice || !phoneNumber || !unitNumber) {
-          throw new Error("Missing required data from local storage.");
+        // Validate and retrieve required data
+        const validatedData = getRequiredData();
+        if (!validatedData) {
+          throw new Error("Missing required data from storage.");
         }
 
-        // Calculate total cooking time
-        const timeToCook = cartItems.reduce(
-          (total, item) => total + (item.totalTimeToCook || 0),
-          0
-        );
+        const { cartItems, dueDate, totalPrice, phoneNumber, unitNumber } = validatedData;
 
-        const newOrderDetails = {
+        // Create order object
+        const orderDetails = {
           items: cartItems,
-          dueDate: dueDate.toISOString(),
-          orderedAt: new Date().toISOString(),
+          dueDate,
           totalPrice,
-          paymentDetails: {
-            cardBrand: brand || "unknown",
-            lastFour: lastFour || "N/A",
-            paymentIntentId,
-          },
-          customerDetails: {
-            phoneNumber,
-            unitNumber,
-          },
+          paymentDetails: { cardBrand: brand || "unknown", lastFour: lastFour || "N/A", paymentIntentId },
+          customerDetails: { phoneNumber, unitNumber },
         };
 
-        console.log("Saving order details:", newOrderDetails);
+        // Save order to backend
+        const saveOrderResponse = await placeOrder(orderDetails);
+        console.log("saveOrderResponse:", saveOrderResponse); // Debugging
 
-        // Save order to database
-        await placeOrder(newOrderDetails);
-
-        // Book the delivery slot
-        const date = dueDate.toISOString().split("T")[0]; // Extract UTC date
-        const time = dueDate.toISOString().split("T")[1].slice(0, 5); // Extract UTC time
-
-        console.log("Booking slot with:", { date, time, timeToCook });
-
-        const slotResponse = await fetch(`${apiUrl}/hours/${date}/book-slot`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            time,
-            timeToCook,
-          }),
-        });
-
-        if (!slotResponse.ok) {
-          throw new Error("Failed to book slot.");
+        // Access orderedAt from the correct path
+        const orderedAt = saveOrderResponse.savedOrder?.order?.orderedAt;
+        if (!orderedAt) {
+          throw new Error("orderedAt is missing from backend response.");
         }
 
-        console.log("Slot booked successfully.");
+        // Include the `orderedAt` from the backend response
+        setOrderDetails({
+          ...orderDetails,
+          orderedAt,
+        });
 
-        setOrderDetails(newOrderDetails);
-        setMessage("Order saved and slot booked successfully!");
+        setMessage("Order saved successfully!");
         clearCart();
       } catch (error) {
         console.error("Error saving order or booking slot:", error);
-        setMessage("Failed to save order or book slot. Please contact support.");
+        setMessage("Failed to save order. Please contact support.");
       } finally {
         setIsLoading(false);
       }
@@ -128,8 +127,14 @@ const OrderConfirmation = () => {
     fetchAndSaveOrder();
   }, []);
 
+
+
   if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (!orderDetails) {
+    return <div>{message}</div>;
   }
 
   return (

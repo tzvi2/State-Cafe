@@ -14,10 +14,10 @@ function WelcomeSlide() {
 
 	return (
 		<div className={styles.welcomeSlide}>
-			<p className={styles.header}>Welcome to State Cafe.</p> 
+			<p className={styles.header}>Welcome to State Cafe.</p>
 			{/* <img src={logo} className={styles.logo}></img> */}
-			<p className={styles.sub_header}>We deliver <strong>ready-to-eat kosher food</strong> in the Teaneck area.</p>
-			
+			<p className={styles.sub_header}>Based in One500, we deliver <strong>ready-to-eat kosher food</strong> in the Teaneck area.</p>
+
 			{/* <div className={styles.scrolling_steps_animation}>
 				{steps.map((step, index) => (
 					<div key={index}>

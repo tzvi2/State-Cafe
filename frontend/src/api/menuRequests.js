@@ -22,10 +22,11 @@ export const getMenuItems = async (category = '') => {
 }
 
 export const getActiveMenuItems = async () => {
-  console.log('getting active menu items')
   try {
+    console.log('getting menu items from url', apiUrl)
+
     const res = await fetch(`${apiUrl}/menu/active`)
-    //const res = await fetch('http://localhost:5001/state-cafe/us-central1/api/menu/active')
+    //const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/menu/active`)
 
     if (!res.ok) {
       throw new Error('Failed to fetch active menu items.')
@@ -119,8 +120,9 @@ export const updateMenuItemActiveStatus = async (itemId, isActive) => {
 
 
 export const updateMenuItem = async (menuItemDetails) => {
+  console.log('updating menu item. new details: ', menuItemDetails)
   try {
-    const response = await fetch(`${apiUrl}/edit-menu/update-item`, {
+    const response = await fetch(`${apiUrl}/menu/edit-menu/update-item`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

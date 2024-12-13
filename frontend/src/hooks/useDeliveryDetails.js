@@ -1,73 +1,66 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { getESTDate, formatDateToYYYYMMDD } from '../../src/utils/dateUtilities'; // Import utility functions if not already
+import React, { createContext, useState, useContext, useEffect, useMemo } from 'react';
+import { getESTDate, formatDateToYYYYMMDD } from '../../src/utils/dateUtilities';
 
 const DeliveryDetailsContext = createContext();
 
 export const useDeliveryDetails = () => useContext(DeliveryDetailsContext);
 
 export default function DeliverySlotProvider({ children }) {
-  const todayEST = getESTDate(); // Get current date in EST
-  const todayFormatted = formatDateToYYYYMMDD(todayEST); // Format as YYYY-MM-DD
+  const todayEST = useMemo(() => getESTDate(), []);
+  const todayFormatted = useMemo(() => formatDateToYYYYMMDD(todayEST), [todayEST]);
 
-  const [deliverySlot, setDeliverySlot] = useState(() => {
-    const savedSlot = localStorage.getItem('deliverySlot');
-    return savedSlot ? JSON.parse(savedSlot) : "";
-  });
+  // Retrieve data from sessionStorage or initialize defaults
+  const savedDate = sessionStorage.getItem('deliveryDate');
+  const initialDeliveryDate = useMemo(() => {
+    if (!savedDate) return todayFormatted; // Default to today's date if no saved date exists
+    if (new Date(savedDate) < new Date(todayFormatted)) return todayFormatted; // Reset to today if saved date is in the past
+    return savedDate; // Use saved date if valid
+  }, [savedDate, todayFormatted]);
 
-  const [unitNumber, setUnitNumber] = useState(() => {
-    const savedUnitNumber = localStorage.getItem('unitNumber');
-    return savedUnitNumber || "";
-  });
+  const [deliveryDate, setDeliveryDate] = useState(initialDeliveryDate);
+  const [deliverySlot, setDeliverySlot] = useState(() => sessionStorage.getItem('deliverySlot') || "");
+  const [unitNumber, setUnitNumber] = useState(() => sessionStorage.getItem('unitNumber') || "");
+  const [phoneNumber, setPhoneNumber] = useState(() => sessionStorage.getItem('phoneNumber') || "");
 
-  const [deliveryDate, setDeliveryDate] = useState(() => {
-    const savedDate = localStorage.getItem('deliveryDate');
-    return savedDate || todayFormatted; // Default to today if no saved date exists
-  });
-
-  const [phoneNumber, setPhoneNumber] = useState(() => {
-    const savedPhoneNumber = localStorage.getItem('phoneNumber');
-    return savedPhoneNumber || "";
-  });
+  // Persist state in sessionStorage
+  useEffect(() => {
+    console.log('deliveryDate', deliveryDate)
+    sessionStorage.setItem('deliveryDate', deliveryDate);
+  }, [deliveryDate]);
 
   useEffect(() => {
-    localStorage.setItem('unitNumber', unitNumber);
-  }, [unitNumber]);
-
-  useEffect(() => {
-    localStorage.setItem('phoneNumber', phoneNumber);
-  }, [phoneNumber]);
-
-  useEffect(() => {
-    localStorage.setItem('deliverySlot', JSON.stringify(deliverySlot));
+    sessionStorage.setItem('deliverySlot', deliverySlot);
+    console.log('deliverySlot ', deliverySlot)
   }, [deliverySlot]);
 
   useEffect(() => {
-    localStorage.setItem('deliveryDate', deliveryDate);
-  }, [deliveryDate]);
+    sessionStorage.setItem('unitNumber', unitNumber);
+  }, [unitNumber]);
+
+  useEffect(() => {
+    sessionStorage.setItem('phoneNumber', phoneNumber);
+  }, [phoneNumber]);
 
   const clearDeliveryDetails = () => {
     setDeliverySlot("");
     setUnitNumber("");
     setDeliveryDate(todayFormatted); // Reset to today when clearing
     setPhoneNumber("");
-    localStorage.removeItem('deliverySlot');
-    localStorage.removeItem('unitNumber');
-    localStorage.removeItem('deliveryDate');
-    localStorage.removeItem('phoneNumber');
+    sessionStorage.clear();
   };
 
   return (
     <DeliveryDetailsContext.Provider
       value={{
+        deliveryDate,
+        setDeliveryDate,
         deliverySlot,
         setDeliverySlot,
         unitNumber,
         setUnitNumber,
-        deliveryDate,
-        setDeliveryDate,
-        clearDeliveryDetails,
         phoneNumber,
-        setPhoneNumber
+        setPhoneNumber,
+        clearDeliveryDetails,
       }}>
       {children}
     </DeliveryDetailsContext.Provider>

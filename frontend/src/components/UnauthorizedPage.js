@@ -6,7 +6,7 @@ const UnauthorizedPage = () => {
   return (
     <div className={styles.page}>
       <h1>Unauthorized</h1>
-      <p>You're in the wrong neighborhood son😤</p>
+      <p className={styles.UnauthorizedPage}>You're in the wrong neighborhood son😤</p>
     </div>
   );
 };

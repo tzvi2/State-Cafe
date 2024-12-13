@@ -85,6 +85,7 @@ function DeliveryPage() {
   const handleSubmit = () => {
     let isValid = true;
 
+    // Validate apartment number
     if (!unitNumber || unitNumber.length !== 3 || unitNumber < 201 || unitNumber > 558) {
       setApartmentNumberError('Apartment number should be 3 digits between 201 and 558.');
       isValid = false;
@@ -92,6 +93,7 @@ function DeliveryPage() {
       setApartmentNumberError('');
     }
 
+    // Validate phone number
     const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
     if (!phoneNumber || !phonePattern.test(phoneNumber)) {
       setPhoneNumberError('Phone number should be in the format 123-456-7890.');
@@ -100,10 +102,19 @@ function DeliveryPage() {
       setPhoneNumberError('');
     }
 
-    if (isValid && deliverySlot && deliveryDate) {
-      navigate('/payment');
+    // Save to sessionStorage if valid
+    if (isValid) {
+      sessionStorage.setItem('phoneNumber', phoneNumber);
+      sessionStorage.setItem('unitNumber', unitNumber);
+
+      if (deliverySlot && deliveryDate) {
+        navigate('/payment');
+      } else {
+        console.warn('Missing delivery slot or date.');
+      }
     }
   };
+
 
   return (
     <div className={styles.deliveryPage}>

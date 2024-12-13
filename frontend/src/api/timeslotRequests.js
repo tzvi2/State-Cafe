@@ -152,3 +152,94 @@ export const getAvailableDeliverySlots = async (date, timeToCook) => {
     throw error;
   }
 };
+
+export const dayHasAvailableSlots = async (date) => {
+  try {
+    const response = await fetch(`${apiUrl}/hours/${date}/has-available-slots`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!response.ok) {
+      console.error('Error checking available slots:', response.statusText);
+      return false; // Default to false on error
+    }
+
+    const data = await response.json();
+    return data.available || false; // Return the 'available' field from the response
+  } catch (error) {
+    console.error('Error checking available slots:', error);
+    return false; // Default to false on exception
+  }
+};
+
+export const getOrderingWindow = async (date) => {
+  try {
+    const response = await fetch(`${apiUrl}/hours/${date}/get-ordering-window`);
+    if (!response.ok) {
+      console.error('Error fetching ordering window:', response.statusText);
+      return [];
+    }
+    const data = await response.json();
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching ordering window:', error);
+    return []; // Return an empty array if there's an error
+  }
+};
+
+export const addOrderingWindow = async (date, start, end) => {
+  try {
+    // First, check if an ordering window already exists
+    const existingOrderingWindow = await getOrderingWindow(date);
+    if (existingOrderingWindow.length > 0) {
+      return { message: 'An ordering window already exists for this date.' };
+    }
+
+    // Add the new ordering window
+    const response = await fetch(`${apiUrl}/hours/${date}/add-ordering-window`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ start, end }),
+    });
+
+    if (!response.ok) {
+      console.error('Error adding ordering window:', response.statusText);
+      return { error: 'Failed to add ordering window.' };
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error adding ordering window:', error);
+    return { error: 'Failed to add ordering window.' };
+  }
+};
+
+export const removeOrderingWindow = async (date, start, end) => {
+  try {
+    // First, check if an ordering window exists
+    const existingOrderingWindow = await getOrderingWindow(date);
+    if (existingOrderingWindow.length === 0) {
+      return { message: 'No ordering window exists for this date.' };
+    }
+
+    // Remove the specified ordering window
+    const response = await fetch(`${apiUrl}/hours/${date}/remove-ordering-window`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ start, end }),
+    });
+
+    if (!response.ok) {
+      console.error('Error removing ordering window:', response.statusText);
+      return { error: 'Failed to remove ordering window.' };
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error removing ordering window:', error);
+    return { error: 'Failed to remove ordering window.' };
+  }
+};

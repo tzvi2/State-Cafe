@@ -131,6 +131,7 @@ function MenuItemForm() {
       })),
     }));
 
+    console.log('new menu item', newMenuItem)
     try {
       if (itemId) {
         // Update existing menu item

@@ -33,20 +33,20 @@ function StepsSlide() {
             <p className={styles.header}>How it works</p>
             <div className={styles.steps} ref={stepsRef}>
                 <div className={`${styles.step} ${isVisible ? styles.step1 : ''}`}>
-                    <CalendarCheck2 className={styles.icon}/>
-                    <p>Select a delivery date</p>
+                    <CalendarCheck2 className={styles.icon} />
+                    <p>Select delivery date.</p>
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step2 : ''}`}>
-                    <ShoppingCart className={styles.icon}/>
-                    <p>Choose your items and checkout</p>
+                    <ShoppingCart className={styles.icon} />
+                    <p>Choose your items and checkout.</p>
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step3 : ''}`}>
-                    <CookingPot className={styles.icon}/>
-                    <p>We cook your food</p>
+                    <CookingPot className={styles.icon} />
+                    <p>We cook your food fresh.</p>
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step4 : ''}`}>
-                    <DoorClosed className={styles.icon}/>
-                    <p>Your food is delivered</p>
+                    <DoorClosed className={styles.icon} />
+                    <p>Food is delivered to your door.</p>
                 </div>
             </div>
         </div>

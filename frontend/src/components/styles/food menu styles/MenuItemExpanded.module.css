@@ -92,7 +92,8 @@ img {
   padding-top: .75rem;
 }
 
-.footer select, .footer button {
+.footer select,
+.footer button {
   font-size: 5.5vw;
   border-radius: 10px;
   background: #ffffff;
@@ -122,11 +123,23 @@ img {
 
 .footer .addToCart.outOfStock {
   color: red;
-	cursor: default;
+  cursor: default;
+  /* Prevent cursor change */
 }
 
 .footer .addToCart.outOfStock:hover {
   box-shadow: none;
+  /* Prevent hover shadow */
+}
+
+.footer .addToCart[disabled] {
+  cursor: not-allowed;
+  /* Show the 'not allowed' cursor for disabled buttons */
+}
+
+.footer .addToCart[disabled]:hover {
+  box-shadow: none;
+  /* Disable shadow effect on hover for disabled buttons */
 }
 
 .checkoutButton {
@@ -147,7 +160,11 @@ img {
 }
 
 @media (min-width: 1024px) {
-  .title, .description, .checkbox_and_label label, .price {
+
+  .title,
+  .description,
+  .checkbox_and_label label,
+  .price {
     font-size: 1.25rem;
   }
 
@@ -163,16 +180,14 @@ img {
   .title {
     margin: .5rem;
   }
-  
+
   img {
     height: 12rem;
     width: 12rem;
     margin: 0;
   }
 
-  .optionsList {
-
-  }
+  .optionsList {}
 
   .optionRow {
     margin: .5rem;
@@ -189,7 +204,8 @@ img {
     width: 15%;
   }
 
-  .footer select, .footer button {
+  .footer select,
+  .footer button {
     font-size: 1.5rem;
     margin: .5rem;
   }
