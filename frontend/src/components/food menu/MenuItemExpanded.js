@@ -8,6 +8,7 @@ import { getMenuItemByItemId } from '../../api/menuRequests';
 import { getStockForDate } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
+import { useOrderContext } from '../../contexts/OrderContext';
 
 const MenuItemExpanded = () => {
   const { itemId } = useParams();
@@ -18,6 +19,7 @@ const MenuItemExpanded = () => {
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [quantityLeft, setQuantityLeft] = useState(0);
+  const { inOrderingWindow } = useOrderContext()
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Cart",
@@ -190,7 +192,7 @@ const MenuItemExpanded = () => {
           )}
           <button
             className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 ? styles.outOfStock : ''}`}
-            disabled={buttonLocked || availableQuantity === 0}
+            disabled={buttonLocked || availableQuantity === 0 || !inOrderingWindow}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>

@@ -15,7 +15,6 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log('User logged in:', user);
         setCurrentUser(user);
 
         try {
@@ -26,7 +25,6 @@ export const AuthContextProvider = ({ children }) => {
           setIsAllowed(false);
         }
       } else {
-        console.log('No user logged in');
         setCurrentUser(null);
         setIsAllowed(null);
       }

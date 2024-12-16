@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { dayHasAvailableSlots, getOrderingWindow } from '../api/timeslotRequests';
 import { getStockForDate } from '../api/stockRequests';
-import { getESTDate, formatDateToYYYYMMDD } from '../utils/dateUtilities'; // Ensure correct import
+import { getESTDate, formatDateToYYYYMMDD } from '../utils/dateUtilities';
 import { useDeliveryDetails } from '../hooks/useDeliveryDetails';
 
 const OrderContext = createContext();
@@ -11,57 +11,71 @@ export const useOrderContext = () => useContext(OrderContext);
 export const OrderProvider = ({ children }) => {
 	const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
 	const [acceptingOrders, setAcceptingOrders] = useState(true);
+	const [stockAvailable, setStockAvailable] = useState(false);
+	const [slotsAvailable, setSlotsAvailable] = useState(false);
+	const [inOrderingWindow, setInOrderingWindow] = useState(false);
+	const [orderingWindow, setOrderingWindow] = useState(null);
 
 	useEffect(() => {
-		// Set a default delivery date if not already set
 		if (!deliveryDate) {
 			const todayFormatted = formatDateToYYYYMMDD(getESTDate());
-			console.log('Setting default delivery date:', todayFormatted);
-			setDeliveryDate(todayFormatted); // Set default delivery date
-			return; // Exit early until deliveryDate is updated
+			setDeliveryDate(todayFormatted);
+			return;
 		}
 
 		const checkAcceptingOrders = async () => {
-			console.log('Determining acceptance of orders...');
 			try {
+				// Fetch ordering window
+				const window = await getOrderingWindow(deliveryDate);
+				setOrderingWindow(window);
+
+				// Fetch stock and slots
 				const stockData = await getStockForDate(deliveryDate);
-				const stockAvailable = Object.values(stockData).some(item => item.quantity > 0);
-				console.log('Stock available:', stockAvailable);
+				const isStockAvailable = Object.values(stockData).some(item => item.quantity > 0);
+				setStockAvailable(isStockAvailable);
+				console.log('stock available ', isStockAvailable)
 
-				const slotsAvailable = await dayHasAvailableSlots(deliveryDate);
-				console.log('Slots available:', slotsAvailable);
+				const isSlotsAvailable = await dayHasAvailableSlots(deliveryDate);
+				setSlotsAvailable(isSlotsAvailable);
 
-				const orderingWindow = await getOrderingWindow(deliveryDate);
-				console.log('ordering window:', orderingWindow);
+				console.log('slots available ', slotsAvailable)
 
-				// Get the current time in EST in HH:mm format
+				// Check current time within ordering window
 				const nowEST = new Date().toLocaleString('en-US', { timeZone: 'America/New_York' });
 				const currentTime = new Date(nowEST);
-				const nowTimeString = currentTime.toTimeString().split(' ')[0].substring(0, 5); // "HH:mm"
+				const nowTimeString = currentTime.toTimeString().split(' ')[0].substring(0, 5);
 
-				console.log('Current EST time:', nowTimeString);
-
-				// Check if the current time is within any ordering window
-				const withinOrderingWindow = orderingWindow.some(({ start, end }) => {
+				const isInOrderingWindow = window.some(({ start, end }) => {
 					return nowTimeString >= start && nowTimeString <= end;
 				});
+				setInOrderingWindow(isInOrderingWindow);
 
-				console.log('Within ordering window:', withinOrderingWindow);
+				console.log('currently in ordering window ', isInOrderingWindow)
 
-				setAcceptingOrders(stockAvailable && slotsAvailable && withinOrderingWindow);
+				// Update general acceptance status
+				setAcceptingOrders(isStockAvailable && isSlotsAvailable && isInOrderingWindow);
 			} catch (error) {
 				console.error('Error checking acceptance of orders:', error);
+				setStockAvailable(false);
+				setSlotsAvailable(false);
+				setInOrderingWindow(false);
 				setAcceptingOrders(false);
 			}
 		};
 
-
-
 		checkAcceptingOrders();
-	}, [deliveryDate]); // Only depend on deliveryDate
+	}, [deliveryDate]);
 
 	return (
-		<OrderContext.Provider value={{ acceptingOrders }}>
+		<OrderContext.Provider
+			value={{
+				acceptingOrders,
+				stockAvailable,
+				slotsAvailable,
+				inOrderingWindow,
+				orderingWindow,
+			}}
+		>
 			{children}
 		</OrderContext.Provider>
 	);

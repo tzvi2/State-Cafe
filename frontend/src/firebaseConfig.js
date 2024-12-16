@@ -21,11 +21,5 @@ const db = getFirestore(app);
 const auth = getAuth(app)
 
 setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("Persistence set to LOCAL");
-  })
-  .catch((error) => {
-    console.error("Error setting persistence: ", error);
-  });
 
 export { db, auth, Timestamp }

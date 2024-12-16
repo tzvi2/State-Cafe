@@ -19,7 +19,7 @@ export const availableSlotsRemain = async () => {
 
 // Book a time slot for delivery
 export const bookTimeSlot = async (date, time, timeToCook) => {
-  console.log('sending book request')
+  console.log('sending book request ', date, time, timeToCook)
   try {
     const response = await fetch(`${apiUrl}/hours/${date}/book-slot`, {
       method: 'POST',
@@ -241,5 +241,29 @@ export const removeOrderingWindow = async (date, start, end) => {
   } catch (error) {
     console.error('Error removing ordering window:', error);
     return { error: 'Failed to remove ordering window.' };
+  }
+};
+
+export const validateTimeSlot = async (deliveryDate, deliverySlot, totalCookTime) => {
+  try {
+    const response = await fetch(
+      `${apiUrl}/hours/${deliveryDate}/${deliverySlot}/${totalCookTime}/slot-is-available`
+    );
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Failed to validate the time slot.");
+    }
+
+    const { message } = await response.json();
+    console.log("Time slot validation:", message);
+
+    return { success: true, message };
+  } catch (error) {
+    console.error("Error validating time slot:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to validate the selected time slot.",
+    };
   }
 };

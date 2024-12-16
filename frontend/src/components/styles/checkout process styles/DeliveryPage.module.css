@@ -36,17 +36,26 @@
 .error {
 	color: red;
 	margin: 0;
-	text-align: end;
 	width: 50%;
 }
 
-.deliveryPage select, .deliveryPage button, .flexRow label, .flexRow input, .flexRow button {
+.slotError {
+	color: red;
+}
+
+.deliveryPage select,
+.deliveryPage button,
+.flexRow label,
+.flexRow input,
+.flexRow button {
 	font-size: 1.2rem;
 	border-radius: 5px;
 	box-sizing: border-box;
 }
 
-.flexRow label, .flexRow input, .flexRow button {
+.flexRow label,
+.flexRow input,
+.flexRow button {
 	width: 48%;
 }
 
@@ -79,6 +88,10 @@
 	align-items: center;
 	padding: .5rem;
 	height: 2.5rem;
+	width: 100%;
+	font-size: 1.2rem;
+	border-radius: 5px;
+	box-sizing: border-box;
 }
 
 .wideBtn:hover {
@@ -96,6 +109,7 @@
 	box-shadow: 1px 1px 3px rgba(96, 95, 95, 0.089);
 
 }
+
 /* 
 .morningHours {
 	color: #258faf;
@@ -111,6 +125,4 @@
 	}
 }
 
-@media (min-width: 1024px) {
-	
-}
+@media (min-width: 1024px) {}

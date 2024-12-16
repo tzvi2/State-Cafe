@@ -30,7 +30,7 @@ export default function DeliverySlotProvider({ children }) {
 
   useEffect(() => {
     sessionStorage.setItem('deliverySlot', deliverySlot);
-    console.log('deliverySlot ', deliverySlot)
+    //console.log('deliverySlot ', deliverySlot)
   }, [deliverySlot]);
 
   useEffect(() => {

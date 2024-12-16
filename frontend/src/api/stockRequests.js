@@ -2,7 +2,7 @@ import apiUrl from '../config';
 
 // Retrieve all stock data for a specific date
 export const getStockForDate = async (date) => {
-  console.log('Fetching stock for', date);
+  //console.log('Fetching stock for', date);
   try {
     const res = await fetch(`${apiUrl}/stock/${date}`);
     if (!res.ok) {

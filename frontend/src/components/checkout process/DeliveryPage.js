@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useCart } from '../../hooks/useCart';
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
 import apiUrl from '../../config';
+import AvailableTimeslots from './AvailableTimeslots';
 
 function DeliveryPage() {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
@@ -22,50 +23,50 @@ function DeliveryPage() {
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const navigate = useNavigate();
 
-  const fetchTimeSlots = useCallback(async () => {
-    if (!deliveryDate || cart.totalCookTime <= 0) {
-      setAvailableTimeSlots([]);
-      setDeliveryAvailable(false);
-      return;
-    }
+  useEffect(() => {
+    // Function to fetch available delivery slots
+    const fetchTimeSlots = async () => {
+      if (!deliveryDate || cart.totalCookTime <= 0) {
+        setAvailableTimeSlots([]);
+        setDeliveryAvailable(false);
+        return;
+      }
 
-    const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
-    const url = `${apiUrl}/hours/${formattedDate}/available-slots?timeToCook=${cart.totalCookTime}`;
-    console.log(`Fetching time slots from: ${url}, total cook time: ${cart.totalCookTime}`);
+      const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
+      const url = `${apiUrl}/hours/${formattedDate}/available-slots?timeToCook=${cart.totalCookTime}`;
+      console.log(`Fetching time slots from: ${url}, total cook time: ${cart.totalCookTime}`);
 
-    try {
-      const response = await fetch(url);
-      if (!response.ok) throw new Error("Failed to fetch available delivery slots");
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Failed to fetch available delivery slots");
 
-      const { available_slots: slots } = await response.json();
-      const formattedSlots = slots.map(slot => ({
-        time: slot,
-        displayTime: new Intl.DateTimeFormat([], {
-          hour: "numeric",
-          minute: "2-digit",
-          hour12: true,
-          timeZone: "UTC",
-        }).format(new Date(`1970-01-01T${slot}:00Z`)),
-      }));
+        const { available_slots: slots } = await response.json();
+        const formattedSlots = slots.map(slot => ({
+          time: slot,
+          displayTime: new Intl.DateTimeFormat([], {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+            timeZone: "UTC",
+          }).format(new Date(`1970-01-01T${slot}:00Z`)),
+        }));
 
-      setAvailableTimeSlots(formattedSlots);
-      setDeliveryAvailable(formattedSlots.length > 0);
-    } catch (error) {
-      console.error("Error fetching time slots:", error);
-      setAvailableTimeSlots([]);
-      setDeliveryAvailable(false);
-    }
+        setAvailableTimeSlots(formattedSlots);
+        setDeliveryAvailable(formattedSlots.length > 0);
+      } catch (error) {
+        console.error("Error fetching time slots:", error);
+        setAvailableTimeSlots([]);
+        setDeliveryAvailable(false);
+      }
+    };
+
+    // Call fetchTimeSlots whenever deliveryDate or cart.totalCookTime changes
+    fetchTimeSlots();
   }, [deliveryDate, cart.totalCookTime]);
 
-
-
   useEffect(() => {
-    fetchTimeSlots();
-  }, [fetchTimeSlots]);
-
-  useEffect(() => {
-    console.log('available slots', availableTimeSlots)
-  }, [availableTimeSlots])
+    console.log('available slots', availableTimeSlots);
+  }, [availableTimeSlots]);
 
   const handlePhoneNumberChange = (e) => {
     let input = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
@@ -77,12 +78,12 @@ function DeliveryPage() {
     setPhoneNumber(input);
   };
 
-
   const handleSlotSelection = (e) => setDeliverySlot(e.target.value);
 
   const handleApartmentNumberChange = (e) => setUnitNumber(e.target.value);
 
   const handleSubmit = () => {
+    console.log('delivery slot', deliverySlot);
     let isValid = true;
 
     // Validate apartment number
@@ -114,7 +115,6 @@ function DeliveryPage() {
       }
     }
   };
-
 
   return (
     <div className={styles.deliveryPage}>
@@ -152,27 +152,7 @@ function DeliveryPage() {
 
       {deliveryDate && (
         <>
-          {deliveryAvailable ? (
-            <select
-              className={styles.wideBtn}
-              value={deliverySlot}
-              onChange={handleSlotSelection}
-            >
-              <option value="">Select a delivery time</option>
-              {availableTimeSlots.map((slot) => (
-                <option
-                  key={slot.time}
-                  value={slot.time}
-                  className={slot.displayTime.endsWith('AM') ? styles.morningHours : styles.eveningHours}
-                >
-                  {slot.displayTime}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <div style={{ textAlign: 'center' }}>No delivery slots available for the selected date</div>
-          )}
-
+          <AvailableTimeslots />
           <button
             className={styles.wideBtn}
             onClick={handleSubmit}

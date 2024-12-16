@@ -57,14 +57,21 @@ function OrdersPage() {
           .map((doc) => {
             const order = doc.data();
             const dueDate = new Date(order.dueDate); // Convert dueDate string to Date
-            console.log("Order ID:", doc.id, "dueDate (UTC):", dueDate);
-            return { id: doc.id, ...order, dueDate };
+            const orderedAt = new Date(order.orderedAt); // Convert orderedAt string to Date
+            console.log("Order ID:", doc.id, "dueDate (UTC):", dueDate, "orderedAt (UTC):", orderedAt);
+            return { id: doc.id, ...order, dueDate, orderedAt };
           })
           .filter(
             (order) => order.dueDate >= startOfDay && order.dueDate <= endOfDay
-          );
+          )
+          .sort((a, b) => {
+            if (a.dueDate.getTime() !== b.dueDate.getTime()) {
+              return a.dueDate - b.dueDate; // Primary sort by earliest dueDate
+            }
+            return a.orderedAt - b.orderedAt; // Secondary sort by earliest orderedAt
+          });
 
-        console.log("Filtered orders:", fetchedOrders);
+        console.log("Filtered and sorted orders:", fetchedOrders);
         setOrders(fetchedOrders);
         setIsLoading(false);
       },
@@ -77,7 +84,6 @@ function OrdersPage() {
 
     return () => unsubscribe();
   }, [selectedDate]);
-
 
   if (isLoading) {
     return <div>Loading...</div>;

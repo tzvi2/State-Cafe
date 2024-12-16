@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import styles from "../styles/checkout process styles/OrderConfirmation.module.css";
 import { placeOrder } from "../../api/orderRequests";
+import { bookTimeSlot } from '../../api/timeslotRequests'
 import apiUrl from "../../config";
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
 import { formatIsoToTime } from "../../utils/timeUtilities";
 import { useCart } from "../../hooks/useCart";
+import { useDeliveryDetails } from "../../hooks/useDeliveryDetails";
 
 const OrderDetailsRow = ({ label, value, isLoading }) => (
   <div className={styles.orderDetailsRow}>
@@ -18,7 +20,8 @@ const OrderConfirmation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [message, setMessage] = useState("");
 
-  const { clearCart } = useCart();
+  const { clearCart, cart } = useCart();
+  const { deliverySlot } = useDeliveryDetails()
 
   const getRequiredData = () => {
     try {
@@ -41,7 +44,6 @@ const OrderConfirmation = () => {
       return null;
     }
   };
-
 
   const calculateDueDate = (deliveryDate, deliverySlot) => {
     const [hour, minute] = deliverySlot.split(":").map(Number);
@@ -89,7 +91,11 @@ const OrderConfirmation = () => {
 
         const { cartItems, dueDate, totalPrice, phoneNumber, unitNumber } = validatedData;
 
-        // Create order object
+        // Extract date and time from dueDate
+        const deliveryDate = dueDate.split("T")[0];
+        const deliveryTime = dueDate.split("T")[1].slice(0, 5);
+
+        // Save order to backend
         const orderDetails = {
           items: cartItems,
           dueDate,
@@ -98,17 +104,17 @@ const OrderConfirmation = () => {
           customerDetails: { phoneNumber, unitNumber },
         };
 
-        // Save order to backend
         const saveOrderResponse = await placeOrder(orderDetails);
-        console.log("saveOrderResponse:", saveOrderResponse); // Debugging
+        console.log("saveOrderResponse:", saveOrderResponse);
 
-        // Access orderedAt from the correct path
+        const bookedTimeslotResponse = await bookTimeSlot(deliveryDate, deliverySlot, cart.totalCookTime);
+        console.log("Booked timeslot response:", bookedTimeslotResponse);
+
         const orderedAt = saveOrderResponse.savedOrder?.order?.orderedAt;
         if (!orderedAt) {
           throw new Error("orderedAt is missing from backend response.");
         }
 
-        // Include the `orderedAt` from the backend response
         setOrderDetails({
           ...orderDetails,
           orderedAt,

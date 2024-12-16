@@ -23,7 +23,6 @@ export const getMenuItems = async (category = '') => {
 
 export const getActiveMenuItems = async () => {
   try {
-    console.log('getting menu items from url', apiUrl)
 
     const res = await fetch(`${apiUrl}/menu/active`)
     //const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/menu/active`)
@@ -33,7 +32,6 @@ export const getActiveMenuItems = async () => {
     }
 
     const data = res.json()
-    console.log('data: ', data)
 
     return data
 
