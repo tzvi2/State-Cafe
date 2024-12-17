@@ -85,10 +85,10 @@ const MenuItemExpanded = () => {
       menuItem.optionGroups.forEach((group) => {
         const selectedInGroup = selectedOptions.filter((option) => option.group === group.title);
         if (selectedInGroup.length < group.minSelection) {
-          validationErrors.push(`Please select at least ${group.minSelection} option(s) for the group "${group.title}".`);
+          validationErrors.push(`Please select at least ${group.minSelection} option(s) for "${group.title}".`);
         }
         if (selectedInGroup.length > group.maxSelection) {
-          validationErrors.push(`Please select no more than ${group.maxSelection} option(s) for the group "${group.title}".`);
+          validationErrors.push(`Please select no more than ${group.maxSelection} option(s) for "${group.title}".`);
         }
       });
     }
@@ -153,7 +153,7 @@ const MenuItemExpanded = () => {
           amount: centsToFormattedPrice(totalItemPrice),
         });
         setButtonLocked(false);
-      }, 2000);
+      }, 1600);
     }
   };
 
