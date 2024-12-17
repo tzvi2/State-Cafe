@@ -47,14 +47,9 @@ const OrderConfirmation = () => {
 
   const calculateDueDate = (deliveryDate, deliverySlot) => {
     const [hour, minute] = deliverySlot.split(":").map(Number);
-    const dueDate = new Date(deliveryDate);
-
-    // Set the delivery time in local time
-    dueDate.setHours(hour, minute, 0, 0);
-
-    return dueDate.toISOString(); // Return ISO format expected by the backend
+    const dueDate = new Date(`${deliveryDate}T${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:00Z`);
+    return dueDate.toISOString();
   };
-
 
   useEffect(() => {
     const fetchAndSaveOrder = async () => {
