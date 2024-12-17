@@ -107,6 +107,7 @@ const MenuItemExpanded = () => {
 
   useEffect(() => {
     updateButtonContent();
+    //console.log('selected options: ', selectedOptions)
   }, [selectedOptions, quantity, updateButtonContent]);
 
   const handleAddToCart = async () => {
@@ -118,26 +119,34 @@ const MenuItemExpanded = () => {
       return;
     }
 
-    if (quantity > quantityLeft) {
-      const userConfirmed = window.confirm(`Only ${quantityLeft} left in stock. Would you like to add the remaining ${quantityLeft} to your cart?`);
-      if (!userConfirmed) return;
-      setQuantity(quantityLeft);
-    }
+    const userConfirmed = quantity > quantityLeft && window.confirm(
+      `Only ${quantityLeft} left in stock. Would you like to add the remaining ${quantityLeft} to your cart?`
+    );
+    if (!userConfirmed && quantity > quantityLeft) return;
+    setQuantity(Math.min(quantity, quantityLeft));
 
     setButtonLocked(true);
 
-    const wasAdded = addToCart({
-      ...menuItem,
-      options: selectedOptions,
-      quantity: Math.min(quantity, quantityLeft),
-      total: totalItemPrice,
-    });
+    const flattenedOptions = selectedOptions.map((option) => ({
+      title: option.title,
+      price: option.price || 0,
+      timeToCook: option.timeToCook || 0,
+    }));
+
+    const cartItem = {
+      id: menuItem.id,
+      title: menuItem.title,
+      img: menuItem.img,
+      basePrice: menuItem.price,
+      baseTimeToCook: menuItem.timeToCook,
+      quantity,
+      options: flattenedOptions,
+    };
+
+    const wasAdded = addToCart(cartItem);
 
     if (wasAdded) {
-      timeoutId1Ref.current = setTimeout(() => {
-        setButtonContent({ text: "Added to cart", amount: "" });
-      }, 100);
-
+      timeoutId1Ref.current = setTimeout(() => setButtonContent({ text: "Added to cart", amount: "" }), 100);
       timeoutId2Ref.current = setTimeout(() => {
         setButtonContent({
           text: "Add to Cart ",
@@ -147,6 +156,8 @@ const MenuItemExpanded = () => {
       }, 2000);
     }
   };
+
+
 
   useEffect(() => {
     return () => {

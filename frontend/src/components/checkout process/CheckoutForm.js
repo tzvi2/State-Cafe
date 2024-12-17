@@ -18,10 +18,11 @@ export default function CheckoutForm() {
   const { deliveryDate, deliverySlot, setDeliverySlot } = useDeliveryDetails();
 
   const [message, setMessage] = useState("");
-  const [slotMessage, setSlotMessage] = useState("")
+  const [slotMessage, setSlotMessage] = useState("");
   const [formLoading, setFormLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [showTimeslotError, setShowTimeslotError] = useState(false);
+  const [showTimeslots, setShowTimeslots] = useState(false); // New state
 
   const handleSlotValidation = async () => {
     try {
@@ -36,6 +37,7 @@ export default function CheckoutForm() {
           "Your selected delivery time is no longer available. Please select a new delivery time."
         );
         setShowTimeslotError(true);
+        setShowTimeslots(true); // Keep the component visible
         return false;
       }
 
@@ -49,8 +51,9 @@ export default function CheckoutForm() {
 
   const handleNewTimeslotSelection = (slot) => {
     setDeliverySlot(slot); // Update the selected delivery slot
-    setShowTimeslotError(false); // Hide error message
     setSlotMessage(""); // Clear the message
+    setShowTimeslotError(false); // Clear error
+    setShowTimeslots(true); // Keep the component visible
   };
 
   const handleSubmit = async (event) => {
@@ -133,12 +136,13 @@ export default function CheckoutForm() {
         onSubmit={handleSubmit}
       >
         <PaymentElement className={styles.stripeElement} />
-        {showTimeslotError && (
+        {(showTimeslotError || showTimeslots) && (
           <AvailableTimeslots
             onSlotChange={handleNewTimeslotSelection}
             showError={showTimeslotError}
           />
         )}
+
         {!formLoading && (
           <button
             className={styles.payButton}

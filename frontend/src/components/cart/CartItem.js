@@ -14,14 +14,29 @@ function CartItem({ item }) {
   useEffect(() => {
     const fetchStock = async () => {
       if (deliveryDate) {
-        const stockData = await getItemStockLeft(deliveryDate, item.title);
-        const stockLeft = stockData.quantity;
-        const currentQuantityInCart = cart.items
-          .filter(cartItem => cartItem.title === item.title)
-          .reduce((total, cartItem) => total + cartItem.quantity, 0);
-        setMaxQuantity(stockLeft - currentQuantityInCart + item.quantity);
+        try {
+          console.log(`Fetching stock for ${item.title} on ${deliveryDate}`);
+          const stockData = await getItemStockLeft(deliveryDate, item.title);
+
+          if (!stockData || typeof stockData.quantity === 'undefined') {
+            console.warn(`Stock data is invalid for ${item.title}:`, stockData);
+            setMaxQuantity(0); // Set to zero if stock is not available
+            return;
+          }
+
+          const stockLeft = stockData.quantity;
+          const currentQuantityInCart = cart.items
+            .filter(cartItem => cartItem.title === item.title)
+            .reduce((total, cartItem) => total + cartItem.quantity, 0);
+
+          setMaxQuantity(Math.max(stockLeft - currentQuantityInCart + item.quantity, 0));
+        } catch (error) {
+          console.error(`Error fetching stock for ${item.title}:`, error);
+          setMaxQuantity(0); // Set to zero on error
+        }
       }
     };
+
 
     fetchStock();
   }, [deliveryDate, item.id, cart.items, item.title, item.quantity]);
@@ -63,7 +78,7 @@ function CartItem({ item }) {
       </div>
       <div className={styles.col3}>
         <Trash2 className={styles.delete} onClick={handleDeleteItem} />
-        <p className={styles.itemPrice}>{centsToFormattedPrice(item.total)}</p>
+        <p className={styles.itemPrice}>{centsToFormattedPrice(item.totalPrice)}</p>
       </div>
     </div>
   );

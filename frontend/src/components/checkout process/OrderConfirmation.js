@@ -4,7 +4,7 @@ import { placeOrder } from "../../api/orderRequests";
 import { bookTimeSlot } from '../../api/timeslotRequests'
 import apiUrl from "../../config";
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
-import { formatIsoToTime } from "../../utils/timeUtilities";
+import { convertIsoTo12HourTime, formatIsoToTime } from "../../utils/timeUtilities";
 import { useCart } from "../../hooks/useCart";
 import { useDeliveryDetails } from "../../hooks/useDeliveryDetails";
 
@@ -32,18 +32,40 @@ const OrderConfirmation = () => {
       const phoneNumber = sessionStorage.getItem("phoneNumber");
       const unitNumber = sessionStorage.getItem("unitNumber");
 
-      if (!cartItems.length || !deliveryDate || !deliverySlot || !totalPrice || !phoneNumber || !unitNumber) {
-        throw new Error("Missing or invalid data from storage.");
+      // Improved validation checks
+      if (!Array.isArray(cartItems) || cartItems.length === 0) {
+        console.error("Cart items are missing or invalid");
+        return null;
+      }
+      if (!deliveryDate || isNaN(Date.parse(deliveryDate))) {
+        console.error("Delivery date is missing or invalid");
+        return null;
+      }
+      if (!deliverySlot || !/^\d{2}:\d{2}$/.test(deliverySlot)) {
+        console.error("Delivery slot is missing or invalid");
+        return null;
+      }
+      if (isNaN(totalPrice) || totalPrice <= 0) {
+        console.error("Total price is missing or invalid");
+        return null;
+      }
+      if (!phoneNumber || typeof phoneNumber !== "string") {
+        console.error("Phone number is missing or invalid");
+        return null;
+      }
+      if (!unitNumber || typeof unitNumber !== "string") {
+        console.error("Unit number is missing or invalid");
+        return null;
       }
 
-      const dueDate = calculateDueDate(deliveryDate, deliverySlot); // Combine date and slot
-
+      const dueDate = calculateDueDate(deliveryDate, deliverySlot);
       return { cartItems, dueDate, totalPrice, phoneNumber, unitNumber };
     } catch (error) {
       console.error("Error validating storage data:", error);
       return null;
     }
   };
+
 
   const calculateDueDate = (deliveryDate, deliverySlot) => {
     const [hour, minute] = deliverySlot.split(":").map(Number);
@@ -143,7 +165,7 @@ const OrderConfirmation = () => {
       <h2>Thank you, your order is complete.</h2>
       <div className={styles.rows}>
         <OrderDetailsRow label="Ordered" value={formatIsoToTime(orderDetails.orderedAt)} isLoading={isLoading} />
-        <OrderDetailsRow label="Delivery" value={`Unit ${orderDetails.customerDetails.unitNumber} at ${formatIsoToTime(orderDetails.dueDate)}`} isLoading={isLoading} />
+        <OrderDetailsRow label="Delivery" value={`Unit ${orderDetails.customerDetails.unitNumber} at ${convertIsoTo12HourTime(orderDetails.dueDate)}`} isLoading={isLoading} />
       </div>
       <table className={styles.orderTable}>
         <thead>
@@ -166,7 +188,7 @@ const OrderConfirmation = () => {
                   </div>
                 ))}
               </td>
-              <td className={styles.price}>{centsToFormattedPrice(item.total)}</td>
+              <td className={styles.price}>{centsToFormattedPrice(item.totalPrice)}</td>
             </tr>
           ))}
         </tbody>

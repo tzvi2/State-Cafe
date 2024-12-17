@@ -26,4 +26,22 @@ export function convertTo12HourFormat(time24) {
 	return `${hours12}:${minutes.toString().padStart(2, '0')}${period}`;
 }
 
+export function convertIsoTo12HourTime(isoString) {
+	const date = new Date(isoString);
+
+	// Extract hours and minutes
+	let hours = date.getUTCHours(); // Use UTC time
+	const minutes = date.getUTCMinutes();
+
+	// Determine am/pm
+	const ampm = hours >= 12 ? 'pm' : 'am';
+
+	// Convert hours from 24-hour to 12-hour format
+	hours = hours % 12 || 12; // Convert 0 to 12 for 12 AM
+
+	// Format minutes with leading zero
+	const formattedMinutes = minutes.toString().padStart(2, '0');
+
+	return `${hours}:${formattedMinutes}${ampm}`;
+}
 
