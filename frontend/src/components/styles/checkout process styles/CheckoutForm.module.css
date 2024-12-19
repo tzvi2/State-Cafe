@@ -28,6 +28,7 @@
 .soldOutItems,
 .error {
   color: rgb(239, 90, 60);
+  text-align: center;
 }
 
 .stripeElement {

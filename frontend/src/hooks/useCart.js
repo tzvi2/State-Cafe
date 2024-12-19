@@ -31,6 +31,7 @@ export default function CartProvider({ children }) {
   };
 
   const calculateTotals = (items) => {
+    console.log('calculating totals ', items)
     const newTotalPrice = items.reduce((total, item) => total + item.totalPrice, 0);
 
 
@@ -80,13 +81,15 @@ export default function CartProvider({ children }) {
     const optionsTimeToCook = options.reduce((total, option) => total + option.timeToCook, 0);
     const totalTimeToCook = (baseTimeToCook + optionsTimeToCook) * quantity;
 
+    console.log(`Calculated totals for ${quantity} items:`, { totalPrice, totalTimeToCook });
+
     return { totalPrice, totalTimeToCook };
   };
 
   const updateItemQuantity = (cartItemId, newQuantity) => {
     const updatedItems = cartItems.map((item) => {
       if (item.cartItemId === cartItemId) {
-        // In updateItemQuantity
+        // Recalculate totals for the updated item
         const { totalPrice, totalTimeToCook } = calculateCartItemTotals(
           item.basePrice,
           item.baseTimeToCook,
@@ -94,13 +97,14 @@ export default function CartProvider({ children }) {
           newQuantity
         );
 
-
         return { ...item, quantity: newQuantity, totalPrice, totalTimeToCook };
       }
       return item;
     });
+
     setCartItems(updatedItems);
   };
+
 
   const addToCart = (newMenuItem) => {
     const existingItem = cartItems.find(
@@ -151,7 +155,7 @@ export default function CartProvider({ children }) {
   };
 
   return (
-    <CartContext.Provider value={{ cart: { items: cartItems, totalPrice, totalCount, totalCookTime }, addToCart, removeFromCart, updateItemQuantity, clearCart }}>
+    <CartContext.Provider value={{ cart: { items: cartItems, totalPrice, totalCount, totalCookTime }, addToCart, removeFromCart, updateItemQuantity, clearCart, setCartItems }}>
       {children}
     </CartContext.Provider>
   );

@@ -20,6 +20,7 @@ const HoursPage = () => {
   const [endOpenTime, setEndOpenTime] = useState('');
   const [startOrderingTime, setStartOrderingTime] = useState('');
   const [endOrderingTime, setEndOrderingTime] = useState('');
+  const [orderingDate, setOrderingDate] = useState('');
 
   useEffect(() => {
     const fetchHours = async () => {
@@ -29,7 +30,7 @@ const HoursPage = () => {
         setOpenHours(openHours);
         setOrderingWindow(orderingWindow);
       } catch (error) {
-        console.error("Error fetching hours:", error);
+        console.error('Error fetching hours:', error);
       }
     };
 
@@ -45,20 +46,21 @@ const HoursPage = () => {
       setEndOpenTime('');
       setShowNewOpenRange(false);
     } catch (error) {
-      console.error("Error saving open range:", error);
+      console.error('Error saving open range:', error);
     }
   };
 
   const handleSaveOrderingRange = async () => {
     try {
-      await addOrderingWindow(selectedDate, startOrderingTime, endOrderingTime);
+      await addOrderingWindow(selectedDate, startOrderingTime, endOrderingTime, orderingDate);
       const orderingWindow = await getOrderingWindow(selectedDate);
       setOrderingWindow(orderingWindow);
+      setOrderingDate('');
       setStartOrderingTime('');
       setEndOrderingTime('');
       setShowNewOrderingRange(false);
     } catch (error) {
-      console.error("Error saving ordering range:", error);
+      console.error('Error saving ordering range:', error);
     }
   };
 
@@ -68,17 +70,17 @@ const HoursPage = () => {
       const openHours = await getOpenHours(selectedDate);
       setOpenHours(openHours);
     } catch (error) {
-      console.error("Error deleting open range:", error);
+      console.error('Error deleting open range:', error);
     }
   };
 
-  const handleDeleteOrderingRange = async (start, end) => {
+  const handleDeleteOrderingRange = async (start, end, date) => {
     try {
-      await removeOrderingWindow(selectedDate, start, end);
+      await removeOrderingWindow(selectedDate, start, end, date);
       const orderingWindow = await getOrderingWindow(selectedDate);
       setOrderingWindow(orderingWindow);
     } catch (error) {
-      console.error("Error deleting ordering range:", error);
+      console.error('Error deleting ordering range:', error);
     }
   };
 
@@ -135,13 +137,13 @@ const HoursPage = () => {
         orderingWindow.map((range, index) => (
           <div key={index} className={styles.range}>
             <p className={styles.rangeHours}>
-              {formatTime(range.start)} - {formatTime(range.end)}
+              {range.date} | {formatTime(range.start)} - {formatTime(range.end)}
             </p>
             <input
               className={styles.delete_range}
               type="button"
               value="delete"
-              onClick={() => handleDeleteOrderingRange(range.start, range.end)}
+              onClick={() => handleDeleteOrderingRange(range.start, range.end, range.date)}
             />
           </div>
         ))
@@ -152,6 +154,7 @@ const HoursPage = () => {
       {showNewOrderingRange && (
         <div className={styles.newRange}>
           <div className={styles.times}>
+            <input type="date" value={orderingDate} onChange={(e) => setOrderingDate(e.target.value)} />
             <input type="time" value={startOrderingTime} onChange={(e) => setStartOrderingTime(e.target.value)} />
             <input type="time" value={endOrderingTime} onChange={(e) => setEndOrderingTime(e.target.value)} />
           </div>

@@ -188,19 +188,14 @@ export const getOrderingWindow = async (date) => {
   }
 };
 
-export const addOrderingWindow = async (date, start, end) => {
+export const addOrderingWindow = async (date, start, end, windowDate) => {
+  console.log('adding ordering window for date ', date)
+  console.log(start, end, windowDate)
   try {
-    // First, check if an ordering window already exists
-    const existingOrderingWindow = await getOrderingWindow(date);
-    if (existingOrderingWindow.length > 0) {
-      return { message: 'An ordering window already exists for this date.' };
-    }
-
-    // Add the new ordering window
     const response = await fetch(`${apiUrl}/hours/${date}/add-ordering-window`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ start, end }),
+      body: JSON.stringify({ start, end, windowDate }),
     });
 
     if (!response.ok) {
@@ -216,7 +211,8 @@ export const addOrderingWindow = async (date, start, end) => {
   }
 };
 
-export const removeOrderingWindow = async (date, start, end) => {
+
+export const removeOrderingWindow = async (date, start, end, orderingDate) => {
   try {
     // First, check if an ordering window exists
     const existingOrderingWindow = await getOrderingWindow(date);
@@ -228,7 +224,7 @@ export const removeOrderingWindow = async (date, start, end) => {
     const response = await fetch(`${apiUrl}/hours/${date}/remove-ordering-window`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ start, end }),
+      body: JSON.stringify({ start, end, orderingDate }),
     });
 
     if (!response.ok) {

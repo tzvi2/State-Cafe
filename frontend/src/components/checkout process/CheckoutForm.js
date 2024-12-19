@@ -7,15 +7,18 @@ import {
 import styles from "../styles/checkout process styles/CheckoutForm.module.css";
 import { useCart } from "../../hooks/useCart";
 import { useDeliveryDetails } from "../../hooks/useDeliveryDetails";
+import { useOrderContext } from "../../contexts/OrderContext";
 import { centsToFormattedPrice } from "../../utils/priceUtilities";
 import { validateTimeSlot } from "../../api/timeslotRequests";
 import AvailableTimeslots from "./AvailableTimeslots";
+import { getStockForDate } from '../../api/stockRequests'
 
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
-  const { cart } = useCart();
+  const { cart, updateItemQuantity, setCartItems, removeFromCart } = useCart();
   const { deliveryDate, deliverySlot, setDeliverySlot } = useDeliveryDetails();
+  const { inOrderingWindow } = useOrderContext()
 
   const [message, setMessage] = useState("");
   const [slotMessage, setSlotMessage] = useState("");
@@ -49,6 +52,97 @@ export default function CheckoutForm() {
     }
   };
 
+  const validateCartStock = async () => {
+    console.log("Checking cart items against stock...");
+    const stockData = await getStockForDate(deliveryDate);
+    console.log("Stock data:", stockData);
+
+    const outOfStockItems = [];
+    const lowStockItems = [];
+
+    cart.items.forEach((item) => {
+      const availableQuantity = stockData[item.title]?.quantity || 0;
+
+      if (availableQuantity === 0) {
+        outOfStockItems.push(item);
+      } else if (availableQuantity < item.quantity) {
+        lowStockItems.push({
+          ...item,
+          availableQuantity,
+        });
+      }
+    });
+
+    if (outOfStockItems.length > 0 && lowStockItems.length === 0) {
+      const userConfirmed = window.confirm(
+        `The following items are out of stock:\n\n${outOfStockItems
+          .map((item) => item.title)
+          .join(", ")}\n\nWould you like to automatically remove them from your cart?`
+      );
+
+      if (userConfirmed) {
+        outOfStockItems.forEach((item) => removeFromCart(item.cartItemId));
+        return {
+          success: false,
+          message: "Out-of-stock items were removed from your cart. Please review your cart and try again.",
+        };
+      } else {
+        return {
+          success: false,
+          message: "Please remove out-of-stock items before proceeding.",
+        };
+      }
+    }
+
+    if (outOfStockItems.length === 0 && lowStockItems.length > 0) {
+      const userConfirmed = window.confirm(
+        `The following items have limited quantities:\n\n${lowStockItems
+          .map((item) => `${item.title}: only ${item.availableQuantity} left`)
+          .join("\n")}\n\nWould you like to adjust the quantities in your cart?`
+      );
+
+      if (userConfirmed) {
+        lowStockItems.forEach((item) => updateItemQuantity(item.cartItemId, item.availableQuantity));
+        return {
+          success: false,
+          message: "Cart has been updated to reflect available items.",
+        };
+      } else {
+        return {
+          success: false,
+          message: "Please adjust your cart before proceeding.",
+        };
+      }
+    }
+
+    if (outOfStockItems.length > 0 && lowStockItems.length > 0) {
+      const userConfirmed = window.confirm(
+        `The following items are out of stock:\n\n${outOfStockItems
+          .map((item) => item.title)
+          .join(", ")}\n\nThe following items have limited quantities:\n\n${lowStockItems
+            .map((item) => `${item.title}: only ${item.availableQuantity} left`)
+            .join("\n")}\n\nWould you like to automatically remove out-of-stock items and adjust the quantities of limited stock items?`
+      );
+
+      if (userConfirmed) {
+        outOfStockItems.forEach((item) => removeFromCart(item.cartItemId));
+        lowStockItems.forEach((item) => updateItemQuantity(item.cartItemId, item.availableQuantity));
+        return {
+          success: false,
+          message: "Cart has been updated to reflect available items.",
+        };
+      } else {
+        return {
+          success: false,
+          message: "Please adjust your cart before proceeding.",
+        };
+      }
+    }
+
+    console.log("All items are in stock.");
+    return { success: true };
+  };
+
   const handleNewTimeslotSelection = (slot) => {
     setDeliverySlot(slot); // Update the selected delivery slot
     setSlotMessage(""); // Clear the message
@@ -64,9 +158,18 @@ export default function CheckoutForm() {
       return;
     }
 
+    // handleSlotValidation checks if the selected slot is still available
     const isSlotValid = await handleSlotValidation();
     if (!isSlotValid) {
-      return; // Don't proceed if the slot is invalid
+      return;
+    }
+
+    // handleCartValidation checks each item in cart to ensure enough stock remains
+    const sufficientStockRemains = await validateCartStock()
+    if (!sufficientStockRemains.success) {
+      setMessage(sufficientStockRemains.message);
+      console.log("Stock check failed:", sufficientStockRemains.message);
+      return;
     }
 
     setPaymentLoading(true);
