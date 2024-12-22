@@ -5,13 +5,9 @@ import LoginPage from './LoginPage';
 
 const ProtectedRoute = ({ element }) => {
   const { currentUser, isAllowed, loading } = useAuth();
-  const navigate = useNavigate()
-
-  console.log('ProtectedRoute - currentUser:', currentUser);
-  console.log('ProtectedRoute - isAllowed:', isAllowed);
 
   if (loading) {
-    return <div>Loading...</div>; 
+    return <div>Loading...</div>;
   }
 
   if (!currentUser) {

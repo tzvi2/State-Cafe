@@ -4,6 +4,8 @@ import CheckoutForm from './CheckoutForm';
 import { Elements } from '@stripe/react-stripe-js';
 import { useCart } from '../../hooks/useCart';
 import apiUrl from '../../config';
+import BackArrow from '../BackArrow';
+
 
 function Checkout(props) {
   const { cart } = useCart();
@@ -31,7 +33,8 @@ function Checkout(props) {
 
   return (
     <>
-      <h1 style={{ textAlign: "center" }}>Payment with Stripe</h1>
+      <BackArrow />
+      <p style={{ textAlign: "center", fontSize: "1.5rem" }}>Payment details</p>
       {stripePromise && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm />

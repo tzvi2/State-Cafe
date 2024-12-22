@@ -5,6 +5,7 @@ import { useCart } from '../../hooks/useCart';
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
 import apiUrl from '../../config';
 import AvailableTimeslots from './AvailableTimeslots';
+import BackArrow from '../BackArrow';
 
 function DeliveryPage() {
   const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
@@ -117,52 +118,55 @@ function DeliveryPage() {
   };
 
   return (
-    <div className={styles.deliveryPage}>
-      <div className={styles.errorRow}>
-        {apartmentNumberError && <p className={styles.error}>{apartmentNumberError}</p>}
-      </div>
+    <>
+      <BackArrow />
+      <div className={styles.deliveryPage}>
+        <div className={styles.errorRow}>
+          {apartmentNumberError && <p className={styles.error}>{apartmentNumberError}</p>}
+        </div>
 
-      <div className={styles.flexRow}>
-        <label htmlFor="apartmentNumber">Apartment:</label>
-        <input
-          type="number"
-          id="apartmentNumber"
-          value={unitNumber}
-          onChange={handleApartmentNumberChange}
-          min={201}
-          max={558}
-          placeholder="e.g., 305"
-        />
-      </div>
+        <div className={styles.flexRow}>
+          <label htmlFor="apartmentNumber">Apartment:</label>
+          <input
+            type="number"
+            id="apartmentNumber"
+            value={unitNumber}
+            onChange={handleApartmentNumberChange}
+            min={201}
+            max={558}
+            placeholder="e.g., 305"
+          />
+        </div>
 
-      <div className={styles.errorRow}>
-        {phoneNumberError && <p className={styles.error}>{phoneNumberError}</p>}
-      </div>
+        <div className={styles.errorRow}>
+          {phoneNumberError && <p className={styles.error}>{phoneNumberError}</p>}
+        </div>
 
-      <div className={styles.flexRow}>
-        <label htmlFor="phoneNumber">Phone Number:</label>
-        <input
-          type="tel"
-          id="phoneNumber"
-          value={phoneNumber}
-          onChange={handlePhoneNumberChange}
-          placeholder="123-456-7890"
-        />
-      </div>
+        <div className={styles.flexRow}>
+          <label htmlFor="phoneNumber">Phone Number:</label>
+          <input
+            type="tel"
+            id="phoneNumber"
+            value={phoneNumber}
+            onChange={handlePhoneNumberChange}
+            placeholder="123-456-7890"
+          />
+        </div>
 
-      {deliveryDate && (
-        <>
-          <AvailableTimeslots />
-          <button
-            className={styles.wideBtn}
-            onClick={handleSubmit}
-            disabled={!deliveryAvailable || !deliverySlot || !unitNumber}
-          >
-            Proceed to Checkout
-          </button>
-        </>
-      )}
-    </div>
+        {deliveryDate && (
+          <>
+            <AvailableTimeslots />
+            <button
+              className={styles.wideBtn}
+              onClick={handleSubmit}
+              disabled={!deliveryAvailable || !deliverySlot || !unitNumber}
+            >
+              Proceed to Checkout
+            </button>
+          </>
+        )}
+      </div>
+    </>
   );
 }
 

@@ -33,11 +33,11 @@ export const OrderProvider = ({ children }) => {
 				const stockData = await getStockForDate(deliveryDate);
 				const isStockAvailable = Object.values(stockData).some((item) => item.quantity > 0);
 				setStockAvailable(isStockAvailable);
-				console.log("stock available ", isStockAvailable);
+				//console.log("stock available ", isStockAvailable);
 
 				const isSlotsAvailable = await dayHasAvailableSlots(deliveryDate);
 				setSlotsAvailable(isSlotsAvailable);
-				console.log("slots available ", isSlotsAvailable);
+				//console.log("slots available ", isSlotsAvailable);
 
 				// Check current time and date against ordering window
 				const nowEST = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });

@@ -174,6 +174,7 @@ export const dayHasAvailableSlots = async (date) => {
 };
 
 export const getOrderingWindow = async (date) => {
+  console.log('getting ordering window')
   try {
     const response = await fetch(`${apiUrl}/hours/${date}/get-ordering-window`);
     if (!response.ok) {
@@ -211,8 +212,8 @@ export const addOrderingWindow = async (date, start, end, windowDate) => {
   }
 };
 
-
 export const removeOrderingWindow = async (date, start, end, orderingDate) => {
+  console.log('removing ordering window')
   try {
     // First, check if an ordering window exists
     const existingOrderingWindow = await getOrderingWindow(date);

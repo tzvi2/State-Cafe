@@ -31,7 +31,7 @@ export default function CartProvider({ children }) {
   };
 
   const calculateTotals = (items) => {
-    console.log('calculating totals ', items)
+    //console.log('calculating totals ', items)
     const newTotalPrice = items.reduce((total, item) => total + item.totalPrice, 0);
 
 
@@ -107,12 +107,6 @@ export default function CartProvider({ children }) {
     console.log('Updated items:', updatedItems); // Debugging step to confirm new state
     setCartItems(updatedItems); // Update state with the modified cart
   };
-
-  useEffect(() => {
-    console.log('cart items updated', cartItems);
-    calculateTotals(cartItems);
-  }, [cartItems]);
-
 
   const addToCart = (newMenuItem) => {
     const existingItem = cartItems.find(
