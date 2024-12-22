@@ -87,6 +87,8 @@ export default function CartProvider({ children }) {
   };
 
   const updateItemQuantity = (cartItemId, newQuantity) => {
+    console.log('Updating quantity of itemId', cartItemId, 'to', newQuantity);
+
     const updatedItems = cartItems.map((item) => {
       if (item.cartItemId === cartItemId) {
         // Recalculate totals for the updated item
@@ -102,8 +104,14 @@ export default function CartProvider({ children }) {
       return item;
     });
 
-    setCartItems(updatedItems);
+    console.log('Updated items:', updatedItems); // Debugging step to confirm new state
+    setCartItems(updatedItems); // Update state with the modified cart
   };
+
+  useEffect(() => {
+    console.log('cart items updated', cartItems);
+    calculateTotals(cartItems);
+  }, [cartItems]);
 
 
   const addToCart = (newMenuItem) => {
@@ -149,8 +157,9 @@ export default function CartProvider({ children }) {
     return true;
   };
 
-  const removeFromCart = (cartItemId) => {
-    const newCartItems = cartItems.filter((item) => item.cartItemId !== cartItemId);
+  const removeFromCart = (itemId) => {
+    console.log('removing item with id ', itemId)
+    const newCartItems = cartItems.filter((item) => item.id !== itemId);
     setCartItems(newCartItems);
   };
 

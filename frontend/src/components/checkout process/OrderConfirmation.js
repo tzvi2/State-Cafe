@@ -124,8 +124,8 @@ const OrderConfirmation = () => {
         const saveOrderResponse = await placeOrder(orderDetails);
         console.log("saveOrderResponse:", saveOrderResponse);
 
-        const bookedTimeslotResponse = await bookTimeSlot(deliveryDate, deliverySlot, cart.totalCookTime);
-        console.log("Booked timeslot response:", bookedTimeslotResponse);
+        //const bookedTimeslotResponse = await bookTimeSlot(deliveryDate, deliverySlot, cart.totalCookTime);
+        //console.log("Booked timeslot response:", bookedTimeslotResponse);
 
         const orderedAt = saveOrderResponse.savedOrder?.order?.orderedAt;
         if (!orderedAt) {

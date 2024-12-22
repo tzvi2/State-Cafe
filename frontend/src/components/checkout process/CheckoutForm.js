@@ -12,6 +12,7 @@ import { centsToFormattedPrice } from "../../utils/priceUtilities";
 import { validateTimeSlot } from "../../api/timeslotRequests";
 import AvailableTimeslots from "./AvailableTimeslots";
 import { getStockForDate } from '../../api/stockRequests'
+import apiUrl from "../../config";
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -26,6 +27,7 @@ export default function CheckoutForm() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [showTimeslotError, setShowTimeslotError] = useState(false);
   const [showTimeslots, setShowTimeslots] = useState(false); // New state
+  const [cartAdjustmentMessage, setCartAdjustmentMessage] = useState("")
 
   const handleSlotValidation = async () => {
     try {
@@ -34,6 +36,8 @@ export default function CheckoutForm() {
         deliverySlot,
         cart.totalCookTime
       );
+
+      console.log('validation result ', validationResult)
 
       if (!validationResult.success) {
         setSlotMessage(
@@ -150,28 +154,101 @@ export default function CheckoutForm() {
     setShowTimeslots(true); // Keep the component visible
   };
 
+  const validateAndReserve = async (deliveryDate, deliverySlot, cart, totalCookTime) => {
+    try {
+      const response = await fetch(`${apiUrl}/orders/checkout/validate-and-reserve`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          date: deliveryDate,
+          slot: deliverySlot,
+          cart,
+          totalCookTime,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.stockIssues) {
+          const outOfStockItems = data.stockIssues.filter((item) => item.available === 0);
+          const lowStockItems = data.stockIssues.filter(
+            (item) => item.available > 0 && item.available < item.requested
+          );
+          return { success: false, outOfStockItems, lowStockItems };
+        }
+        throw new Error(data.error || "Failed to validate and reserve.");
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error("Validation error:", error.message);
+      return { success: false, message: error.message };
+    }
+  };
+
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!stripe || !elements) {
-      console.log("Stripe or Elements not loaded.");
-      return;
+    const validationResult = await validateAndReserve(
+      deliveryDate,
+      deliverySlot,
+      cart.items,
+      cart.totalCookTime
+    );
+
+    if (!validationResult.success) {
+      const { outOfStockItems = [], lowStockItems = [], message } = validationResult;
+
+      if (message) {
+        setMessage(message);
+        return;
+      }
+
+      let issuesMessage = "";
+
+      // Construct the message for stock issues
+      if (outOfStockItems.length > 0 && lowStockItems.length === 0 && outOfStockItems.length < cart.items.length) {
+        issuesMessage = `The following items are out of stock:\n\n${outOfStockItems
+          .map((item) => item.title)
+          .join(", ")}\n\nWould you like to automatically remove them from your cart?`;
+
+        const userConfirmed = window.confirm(issuesMessage);
+        if (userConfirmed) {
+          outOfStockItems.forEach((item) => removeFromCart(item.itemId));
+          setMessage("Out-of-stock items were removed from your cart. Please review your cart and try again.");
+        } else {
+          setMessage("Please remove out-of-stock items before proceeding.");
+        }
+
+        return;
+      }
+
+      if (outOfStockItems.length === 0 && lowStockItems.length > 0) {
+        issuesMessage = `The following items have limited quantities:\n\n${lowStockItems
+          .map((item) => `${item.title}: only ${item.available} left`)
+          .join("\n")}\n\nPlease adjust your cart before checking out.`;
+        alert(issuesMessage);
+        setMessage("Please adjust your cart for limited-stock items.");
+        return;
+      }
+
+
+      if (outOfStockItems.length > 0 && lowStockItems.length > 0) {
+        issuesMessage = `The following items are out of stock:\n\n${outOfStockItems
+          .map((item) => item.title)
+          .join(", ")}\n\nThe following items have limited quantities:\n\n${lowStockItems
+            .map((item) => `${item.title}: only ${item.available} left`)
+            .join("\n")}`;
+
+        alert(issuesMessage);
+        setMessage("Please adjust your cart to resolve stock issues.");
+        return;
+      }
     }
 
-    // handleSlotValidation checks if the selected slot is still available
-    const isSlotValid = await handleSlotValidation();
-    if (!isSlotValid) {
-      return;
-    }
-
-    // handleCartValidation checks each item in cart to ensure enough stock remains
-    const sufficientStockRemains = await validateCartStock()
-    if (!sufficientStockRemains.success) {
-      setMessage(sufficientStockRemains.message);
-      console.log("Stock check failed:", sufficientStockRemains.message);
-      return;
-    }
-
+    // Proceed with payment
     setPaymentLoading(true);
 
     try {
@@ -184,30 +261,21 @@ export default function CheckoutForm() {
       });
 
       if (paymentResponse.error) {
-        console.error("Payment error:", paymentResponse.error.message);
         setMessage(paymentResponse.error.message);
-        setPaymentLoading(false);
-        return;
-      }
+      } else {
+        localStorage.setItem("dueDate", `${deliveryDate}T${deliverySlot}:00`);
+        window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.id}`;
 
-      const paymentIntent = paymentResponse.paymentIntent;
-
-      if (paymentIntent && paymentIntent.status === "succeeded") {
-        console.log("Payment successful:", paymentIntent);
-        localStorage.setItem(
-          "dueDate",
-          new Date(`${deliveryDate}T${deliverySlot}:00`).toISOString()
-        );
-        localStorage.setItem("paymentIntentId", paymentIntent.id);
-        window.location.href = `/confirmation?payment_intent_client_secret=${paymentIntent.client_secret}`;
       }
     } catch (error) {
-      console.error("Error during payment process:", error);
-      setMessage("An error occurred during payment. Please try again.");
+      setMessage("Payment failed. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
   };
+
+
+
 
   useEffect(() => {
     if (!stripe || !elements) {
@@ -239,6 +307,7 @@ export default function CheckoutForm() {
         onSubmit={handleSubmit}
       >
         <PaymentElement className={styles.stripeElement} />
+        <p>{cartAdjustmentMessage}</p>
         {(showTimeslotError || showTimeslots) && (
           <AvailableTimeslots
             onSlotChange={handleNewTimeslotSelection}
