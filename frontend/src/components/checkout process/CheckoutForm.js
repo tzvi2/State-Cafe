@@ -18,7 +18,7 @@ import { processOrder } from "../../api/orderRequests";
 export default function CheckoutForm() {
   const stripe = useStripe();
   const elements = useElements();
-  const { cart, updateItemQuantity, setCartItems, removeFromCart } = useCart();
+  const { cart, updateItemQuantity, setCartItems, removeFromCart, clearCart } = useCart();
   const { deliveryDate, deliverySlot, setDeliverySlot } = useDeliveryDetails();
   const { inOrderingWindow } = useOrderContext()
 
@@ -208,7 +208,7 @@ export default function CheckoutForm() {
         return;
       }
 
-      // 2. Confirm payment
+      // 2. run payment
       const paymentResponse = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -222,9 +222,6 @@ export default function CheckoutForm() {
         setMessage(paymentResponse.error.message);
         return;
       }
-
-      console.log('payment reonse', paymentResponse);
-
 
       // 3. Process order on backend
       const response = await fetch(`${apiUrl}/orders/process`, {
@@ -248,7 +245,7 @@ export default function CheckoutForm() {
         throw new Error("Failed to process order.");
       }
 
-      const data = await response.json();
+      clearCart()
       window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
     } catch (error) {
       setMessage(error.message || "Payment or order processing failed. Please try again.");
