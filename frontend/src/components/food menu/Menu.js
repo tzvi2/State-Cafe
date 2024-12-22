@@ -71,25 +71,49 @@ export default function Menu() {
 
   return (
     <>
-      <div className={styles.deliveryDateSelection}>
-        {!deliveryDate || showDateButtons ? (
-          <>
-            <h2 className={styles.offering}>Select Delivery Date</h2>
-            <div className={`${styles.flexRow} ${styles.dateButtons}`}>
-              <button className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ''}`} onClick={() => { setDeliveryDate(todayFormatted); setShowDateButtons(false); }}>
-                <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
-              </button>
-              <button className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ''}`} onClick={() => { setDeliveryDate(tomorrowFormatted); setShowDateButtons(false); }}>
-                <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
-              </button>
-            </div>
-          </>
-        ) : (
-          <button className={styles.minimizedButton} onClick={toggleDateButtons}>
-            Delivery Date: {YMDtoDMY(deliveryDate)} &#x25BC;
-          </button>
+
+      <div className={styles.deliveryDateSelection} onClick={toggleDateButtons}>
+
+        <span className={styles.minimizedButton}>
+          Delivery:{" "}
+          {deliveryDate === todayFormatted
+            ? "Today"
+            : deliveryDate === tomorrowFormatted
+              ? "Tomorrow"
+              : YMDtoDMY(deliveryDate)}
+          {" "}
+          {showDateButtons ? "▲" : "▼"}
+        </span>
+
+        {showDateButtons && (
+          <div className={`${styles.flexRow} ${styles.dateButtons}`}>
+            <button
+              className={`${styles.day} ${isDaySelected(todayFormatted) ? styles.selected : ""
+                }`}
+              onClick={() => {
+                setDeliveryDate(todayFormatted);
+                setShowDateButtons(false);
+              }}
+            >
+              <span>Today</span> <span>{formatDateToMDYYYY(todayEST)}</span>
+            </button>
+            <button
+              className={`${styles.day} ${isDaySelected(tomorrowFormatted) ? styles.selected : ""
+                }`}
+              onClick={() => {
+                setDeliveryDate(tomorrowFormatted);
+                setShowDateButtons(false);
+              }}
+            >
+              <span>Tomorrow</span> <span>{formatDateToMDYYYY(tomorrowEST)}</span>
+            </button>
+          </div>
         )}
       </div>
+
+
+
+
 
       <div className={styles.menuContainer}>
         {!acceptingOrders && !isLoading && (
