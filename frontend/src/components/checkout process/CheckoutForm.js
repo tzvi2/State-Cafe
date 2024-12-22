@@ -13,6 +13,7 @@ import { validateTimeSlot } from "../../api/timeslotRequests";
 import AvailableTimeslots from "./AvailableTimeslots";
 import { getStockForDate } from '../../api/stockRequests'
 import apiUrl from "../../config";
+import { processOrder } from "../../api/orderRequests";
 
 export default function CheckoutForm() {
   const stripe = useStripe();
@@ -191,67 +192,23 @@ export default function CheckoutForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const validationResult = await validateAndReserve(
-      deliveryDate,
-      deliverySlot,
-      cart.items,
-      cart.totalCookTime
-    );
-
-    if (!validationResult.success) {
-      const { outOfStockItems = [], lowStockItems = [], message } = validationResult;
-
-      if (message) {
-        setMessage(message);
-        return;
-      }
-
-      let issuesMessage = "";
-
-      // Construct the message for stock issues
-      if (outOfStockItems.length > 0 && lowStockItems.length === 0 && outOfStockItems.length < cart.items.length) {
-        issuesMessage = `The following items are out of stock:\n\n${outOfStockItems
-          .map((item) => item.title)
-          .join(", ")}\n\nWould you like to automatically remove them from your cart?`;
-
-        const userConfirmed = window.confirm(issuesMessage);
-        if (userConfirmed) {
-          outOfStockItems.forEach((item) => removeFromCart(item.itemId, true));
-          setMessage("Out-of-stock items were removed from your cart. Please review your cart and try again.");
-        } else {
-          setMessage("Please remove out-of-stock items before proceeding.");
-        }
-
-        return;
-      }
-
-      if (outOfStockItems.length === 0 && lowStockItems.length > 0) {
-        issuesMessage = `The following items have limited quantities:\n\n${lowStockItems
-          .map((item) => `${item.title}: only ${item.available} left`)
-          .join("\n")}\n\nPlease adjust your cart before checking out.`;
-        alert(issuesMessage);
-        setMessage("Please adjust your cart for limited-stock items.");
-        return;
-      }
-
-
-      if (outOfStockItems.length > 0 && lowStockItems.length > 0) {
-        issuesMessage = `The following items are out of stock:\n\n${outOfStockItems
-          .map((item) => item.title)
-          .join(", ")}\n\nThe following items have limited quantities:\n\n${lowStockItems
-            .map((item) => `${item.title}: only ${item.available} left`)
-            .join("\n")}`;
-
-        alert(issuesMessage);
-        setMessage("Please adjust your cart to resolve stock issues.");
-        return;
-      }
-    }
-
-    // Proceed with payment
     setPaymentLoading(true);
 
     try {
+      // 1. Validate and reserve slot
+      const validationResult = await validateAndReserve(
+        deliveryDate,
+        deliverySlot,
+        cart.items,
+        cart.totalCookTime
+      );
+
+      if (!validationResult.success) {
+        setMessage(validationResult.message || "Validation failed");
+        return;
+      }
+
+      // 2. Confirm payment
       const paymentResponse = await stripe.confirmPayment({
         elements,
         confirmParams: {
@@ -261,19 +218,44 @@ export default function CheckoutForm() {
       });
 
       if (paymentResponse.error) {
+        console.log('payment response', paymentResponse);
         setMessage(paymentResponse.error.message);
-      } else {
-        localStorage.setItem("dueDate", `${deliveryDate}T${deliverySlot}:00`);
-        window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.id}`;
-
+        return;
       }
+
+      console.log('payment reonse', paymentResponse);
+
+
+      // 3. Process order on backend
+      const response = await fetch(`${apiUrl}/orders/process`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentIntentId: paymentResponse.paymentIntent.id,
+          orderDetails: {
+            items: cart.items,
+            dueDate: `${deliveryDate}T${deliverySlot}:00`,
+            totalPrice: cart.totalPrice,
+            customerDetails: {
+              phoneNumber: sessionStorage.getItem("phoneNumber"),
+              unitNumber: sessionStorage.getItem("unitNumber"),
+            },
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to process order.");
+      }
+
+      const data = await response.json();
+      window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
     } catch (error) {
-      setMessage("Payment failed. Please try again.");
+      setMessage(error.message || "Payment or order processing failed. Please try again.");
     } finally {
       setPaymentLoading(false);
     }
   };
-
 
 
 

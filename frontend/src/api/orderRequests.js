@@ -61,3 +61,51 @@ export const getOrdersForDate = async (date) => {
     return { error: error.message }
   }
 }
+
+export const fetchOrderDetails = async (paymentIntentId) => {
+  try {
+    const response = await fetch(`${apiUrl}/orders/order/${paymentIntentId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch order: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    if (!data.success) {
+      throw new Error(data.message || "Failed to retrieve order details.");
+    }
+
+    return data.order; // Return the retrieved order
+  } catch (error) {
+    console.error("Error in fetchOrderDetails:", error.message);
+    throw error; // Re-throw the error for the caller to handle
+  }
+};
+
+export const processOrder = async (order) => {
+  try {
+    const response = await fetch(`${apiUrl}/orders/process-order`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ orderDetails: order }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to process order');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error processing order:', error.message);
+    throw error;
+  }
+};
