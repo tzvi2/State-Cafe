@@ -216,7 +216,7 @@ export default function CheckoutForm() {
 
         const userConfirmed = window.confirm(issuesMessage);
         if (userConfirmed) {
-          outOfStockItems.forEach((item) => removeFromCart(item.itemId));
+          outOfStockItems.forEach((item) => removeFromCart(item.itemId, true));
           setMessage("Out-of-stock items were removed from your cart. Please review your cart and try again.");
         } else {
           setMessage("Please remove out-of-stock items before proceeding.");

@@ -157,9 +157,13 @@ export default function CartProvider({ children }) {
     return true;
   };
 
-  const removeFromCart = (itemId) => {
-    console.log('removing item with id ', itemId)
-    const newCartItems = cartItems.filter((item) => item.id !== itemId);
+  const removeFromCart = (cartItemId, product = false) => {
+    let newCartItems = []
+    if (!product) {
+      newCartItems = cartItems.filter((item) => item.cartItemId !== cartItemId);
+    } else {
+      newCartItems = cartItems.filter((item) => item.id !== cartItemId)
+    }
     setCartItems(newCartItems);
   };
 

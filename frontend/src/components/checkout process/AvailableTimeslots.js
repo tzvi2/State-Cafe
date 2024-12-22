@@ -27,18 +27,31 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 				if (!response.ok) throw new Error("Failed to fetch available delivery slots");
 
 				const { available_slots: slots } = await response.json();
-				const formattedSlots = slots.map(slot => ({
+				const formattedSlots = slots.map((slot, index) => ({
 					time: slot,
-					displayTime: new Intl.DateTimeFormat([], {
-						hour: "numeric",
-						minute: "2-digit",
-						hour12: true,
-						timeZone: "UTC",
-					}).format(new Date(`1970-01-01T${slot}:00Z`)),
+					displayTime: index === 0
+						? `Earliest (${new Intl.DateTimeFormat([], {
+							hour: "numeric",
+							minute: "2-digit",
+							hour12: true,
+							timeZone: "UTC",
+						}).format(new Date(`1970-01-01T${slot}:00Z`))})`
+						: new Intl.DateTimeFormat([], {
+							hour: "numeric",
+							minute: "2-digit",
+							hour12: true,
+							timeZone: "UTC",
+						}).format(new Date(`1970-01-01T${slot}:00Z`)),
 				}));
 
 				setAvailableTimeSlots(formattedSlots);
 				setDeliveryAvailable(formattedSlots.length > 0);
+
+				if (formattedSlots.length > 0) {
+					const soonestSlot = formattedSlots[0].time;
+					setDeliverySlot(soonestSlot); // Automatically select the soonest slot
+					onSlotChange?.(soonestSlot); // Notify parent component
+				}
 			} catch (error) {
 				console.error("Error fetching time slots:", error);
 				setAvailableTimeSlots([]);
@@ -48,6 +61,7 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 
 		fetchTimeSlots();
 	}, [deliveryDate, cart.totalCookTime]);
+
 
 	const handleSlotSelection = (e) => {
 		const newSlot = e.target.value;
