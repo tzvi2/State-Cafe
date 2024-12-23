@@ -34,7 +34,7 @@ function Checkout(props) {
   return (
     <>
       <BackArrow />
-      <p style={{ textAlign: "center", fontSize: "1.5rem" }}>Payment details</p>
+      <p style={{ textAlign: "center", fontSize: "1.5rem", margin: "0", marginBottom: ".75rem" }}>Payment details</p>
       {stripePromise && clientSecret && (
         <Elements stripe={stripePromise} options={{ clientSecret }}>
           <CheckoutForm />

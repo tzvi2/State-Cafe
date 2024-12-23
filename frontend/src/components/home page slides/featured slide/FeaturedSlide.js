@@ -25,23 +25,23 @@ function FeaturedSlide() {
 		}
 
 		return () => {
-      if (featuredRef.current) {
-          observer.unobserve(featuredRef.current);
-      }
-    };
+			if (featuredRef.current) {
+				observer.unobserve(featuredRef.current);
+			}
+		};
 	}, []);
 
 	return (
 		<div className={`${styles.featured} ${isVisible ? styles.visible : ''}`} ref={featuredRef}>
 			<div className={styles.slide_centered}>
 				<h3 className={styles.header}>Our Menu</h3>
-        <p className={styles.serving}>Our menu changes with time. Explore some of our offerings below.</p>
-        <FeaturedCarousel />
+				<p className={styles.serving}>Our menu changes with time. Explore some of our offerings below.</p>
+				<FeaturedCarousel />
 				<p className={styles.button_header}>See what's currently available:</p>
-        <Link className={styles.button_full} to="menu">
-          Menu <MenuSquare />
-        </Link>
-      </div>
+				<Link className={styles.button_full} to="menu">
+					Menu
+				</Link>
+			</div>
 		</div>
 	);
 }

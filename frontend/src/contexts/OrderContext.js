@@ -75,6 +75,25 @@ export const OrderProvider = ({ children }) => {
 		checkAcceptingOrders();
 	}, [deliveryDate]);
 
+	const checkInOrderingWindow = async () => {
+		const window = await getOrderingWindow(deliveryDate);
+		console.log('window ', window)
+		const nowEST = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
+		const currentTime = new Date(nowEST);
+		const nowTimeString = currentTime.toTimeString().split(" ")[0].substring(0, 5);
+		const todayDateString = getESTDateString();
+
+		const isInOrderingWindow = window.some(({ start, end, date }) => {
+			// Compare date and time
+			return (
+				todayDateString === date &&
+				nowTimeString >= start &&
+				nowTimeString <= end
+			);
+		});
+		return isInOrderingWindow
+	}
+
 	return (
 		<OrderContext.Provider
 			value={{
@@ -83,6 +102,7 @@ export const OrderProvider = ({ children }) => {
 				slotsAvailable,
 				inOrderingWindow,
 				orderingWindow,
+				checkInOrderingWindow
 			}}
 		>
 			{children}

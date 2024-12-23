@@ -1,18 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import styles from '../styles/checkout process styles/DeliveryPage.module.css';
 import { useCart } from '../../hooks/useCart';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import apiUrl from '../../config';
+import { useOrderContext } from '../../contexts/OrderContext';
 
 function AvailableTimeslots({ onSlotChange, showError }) {
 	const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 	const [deliveryAvailable, setDeliveryAvailable] = useState(true);
 	const { cart } = useCart();
 	const { setDeliverySlot, deliverySlot, deliveryDate } = useDeliveryDetails();
+	const { checkInOrderingWindow } = useOrderContext()
 
 	useEffect(() => {
 		const fetchTimeSlots = async () => {
 			if (!deliveryDate || cart.totalCookTime <= 0) {
+				setAvailableTimeSlots([]);
+				setDeliveryAvailable(false);
+				return;
+			}
+
+			// Check if the current time is within the ordering window
+			const isInOrderingWindow = await checkInOrderingWindow();
+			if (!isInOrderingWindow) {
+				console.log('Not in ordering window, skipping fetchTimeSlots.');
 				setAvailableTimeSlots([]);
 				setDeliveryAvailable(false);
 				return;
@@ -59,8 +70,10 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 			}
 		};
 
+		// Call fetchTimeSlots only if in the ordering window
 		fetchTimeSlots();
-	}, [deliveryDate, cart.totalCookTime]);
+	}, [deliveryDate, cart.totalCookTime, checkInOrderingWindow, setDeliverySlot, onSlotChange]);
+
 
 
 	const handleSlotSelection = (e) => {

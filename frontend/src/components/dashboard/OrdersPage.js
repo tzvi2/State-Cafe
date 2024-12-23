@@ -4,6 +4,7 @@ import styles from "../styles/dashboard/OrdersPage.module.css";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
 import { db, Timestamp } from "../../firebaseConfig";
 import { formatPhoneNumber } from "../../utils/stringUtilities";
+import { convertIsoTo12HourTime } from "../../utils/timeUtilities";
 
 function OrdersPage() {
   const [selectedDate] = useOutletContext();
@@ -190,7 +191,7 @@ function OrdersPage() {
                 </td>
                 <td className={styles.topAlign}>{formatPhoneNumber(order.customerDetails.phoneNumber)}</td>
                 <td className={styles.topAlign}>{order.customerDetails.unitNumber}</td>
-                <td className={styles.topAlign}>{formatTime(order.dueDate)}</td>
+                <td className={styles.topAlign}>{convertIsoTo12HourTime(order.dueDate)}</td>
               </tr>
             ))}
           </tbody>

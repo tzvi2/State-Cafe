@@ -231,7 +231,7 @@ export default function CheckoutForm() {
           paymentIntentId: paymentResponse.paymentIntent.id,
           orderDetails: {
             items: cart.items,
-            dueDate: `${deliveryDate}T${deliverySlot}:00`,
+            dueDate: new Date(`${deliveryDate}T${deliverySlot}:00Z`).toISOString(),
             totalPrice: cart.totalPrice,
             customerDetails: {
               phoneNumber: sessionStorage.getItem("phoneNumber"),
