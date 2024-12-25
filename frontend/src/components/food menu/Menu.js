@@ -71,9 +71,7 @@ export default function Menu() {
 
   return (
     <>
-
       <div className={styles.deliveryDateSelection} onClick={toggleDateButtons}>
-
         <span className={styles.minimizedButton}>
           Delivery:{" "}
           {deliveryDate === todayFormatted
@@ -110,10 +108,6 @@ export default function Menu() {
           </div>
         )}
       </div>
-
-
-
-
 
       <div className={styles.menuContainer}>
         {!acceptingOrders && !isLoading && (

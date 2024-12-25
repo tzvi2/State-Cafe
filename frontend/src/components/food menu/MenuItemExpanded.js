@@ -157,8 +157,6 @@ const MenuItemExpanded = () => {
     }
   };
 
-
-
   useEffect(() => {
     return () => {
       if (timeoutId1Ref.current) clearTimeout(timeoutId1Ref.current);
