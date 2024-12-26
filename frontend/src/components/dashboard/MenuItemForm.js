@@ -105,7 +105,7 @@ function MenuItemForm() {
 
     // Prepare new menu item data
     const priceInCents = Math.round(menuItem.price);
-    const timeToCookInSeconds = menuItem.timeToCook;
+    const timeToCookInSeconds = Number(menuItem.timeToCook);
     const tagsArray = [];
 
     const newMenuItem = {
@@ -158,7 +158,7 @@ function MenuItemForm() {
       <textarea name="description" value={menuItem.description} onChange={handleChange} placeholder="Description" />
       <input name="price" type="text" value={menuItem.price} onChange={handleChange} placeholder="Price (in cents)" />
       <input name="category" value={menuItem.category} onChange={handleChange} placeholder="Category" />
-      <input name="timeToCook" type="text" value={menuItem.timeToCook} onChange={handleChange} placeholder="Time to Cook (in seconds)" />
+      <input name="timeToCook" type="number" value={menuItem.timeToCook} onChange={handleChange} placeholder="Time to Cook (in seconds)" />
 
       <label>Image:</label>
       {menuItem.img && (
