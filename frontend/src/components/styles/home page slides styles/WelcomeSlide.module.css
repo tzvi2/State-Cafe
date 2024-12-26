@@ -1,5 +1,5 @@
 .welcomeSlide {
-  margin: 8rem 0;
+	margin: 8rem 0;
 }
 
 .welcomeSlide p {
@@ -7,9 +7,10 @@
 }
 
 .welcomeSlide .header {
-	font-size: 42px;
+	font-size: 36px;
 	opacity: 0;
 	animation: fadeIn 2s .4s forwards;
+	color: rgb(43, 97, 221);
 }
 
 .welcomeSlide .sub_header {
@@ -26,7 +27,7 @@
 
 @keyframes fadeIn {
 	to {
-			opacity: 1;
+		opacity: 1;
 	}
 }
 
