@@ -72,7 +72,7 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 
 		// Call fetchTimeSlots only if in the ordering window
 		fetchTimeSlots();
-	}, [deliveryDate, cart.totalCookTime, checkInOrderingWindow, setDeliverySlot, onSlotChange]);
+	}, [deliveryDate, cart.totalCookTime]);
 
 
 

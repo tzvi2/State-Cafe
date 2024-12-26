@@ -63,10 +63,14 @@ const OrderConfirmation = () => {
     <div className={styles.confirmationCard}>
       <h2>Thank you, your order is complete.</h2>
       <div className={styles.rows}>
-        <OrderDetailsRow label="Ordered" value={formatIsoToTime(orderedAt)} />
+        {/* <OrderDetailsRow label="Ordered" value={formatIsoToTime(orderedAt)} /> */}
         <OrderDetailsRow
           label="Delivery"
           value={`Unit ${unitNumber} at ${convertIsoTo12HourTime(dueDate)}`}
+        />
+        <OrderDetailsRow
+          label="Payment Method"
+          value={`${cardBrand?.toUpperCase()} ending in ${lastFour}`}
         />
       </div>
       <table className={styles.orderTable}>
@@ -107,10 +111,6 @@ const OrderConfirmation = () => {
           </tr>
         </tfoot>
       </table>
-      <OrderDetailsRow
-        label="Payment Method"
-        value={`${cardBrand?.toUpperCase()} ending in ${lastFour}`}
-      />
       <p>
         Something not right? <br /> Contact us: (551) 837-9907
       </p>
