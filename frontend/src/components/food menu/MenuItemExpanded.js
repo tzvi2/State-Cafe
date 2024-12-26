@@ -19,6 +19,7 @@ const MenuItemExpanded = () => {
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [quantityLeft, setQuantityLeft] = useState(0);
+  const [itemIsActive, setItemIsActive] = useState()
   const { inOrderingWindow } = useOrderContext()
 
   const [buttonContent, setButtonContent] = useState({
@@ -33,6 +34,7 @@ const MenuItemExpanded = () => {
     const fetchMenuItem = async () => {
       const data = await getMenuItemByItemId(itemId);
       setMenuItem(data);
+      setItemIsActive(data.active)
     };
 
     fetchMenuItem();
@@ -201,7 +203,7 @@ const MenuItemExpanded = () => {
           )}
           <button
             className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 ? styles.outOfStock : ''}`}
-            disabled={buttonLocked || availableQuantity === 0 || !inOrderingWindow}
+            disabled={buttonLocked || availableQuantity === 0 || !inOrderingWindow || !itemIsActive}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>
