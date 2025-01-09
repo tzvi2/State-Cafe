@@ -121,25 +121,21 @@ img {
   box-shadow: 1.4px 1.6px 3px rgba(128, 128, 128, 0.498);
 }
 
-.footer .addToCart.outOfStock {
+.footer .addToCart.unavailable {
   color: red;
   cursor: default;
-  /* Prevent cursor change */
 }
 
-.footer .addToCart.outOfStock:hover {
+.footer .addToCart.unavailable:hover {
   box-shadow: none;
-  /* Prevent hover shadow */
 }
 
 .footer .addToCart[disabled] {
   cursor: not-allowed;
-  /* Show the 'not allowed' cursor for disabled buttons */
 }
 
 .footer .addToCart[disabled]:hover {
   box-shadow: none;
-  /* Disable shadow effect on hover for disabled buttons */
 }
 
 .checkoutButton {

@@ -202,13 +202,15 @@ const MenuItemExpanded = () => {
             </select>
           )}
           <button
-            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 ? styles.outOfStock : ''}`}
+            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 || !inOrderingWindow || !itemIsActive ? styles.unavailable : ''
+              }`}
             disabled={buttonLocked || availableQuantity === 0 || !inOrderingWindow || !itemIsActive}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>
             {buttonContent.amount && <span>{buttonContent.amount}</span>}
           </button>
+
         </div>
       </div>
       <Link className={styles.checkoutButton} to={"/cart"}>Go to Cart</Link>
