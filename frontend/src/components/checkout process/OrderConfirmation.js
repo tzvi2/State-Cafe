@@ -70,7 +70,7 @@ const OrderConfirmation = () => {
         />
         <OrderDetailsRow
           label="Payment Method"
-          value={`${cardBrand?.toUpperCase()} ending in ${lastFour}`}
+          value={`${cardBrand?.toUpperCase()} ****${lastFour.slice(-4)}`}
         />
       </div>
       <table className={styles.orderTable}>

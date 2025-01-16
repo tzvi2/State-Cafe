@@ -38,7 +38,9 @@ function DeliveryPage() {
   const handleApartmentNumberChange = (e) => setUnitNumber(e.target.value);
 
   const handleSubmit = () => {
-    console.log('delivery slot', deliverySlot);
+    console.log(acceptingOrders, phoneNumber, deliverySlot, unitNumber)
+    //return
+    //console.log('delivery slot', deliverySlot);
     let isValid = true;
 
     // Validate apartment number
@@ -109,7 +111,8 @@ function DeliveryPage() {
 
         {deliveryDate && (
           <>
-            <AvailableTimeslots />
+            <AvailableTimeslots autoSelectEarliest={true} />
+
             <button
               className={styles.wideBtn}
               onClick={handleSubmit}

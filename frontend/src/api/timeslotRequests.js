@@ -174,7 +174,7 @@ export const dayHasAvailableSlots = async (date) => {
 };
 
 export const getOrderingWindow = async (date) => {
-  console.log('getting ordering window')
+  //console.log('getting ordering window')
   try {
     const response = await fetch(`${apiUrl}/hours/${date}/get-ordering-window`);
     if (!response.ok) {

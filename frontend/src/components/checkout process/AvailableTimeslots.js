@@ -5,12 +5,12 @@ import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import apiUrl from '../../config';
 import { useOrderContext } from '../../contexts/OrderContext';
 
-function AvailableTimeslots({ onSlotChange, showError }) {
+function AvailableTimeslots({ onSlotChange, showError, autoSelectEarliest = true }) {
 	const [availableTimeSlots, setAvailableTimeSlots] = useState([]);
 	const [deliveryAvailable, setDeliveryAvailable] = useState(true);
 	const { cart } = useCart();
 	const { setDeliverySlot, deliverySlot, deliveryDate } = useDeliveryDetails();
-	const { checkInOrderingWindow } = useOrderContext()
+	const { checkInOrderingWindow } = useOrderContext();
 
 	useEffect(() => {
 		const fetchTimeSlots = async () => {
@@ -23,7 +23,6 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 			// Check if the current time is within the ordering window
 			const isInOrderingWindow = await checkInOrderingWindow();
 			if (!isInOrderingWindow) {
-				console.log('Not in ordering window, skipping fetchTimeSlots.');
 				setAvailableTimeSlots([]);
 				setDeliveryAvailable(false);
 				return;
@@ -31,7 +30,6 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 
 			const formattedDate = new Date(deliveryDate).toISOString().split("T")[0];
 			const url = `${apiUrl}/hours/${formattedDate}/available-slots?timeToCook=${cart.totalCookTime}`;
-			console.log(`Fetching time slots from: ${url}, total cook time: ${cart.totalCookTime}`);
 
 			try {
 				const response = await fetch(url);
@@ -58,7 +56,7 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 				setAvailableTimeSlots(formattedSlots);
 				setDeliveryAvailable(formattedSlots.length > 0);
 
-				if (formattedSlots.length > 0) {
+				if (formattedSlots.length > 0 && autoSelectEarliest) {
 					const soonestSlot = formattedSlots[0].time;
 					setDeliverySlot(soonestSlot); // Automatically select the soonest slot
 					onSlotChange?.(soonestSlot); // Notify parent component
@@ -70,11 +68,8 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 			}
 		};
 
-		// Call fetchTimeSlots only if in the ordering window
 		fetchTimeSlots();
-	}, [deliveryDate, cart.totalCookTime]);
-
-
+	}, [deliveryDate, cart.totalCookTime, autoSelectEarliest]);
 
 	const handleSlotSelection = (e) => {
 		const newSlot = e.target.value;
@@ -118,6 +113,5 @@ function AvailableTimeslots({ onSlotChange, showError }) {
 		</>
 	);
 }
-
 
 export default AvailableTimeslots

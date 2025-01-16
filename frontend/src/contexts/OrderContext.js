@@ -25,41 +25,18 @@ export const OrderProvider = ({ children }) => {
 
 		const checkAcceptingOrders = async () => {
 			try {
-				// Fetch ordering window
-				const window = await getOrderingWindow(deliveryDate);
-				setOrderingWindow(window);
+				// Fetch ordering window status
+				const isInOrderingWindow = await checkInOrderingWindow();
 
 				// Fetch stock and slots
 				const stockData = await getStockForDate(deliveryDate);
 				const isStockAvailable = Object.values(stockData).some((item) => item.quantity > 0);
 				setStockAvailable(isStockAvailable);
-				//console.log("stock available ", isStockAvailable);
 
 				const isSlotsAvailable = await dayHasAvailableSlots(deliveryDate);
 				setSlotsAvailable(isSlotsAvailable);
-				//console.log("slots available ", isSlotsAvailable);
-
-				// Check current time and date against ordering window
-				const nowEST = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
-				const currentTime = new Date(nowEST);
-				const nowTimeString = currentTime.toTimeString().split(" ")[0].substring(0, 5);
-				const todayDateString = getESTDateString();
-
-				const isInOrderingWindow = window.some(({ start, end, date }) => {
-					// Compare date and time
-					return (
-						todayDateString === date &&
-						nowTimeString >= start &&
-						nowTimeString <= end
-					);
-				});
 
 				setInOrderingWindow(isInOrderingWindow);
-				if (!window.length === 0) {
-					console.log(`currently in ordering window for date ${deliveryDate}: ${isInOrderingWindow}. The ordering window is ${window[0].date} from ${window[0].start} to ${window[0].end}`);
-				} else {
-					console.log(`no ordering window set for ${deliveryDate}`)
-				}
 
 				// Update general acceptance status
 				setAcceptingOrders(isStockAvailable && isSlotsAvailable && isInOrderingWindow);
@@ -71,6 +48,7 @@ export const OrderProvider = ({ children }) => {
 				setAcceptingOrders(false);
 			}
 		};
+
 
 		checkAcceptingOrders();
 	}, [deliveryDate]);
