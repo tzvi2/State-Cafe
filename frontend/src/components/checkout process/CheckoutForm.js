@@ -160,10 +160,8 @@ export default function CheckoutForm() {
       // Successful payment
       if (paymentResponse.paymentIntent.status === "succeeded") {
         console.log('payment succeeded,')
+        clearCart();
         window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
-        setTimeout(() => {
-          clearCart();
-        }, 1000);
       }
 
     } catch (error) {
