@@ -48,19 +48,19 @@
 }
 
 .step1 {
-	animation: slideIn 1s 0.5s forwards;
+	animation: slideIn 1s 0s forwards;
 }
 
 .step2 {
-	animation: slideIn 1s 1s forwards;
+	animation: slideIn 1s .5s forwards;
 }
 
 .step3 {
-	animation: slideIn 1s 1.5s forwards;
+	animation: slideIn 1s 1s forwards;
 }
 
 .step4 {
-	animation: slideIn 1s 2s forwards;
+	animation: slideIn 1s 1.5s forwards;
 }
 
 .icon {

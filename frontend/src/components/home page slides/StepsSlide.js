@@ -38,7 +38,7 @@ function StepsSlide() {
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step2 : ''}`}>
                     <ShoppingCart className={styles.icon} />
-                    <p>Choose your items and checkout.</p>
+                    <p>Choose your food and checkout.</p>
                 </div>
                 <div className={`${styles.step} ${isVisible ? styles.step3 : ''}`}>
                     <CookingPot className={styles.icon} />
