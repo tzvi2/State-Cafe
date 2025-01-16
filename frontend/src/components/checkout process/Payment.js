@@ -20,16 +20,21 @@ function Checkout(props) {
   }, []);
 
   useEffect(() => {
-    console.log('fetching payment intent secret')
-    fetch(`${apiUrl}/payment/create-payment-intent`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: cart.items }),
-    }).then(async (res) => {
-      const { clientSecret } = await res.json();
-      setClientSecret(clientSecret);
-    });
+    if (cart.items.length > 0) {
+      console.log('fetching payment intent secret');
+      fetch(`${apiUrl}/payment/create-payment-intent`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ items: cart.items }),
+      }).then(async (res) => {
+        const { clientSecret } = await res.json();
+        setClientSecret(clientSecret);
+      });
+    } else {
+      console.warn("Cart is empty. Skipping payment intent creation.");
+    }
   }, [cart.items]);
+
 
   return (
     <>

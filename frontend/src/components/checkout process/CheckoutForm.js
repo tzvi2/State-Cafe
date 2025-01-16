@@ -23,6 +23,11 @@ export default function CheckoutForm() {
   const [showTimeslotError, setShowTimeslotError] = useState(false);
   const [outOfStockItems, setOutOfStockItems] = useState([]);
 
+  useEffect(() => {
+    console.log("Cart updated:", cart);
+  }, [cart]);
+
+
   const handleStockIssues = (outOfStockItems, lowStockItems) => {
     const issuesMessage = [];
 
@@ -113,6 +118,8 @@ export default function CheckoutForm() {
         redirect: "if_required",
       });
 
+      console.log('payment response ', paymentResponse)
+
       if (paymentResponse.error) {
         console.error("Payment Error:", paymentResponse.error);
         await fetch(`${apiUrl}/checkout/release-slot`, {
@@ -126,9 +133,39 @@ export default function CheckoutForm() {
         throw new Error(paymentResponse.error.message || "Payment failed.");
       }
 
+      // 3. Process the checkout
+      const processResponse = await fetch(`${apiUrl}/checkout/process`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          dueDate: new Date(`${deliveryDate}T${deliverySlot}:00Z`).toISOString(),
+          slot: deliverySlot,
+          cart: cart.items,
+          totalCookTime: cart.totalCookTime,
+          paymentIntentId: paymentResponse.paymentIntent.id,
+          reservationId: validationData.reservationId,
+          customerDetails: {
+            phoneNumber: sessionStorage.getItem("phoneNumber"),
+            unitNumber: sessionStorage.getItem("unitNumber"),
+          },
+        }),
+      });
+
+      const processData = await processResponse.json();
+      if (!processData.success) {
+        throw new Error(processData.error || 'Checkout process failed.');
+      }
+
+
       // Successful payment
-      clearCart();
-      window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
+      if (paymentResponse.paymentIntent.status === "succeeded") {
+        console.log('payment succeeded,')
+        window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
+        setTimeout(() => {
+          clearCart();
+        }, 1000);
+      }
+
     } catch (error) {
       console.error("Error during checkout:", error.message);
       setMessage(error.message || "An error occurred.");
