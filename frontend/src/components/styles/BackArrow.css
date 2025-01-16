@@ -1,10 +1,12 @@
 .arrow {
-	width: 10vw;
-	height: 6vw;
+	width: 12vw;
+	height: 8vw;
 	border: 1px solid black;
-	border-radius: 10px;
+	border-radius: 5px;
 	background: #f0f0eb;
 	margin: 2vw;
+	position: sticky;
+	top: 65px;
 }
 
 @media (min-width: 1024px) {
@@ -12,7 +14,8 @@
 
 		width: 3rem;
 		height: 2rem;
-		margin: .5rem
+		margin: .5rem;
+		top: 5px;
 	}
 
 
