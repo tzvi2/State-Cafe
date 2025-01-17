@@ -4,7 +4,7 @@ import RenderOptions from './RenderOptions';
 import BackArrow from '../BackArrow';
 import styles from '../styles/food menu styles/MenuItemExpanded.module.css';
 import { useCart } from '../../hooks/useCart';
-import { getMenuItemByItemId } from '../../api/menuRequests';
+import { getMenuItemByItemId } from '../../api/menuRequests'; // Fallback fetch
 import { getStockForDate } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
@@ -15,32 +15,42 @@ const MenuItemExpanded = () => {
   const { itemId } = useParams();
   const { addToCart, cart } = useCart();
   const { deliveryDate } = useDeliveryDetails();
-  const { menuItems, stock } = useMenu();
-
+  const { menuItems, fetchMenuItems, stock } = useMenu(); // Use menu context
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [quantityLeft, setQuantityLeft] = useState(0);
-  const [itemIsActive, setItemIsActive] = useState()
-  const { inOrderingWindow } = useOrderContext()
+  const { inOrderingWindow } = useOrderContext();
 
   const [buttonContent, setButtonContent] = useState({
     text: "Add to Cart",
-    amount: ""
+    amount: "",
   });
 
   const timeoutId1Ref = useRef();
   const timeoutId2Ref = useRef();
 
+  // Fetch the menu item from the context or fallback to API
   useEffect(() => {
-    // Find menu item in cached menuItems
     const item = menuItems.find((menuItem) => menuItem.id === itemId);
     if (item) {
       setMenuItem(item);
+    } else {
+      // Fallback: Fetch item by ID if not in context
+      const fetchFallbackMenuItem = async () => {
+        try {
+          const fetchedItem = await getMenuItemByItemId(itemId);
+          setMenuItem(fetchedItem);
+        } catch (error) {
+          console.error("Error fetching menu item:", error);
+        }
+      };
+      fetchFallbackMenuItem();
     }
   }, [menuItems, itemId]);
 
+  // Fetch stock for the current delivery date
   useEffect(() => {
     const fetchStockData = async () => {
       if (deliveryDate) {
@@ -48,7 +58,6 @@ const MenuItemExpanded = () => {
         setQuantityLeft(stockData[itemId]?.quantity || 0);
       }
     };
-
     fetchStockData();
   }, [deliveryDate, itemId]);
 
@@ -101,8 +110,8 @@ const MenuItemExpanded = () => {
   const updateButtonContent = useCallback(() => {
     if (menuItem.price !== undefined) {
       const newButtonContent = {
-        text: quantityLeft === 0 ? "Out of Stock" : "Add to Cart ",
-        amount: quantityLeft === 0 ? "" : centsToFormattedPrice(totalItemPrice)
+        text: quantityLeft === 0 ? "Out of Stock" : "Add to Cart",
+        amount: quantityLeft === 0 ? "" : centsToFormattedPrice(totalItemPrice),
       };
       setButtonContent(newButtonContent);
     }
@@ -110,7 +119,6 @@ const MenuItemExpanded = () => {
 
   useEffect(() => {
     updateButtonContent();
-    //console.log('selected options: ', selectedOptions)
   }, [selectedOptions, quantity, updateButtonContent]);
 
   const handleAddToCart = async () => {
@@ -152,7 +160,7 @@ const MenuItemExpanded = () => {
       timeoutId1Ref.current = setTimeout(() => setButtonContent({ text: "Added to cart", amount: "" }), 100);
       timeoutId2Ref.current = setTimeout(() => {
         setButtonContent({
-          text: "Add to Cart ",
+          text: "Add to Cart",
           amount: centsToFormattedPrice(totalItemPrice),
         });
         setButtonLocked(false);
@@ -203,15 +211,13 @@ const MenuItemExpanded = () => {
             </select>
           )}
           <button
-            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 || !inOrderingWindow || !itemIsActive ? styles.unavailable : ''
-              }`}
-            disabled={buttonLocked || !inOrderingWindow || !itemIsActive}
+            className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 || !inOrderingWindow ? styles.unavailable : ''}`}
+            disabled={buttonLocked || !inOrderingWindow}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>
             {buttonContent.amount && <span>{buttonContent.amount}</span>}
           </button>
-
         </div>
       </div>
       <Link className={styles.checkoutButton} to={"/cart"}>Go to Cart</Link>
