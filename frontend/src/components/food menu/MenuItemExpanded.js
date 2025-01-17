@@ -9,11 +9,14 @@ import { getStockForDate } from '../../api/stockRequests';
 import { centsToFormattedPrice } from '../../utils/priceUtilities';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useOrderContext } from '../../contexts/OrderContext';
+import { useMenu } from '../../contexts/MenuContext';
 
 const MenuItemExpanded = () => {
   const { itemId } = useParams();
   const { addToCart, cart } = useCart();
   const { deliveryDate } = useDeliveryDetails();
+  const { menuItems, stock } = useMenu();
+
   const [menuItem, setMenuItem] = useState({});
   const [selectedOptions, setSelectedOptions] = useState([]);
   const [buttonLocked, setButtonLocked] = useState(false);
@@ -31,14 +34,12 @@ const MenuItemExpanded = () => {
   const timeoutId2Ref = useRef();
 
   useEffect(() => {
-    const fetchMenuItem = async () => {
-      const data = await getMenuItemByItemId(itemId);
-      setMenuItem(data);
-      setItemIsActive(data.active)
-    };
-
-    fetchMenuItem();
-  }, [itemId]);
+    // Find menu item in cached menuItems
+    const item = menuItems.find((menuItem) => menuItem.id === itemId);
+    if (item) {
+      setMenuItem(item);
+    }
+  }, [menuItems, itemId]);
 
   useEffect(() => {
     const fetchStockData = async () => {
@@ -204,7 +205,7 @@ const MenuItemExpanded = () => {
           <button
             className={`${styles.addToCart} ${buttonContent.amount ? '' : styles.centerText} ${availableQuantity === 0 || !inOrderingWindow || !itemIsActive ? styles.unavailable : ''
               }`}
-            disabled={buttonLocked || availableQuantity === 0 || !inOrderingWindow || !itemIsActive}
+            disabled={buttonLocked || !inOrderingWindow || !itemIsActive}
             onClick={handleAddToCart}
           >
             <span>{buttonContent.text}</span>

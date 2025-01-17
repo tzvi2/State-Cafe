@@ -25,44 +25,47 @@ import DashboardLayout from './components/dashboard/DashboardLayout';
 import LoginPage from './components/LoginPage';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import { MenuProvider } from './contexts/MenuContext';
 
 function App() {
 
   return (
     <BrowserRouter>
-      <CartProvider>
-        <DeliveryDetailsProvider>
-          <AuthContextProvider>
-            <OrderProvider>
-              <Analytics />
-              <SpeedInsights />
-              <Header />
-              <div className='App'>
-                <Routes>
-                  <Route path="/" element={<Home />} />
-                  <Route path="about" element={<About />} />
-                  <Route path="menu" element={<Menu />} />
-                  <Route path="menu/:itemId" element={<MenuItemExpanded />} />
-                  <Route path="cart" element={<CartPage />} />
-                  <Route path="checkout" element={<DeliveryPage />} />
-                  <Route path="payment" element={<Payment />} />
-                  <Route path="confirmation" element={<OrderConfirmation />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/unauthorized" element={<UnauthorizedPage />} />
-                  <Route path="/dashboard" element={<ProtectedRoute element={<DashboardLayout />} />}>
-                    <Route path="stock" element={<StockPage />} />
-                    <Route path="hours" element={<HoursPage />} />
-                    <Route path="menu" element={<MenuPage />} />
-                    <Route path="menu/new" element={<MenuItemForm />} />
-                    <Route path="menu/:itemId" element={<MenuItemForm />} />
-                    <Route path="orders" element={<OrdersPage />} />
-                  </Route>
-                </Routes>
-              </div>
-            </OrderProvider>
-          </AuthContextProvider>
-        </DeliveryDetailsProvider>
-      </CartProvider>
+      <MenuProvider>
+        <CartProvider>
+          <DeliveryDetailsProvider>
+            <AuthContextProvider>
+              <OrderProvider>
+                <Analytics />
+                <SpeedInsights />
+                <Header />
+                <div className='App'>
+                  <Routes>
+                    <Route path="/" element={<Home />} />
+                    <Route path="about" element={<About />} />
+                    <Route path="menu" element={<Menu />} />
+                    <Route path="menu/:itemId" element={<MenuItemExpanded />} />
+                    <Route path="cart" element={<CartPage />} />
+                    <Route path="checkout" element={<DeliveryPage />} />
+                    <Route path="payment" element={<Payment />} />
+                    <Route path="confirmation" element={<OrderConfirmation />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/unauthorized" element={<UnauthorizedPage />} />
+                    <Route path="/dashboard" element={<ProtectedRoute element={<DashboardLayout />} />}>
+                      <Route path="stock" element={<StockPage />} />
+                      <Route path="hours" element={<HoursPage />} />
+                      <Route path="menu" element={<MenuPage />} />
+                      <Route path="menu/new" element={<MenuItemForm />} />
+                      <Route path="menu/:itemId" element={<MenuItemForm />} />
+                      <Route path="orders" element={<OrdersPage />} />
+                    </Route>
+                  </Routes>
+                </div>
+              </OrderProvider>
+            </AuthContextProvider>
+          </DeliveryDetailsProvider>
+        </CartProvider>
+      </MenuProvider>
     </BrowserRouter>
   );
 }

@@ -4,15 +4,13 @@ import Menuitem from "./Menuitem";
 import Shimmer from "./Shimmer";
 import styles from '../styles/food menu styles/Menu.module.css';
 import { getESTDate, formatDateToYYYYMMDD, formatDateToMDYYYY, YMDtoDMY } from '../../utils/dateUtilities';
-import { getActiveMenuItems } from "../../api/menuRequests";
-import { getStockForDate } from '../../api/stockRequests';
 import { useDeliveryDetails } from '../../hooks/useDeliveryDetails';
 import { useOrderContext } from '../../contexts/OrderContext';
+import { useMenu } from '../../contexts/MenuContext';
 
 export default function Menu() {
-  const [menuItems, setMenuItems] = useState([]);
-  const [stock, setStock] = useState({});
-  const [isLoading, setIsLoading] = useState(true);
+  const { menuItems, fetchMenuItems, stock, fetchStock, isLoading } = useMenu();
+
   const [showDateButtons, setShowDateButtons] = useState(false);
   const { acceptingOrders } = useOrderContext();
   const { deliveryDate, setDeliveryDate } = useDeliveryDetails();
@@ -31,36 +29,16 @@ export default function Menu() {
     }
   }, [deliveryDate, setDeliveryDate, todayFormatted]);
 
-
-  // Fetch menu items on mount
+  // Fetch menu items if not already fetched
   useEffect(() => {
-    const fetchMenuItems = async () => {
-      try {
-        const activeItems = await getActiveMenuItems();
-        setMenuItems(activeItems);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Error fetching menu items:', error);
-      }
-    };
-
-    fetchMenuItems();
-  }, []);
+    if (menuItems.length === 0) {
+      fetchMenuItems();
+    }
+  }, [menuItems]);
 
   // Fetch stock for the selected delivery date
   useEffect(() => {
-    const fetchStockForSelectedDate = async () => {
-      if (deliveryDate) {
-        try {
-          const stockData = await getStockForDate(deliveryDate);
-          setStock(stockData);
-        } catch (error) {
-          console.error('Error fetching stock data:', error);
-        }
-      }
-    };
-
-    fetchStockForSelectedDate();
+    fetchStock(deliveryDate);
   }, [deliveryDate]);
 
   const isDaySelected = (dateStr) => deliveryDate === dateStr;
