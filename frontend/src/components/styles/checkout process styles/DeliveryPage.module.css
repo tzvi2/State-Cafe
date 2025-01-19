@@ -110,6 +110,10 @@
 
 }
 
+.centered {
+	text-align: center;
+}
+
 /* 
 .morningHours {
 	color: #258faf;

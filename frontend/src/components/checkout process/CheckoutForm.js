@@ -20,6 +20,7 @@ export default function CheckoutForm() {
   const [message, setMessage] = useState("");
   const [formLoading, setFormLoading] = useState(true);
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [paymentSuccessful, setPaymentSuccessful] = useState(false);
   const [showTimeslotError, setShowTimeslotError] = useState(false);
   const [outOfStockItems, setOutOfStockItems] = useState([]);
 
@@ -118,8 +119,6 @@ export default function CheckoutForm() {
         redirect: "if_required",
       });
 
-      console.log('payment response ', paymentResponse)
-
       if (paymentResponse.error) {
         console.error("Payment Error:", paymentResponse.error);
         await fetch(`${apiUrl}/checkout/release-slot`, {
@@ -133,7 +132,7 @@ export default function CheckoutForm() {
         throw new Error(paymentResponse.error.message || "Payment failed.");
       }
 
-      // 3. Process the checkout
+      // Process the checkout
       const processResponse = await fetch(`${apiUrl}/checkout/process`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -153,22 +152,20 @@ export default function CheckoutForm() {
 
       const processData = await processResponse.json();
       if (!processData.success) {
-        throw new Error(processData.error || 'Checkout process failed.');
+        throw new Error(processData.error || "Checkout process failed.");
       }
-
 
       // Successful payment
       if (paymentResponse.paymentIntent.status === "succeeded") {
-        console.log('payment succeeded,')
+        setPaymentSuccessful(true); // Mark payment as successful
         clearCart();
         window.location.href = `/confirmation?payment_intent_client_secret=${paymentResponse.paymentIntent.client_secret}`;
       }
-
     } catch (error) {
       console.error("Error during checkout:", error.message);
       setMessage(error.message || "An error occurred.");
     } finally {
-      setPaymentLoading(false);
+      if (!paymentSuccessful) setPaymentLoading(false);
     }
   };
 
@@ -222,9 +219,10 @@ export default function CheckoutForm() {
             id="submit"
           >
             <span id="button-text">
-              {paymentLoading ? "Processing..." : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
+              {paymentSuccessful || paymentLoading ? "Processing..." : `Pay ${centsToFormattedPrice(cart.totalPrice)}`}
             </span>
           </button>
+
         )}
       </form>
     </>

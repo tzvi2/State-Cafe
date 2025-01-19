@@ -112,7 +112,8 @@ function DeliveryPage() {
         {deliveryDate && (
           <>
             <AvailableTimeslots autoSelectEarliest={true} />
-
+            {!acceptingOrders && <>
+              <p className={styles.centered}>We're not taking orders at the moment.</p></>}
             <button
               className={styles.wideBtn}
               onClick={handleSubmit}

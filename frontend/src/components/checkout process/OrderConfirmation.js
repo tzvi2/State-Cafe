@@ -112,7 +112,7 @@ const OrderConfirmation = () => {
         </tfoot>
       </table>
       <p>
-        Something not right? <br /> Contact us: (551) 837-9907
+        Something not right? <br /> Call or text: (551) 837-9907
       </p>
     </div>
   );

@@ -51,11 +51,11 @@ export const OrderProvider = ({ children }) => {
 
 
 		checkAcceptingOrders();
+		console.log('accepting orders ', acceptingOrders)
 	}, [deliveryDate]);
 
 	const checkInOrderingWindow = async () => {
 		const window = await getOrderingWindow(deliveryDate);
-		console.log('window ', window)
 		const nowEST = new Date().toLocaleString("en-US", { timeZone: "America/New_York" });
 		const currentTime = new Date(nowEST);
 		const nowTimeString = currentTime.toTimeString().split(" ")[0].substring(0, 5);
@@ -69,6 +69,7 @@ export const OrderProvider = ({ children }) => {
 				nowTimeString <= end
 			);
 		});
+		console.log('is in ordering window', isInOrderingWindow)
 		return isInOrderingWindow
 	}
 
