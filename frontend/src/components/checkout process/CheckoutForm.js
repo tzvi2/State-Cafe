@@ -82,6 +82,7 @@ export default function CheckoutForm() {
     event.preventDefault();
     setPaymentLoading(true);
     setMessage("");
+    //console.log('delivery date', deliveryDate, 'delivery slot', deliverySlot)
 
     try {
       // Validate the checkout

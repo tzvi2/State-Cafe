@@ -110,7 +110,7 @@ function OrdersPage() {
               </div>
               <div className={styles.detailRow}>
                 <span>Delivery</span>
-                <span>{formatTime(order.dueDate)}</span>
+                <span>{convertIsoTo12HourTime(order.dueDate)}</span>
               </div>
               <div className={styles.detailRow}>
                 <span>Phone</span>

@@ -29,16 +29,9 @@ export function convertTo12HourFormat(time24) {
 export function convertIsoTo12HourTime(isoString) {
 	const date = new Date(isoString);
 
-	// Calculate the UTC offset for EST (Eastern Standard Time)
-	const EST_OFFSET = -5; // EST is UTC-5
-	const isDST = date.toLocaleTimeString('en-US', { timeZone: 'America/New_York' }).includes('EDT');
-	const effectiveOffset = isDST ? -4 : EST_OFFSET; // Adjust for daylight saving time (EDT is UTC-4)
-
-	// Get the UTC time and apply the EST/EDT offset
-	const utcHours = date.getUTCHours();
-	const utcMinutes = date.getUTCMinutes();
-	let hours = (utcHours + effectiveOffset + 24) % 24; // Adjust hours for EST/EDT and ensure positive values
-	const minutes = utcMinutes;
+	// Extract hours and minutes
+	let hours = date.getUTCHours(); // Use UTC time
+	const minutes = date.getUTCMinutes();
 
 	// Determine am/pm
 	const ampm = hours >= 12 ? 'pm' : 'am';
@@ -51,5 +44,4 @@ export function convertIsoTo12HourTime(isoString) {
 
 	return `${hours}:${formattedMinutes}${ampm}`;
 }
-
 
