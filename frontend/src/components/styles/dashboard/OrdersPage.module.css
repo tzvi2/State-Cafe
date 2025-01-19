@@ -27,16 +27,23 @@
 
 .items {
   padding-inline-start: 15px;
+  list-style-type: none;
+  padding-inline-start: 0;
+  margin: 0;
 }
 
 .item {
   display: flex;
   justify-content: space-between;
   font-size: 1.25rem;
+  align-items: start;
   margin: 5% 0;
+  flex-direction: row;
 }
 
-.item .description p, .item .quantity p {
+
+.item .description p,
+.item .quantity p {
   margin: 5px;
 }
 
@@ -45,24 +52,15 @@
   border-collapse: collapse;
 }
 
-.ordersTable th, .ordersTable td {
+.ordersTable th,
+.ordersTable td {
   border: 1px solid grey;
   padding: 8px;
   text-align: left;
-  vertical-align: top; /* Align the content at the top */
+  vertical-align: top;
+  /* Align the content at the top */
 }
 
-.items {
-  list-style-type: none;
-  padding-inline-start: 0;
-  margin: 0;
-}
-
-.item {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-}
 
 .options {
   list-style-type: none;
@@ -76,7 +74,8 @@
   margin: 0;
 }
 
-th, td {
+th,
+td {
   font-size: 20px;
 }
 
@@ -107,6 +106,19 @@ th, td {
   .ordersTable {
     display: table;
   }
+
+  .title .qty {
+    margin-left: 20px;
+  }
+
+  .ordersTable tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+
+  .ordersTable tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+  }
+
 }
 
 @media (max-width: 759px) {
