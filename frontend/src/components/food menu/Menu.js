@@ -9,7 +9,7 @@ import { useOrderContext } from '../../contexts/OrderContext';
 import { useMenu } from '../../contexts/MenuContext';
 
 export default function Menu() {
-  const { menuItems, fetchMenuItems, stock, fetchStock, isLoading } = useMenu();
+  const { menuItems, fetchMenuItems, stock, fetchStock, isLoading, error } = useMenu();
 
   const [showDateButtons, setShowDateButtons] = useState(false);
   const { acceptingOrders } = useOrderContext();
@@ -32,9 +32,10 @@ export default function Menu() {
   // Fetch menu items if not already fetched
   useEffect(() => {
     if (menuItems.length === 0) {
+      console.log('fetching')
       fetchMenuItems();
     }
-  }, [menuItems]);
+  }, []);
 
   // Fetch stock for the selected delivery date
   useEffect(() => {
@@ -88,17 +89,31 @@ export default function Menu() {
       </div>
 
       <div className={styles.menuContainer}>
-        {!acceptingOrders && !isLoading && (
+        {/* Display error message if there is an error */}
+        {error && (
+          <div className={styles.errorContainer}>
+            <p className={styles.ordersMessage}>{error}</p>
+            {/* <button className={styles.retryButton} onClick={() => fetchMenuItems()}>
+              Try Again
+            </button> */}
+          </div>
+        )}
+
+        {/* Display a message if not accepting orders and there is no error */}
+        {!acceptingOrders && !isLoading && !error && (
           <p className={styles.ordersMessage}>
             We are not accepting orders for the selected date.
           </p>
         )}
 
-        {isLoading && <p className={styles.loadingMessage}>Loading, please wait...</p>}
+        {/* Display loading message only if there is no error */}
+        {isLoading && !error && (
+          <p className={styles.loadingMessage}>Loading, please wait...</p>
+        )}
+
+        {/* Render menu items if not loading and there is no error */}
         <div className={styles.menu}>
-          {isLoading ? (
-            Array(10).fill(0).map((_, index) => <Shimmer key={index} />)
-          ) : (
+          {!isLoading && !error ? (
             menuItems.map((item) => (
               <Menuitem
                 key={item.id}
@@ -106,9 +121,13 @@ export default function Menu() {
                 stock={stock[item.id]?.quantity || 0}
               />
             ))
+          ) : (
+            isLoading && Array(10).fill(0).map((_, index) => <Shimmer key={index} />)
           )}
         </div>
       </div>
+
+
     </>
   );
 }

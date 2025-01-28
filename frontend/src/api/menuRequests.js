@@ -23,23 +23,25 @@ export const getMenuItems = async (category = '') => {
 
 export const getActiveMenuItems = async () => {
   try {
+    const res = await fetch(`${apiUrl}/menu/active`);
 
-    const res = await fetch(`${apiUrl}/menu/active`)
-    //const res = await fetch(`https://api-v3nds5fhrq-uc.a.run.app/menu/active`)
-
+    // Check if the response status is not OK
     if (!res.ok) {
-      throw new Error('Failed to fetch active menu items.')
+      throw new Error(`Failed to fetch active menu items. Status: ${res.status}`);
     }
 
-    const data = res.json()
+    // Await the parsed JSON data
+    const data = await res.json();
 
-    return data
-
+    return data;
   } catch (error) {
-    console.error('Error fetching menu items:', error);
-    return [];
+    console.error("Error fetching menu items:", error.message); // Log the actual error message
+    throw error; // Re-throw the error to propagate it to the caller
   }
-}
+};
+
+
+
 
 export const getMenuAndStockForDate = async (date) => {
   console.log('getting menu and stock for date ', date)

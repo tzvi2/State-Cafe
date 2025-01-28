@@ -9,17 +9,25 @@ export const MenuProvider = ({ children }) => {
 	const [stock, setStock] = useState({});
 	const [stockLastFetched, setStockLastFetched] = useState(null);
 	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	const fetchMenuItems = async () => {
+		setIsLoading(true);
+		setError(null);
 		try {
 			const activeItems = await getActiveMenuItems();
 			setMenuItems(activeItems);
-			setIsLoading(false);
 		} catch (error) {
 			console.error("Error fetching menu items:", error);
+			setError("We've encountered technical difficulties and couldn't load the menu right now. Please try again later.");
+		} finally {
 			setIsLoading(false);
+			console.log("IsLoading set to:", false);
 		}
 	};
+
+
+
 
 	const fetchStock = async (deliveryDate) => {
 		if (deliveryDate) {
@@ -46,8 +54,9 @@ export const MenuProvider = ({ children }) => {
 				setStock,
 				isLoading,
 				setIsLoading,
-				fetchMenuItems, // Expose this function
+				fetchMenuItems,
 				fetchStock,
+				error
 			}}
 		>
 			{children}
