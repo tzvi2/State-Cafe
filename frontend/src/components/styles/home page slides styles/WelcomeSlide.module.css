@@ -1,9 +1,11 @@
 .welcomeSlide {
-	margin: 8rem 0;
+	margin: 4rem 0;
+	display: flex;
+	flex-direction: column;
 }
 
 .welcomeSlide p {
-	margin: 3rem 1rem;
+	margin: 1rem;
 }
 
 .welcomeSlide .header {
@@ -24,6 +26,13 @@
 
 }
 
+.logo {
+	width: 8rem;
+	align-self: center;
+	margin: 1rem;
+	transition: transform 0.3s ease-in-out;
+}
+
 
 @keyframes fadeIn {
 	to {
@@ -35,4 +44,33 @@
 	.welcomeSlide {
 		text-align: center;
 	}
+
+	.logo {
+		width: unset;
+	}
+}
+
+@media (hover: hover) {
+	.logo:hover {
+		transform: scale(1.05);
+		cursor: pointer;
+	}
+
+	.logo.no_hover:hover {
+		transform: none;
+	}
+}
+
+@keyframes spin {
+	from {
+		transform: rotate(0deg);
+	}
+
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.spin {
+	animation: spin 0.6s ease-in-out;
 }
