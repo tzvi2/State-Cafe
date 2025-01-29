@@ -17,17 +17,13 @@
 	row-gap: 1rem;
 }
 
-.contact img {
-	height: 7rem;
-	width: 7rem;
-	
-}
+
 
 .phoneLine {
 	display: flex;
 	column-gap: 2%;
 	align-items: center;
-	margin: 1rem 0;
+	margin: 0;
 }
 
 .phoneLine a {
@@ -61,6 +57,32 @@
 	margin: .1rem 0;
 }
 
+.instagramLine {
+	display: flex;
+
+}
+
+.instagramLine {
+	font-size: 1.1rem;
+}
+
+.icon_container {
+	text-align: center;
+	margin-left: 1rem;
+	display: flex;
+}
+
+.icon_container p {
+	color: black;
+	text-decoration: none;
+}
+
+.instagramIcon {
+	width: 3rem;
+	height: 3rem;
+	margin: 0;
+}
+
 
 @media (min-width: 550px) {
 
@@ -72,7 +94,8 @@
 		font-size: 4vw;
 	}
 
-	.hours h4, .hours p {
+	.hours h4,
+	.hours p {
 		font-size: 4vw;
 	}
 }
@@ -107,7 +130,7 @@
 	.phoneLine {
 		display: flex;
 		margin: 0;
-		
+
 	}
 
 	.hours {
@@ -121,7 +144,8 @@
 		font-size: 1.25rem;
 	}
 
-	.hours h4, .hours p {
+	.hours h4,
+	.hours p {
 		font-size: 1.25rem;
 		margin: 0;
 	}
