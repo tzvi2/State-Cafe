@@ -147,6 +147,7 @@ export default function CheckoutForm() {
           customerDetails: {
             phoneNumber: sessionStorage.getItem("phoneNumber"),
             unitNumber: sessionStorage.getItem("unitNumber"),
+            buildingName: sessionStorage.getItem("buildingName")
           },
         }),
       });

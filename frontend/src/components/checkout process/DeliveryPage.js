@@ -11,7 +11,7 @@ import BackArrow from '../BackArrow';
 function DeliveryPage() {
   const [deliveryAvailable, setDeliveryAvailable] = useState(true);
   const { cart } = useCart();
-  const { acceptingOrders } = useOrderContext()
+  const { acceptingOrders } = useOrderContext();
   const {
     setDeliverySlot,
     setUnitNumber,
@@ -20,10 +20,16 @@ function DeliveryPage() {
     deliveryDate,
     phoneNumber,
     setPhoneNumber,
+    buildingName,
+    setBuildingName,
   } = useDeliveryDetails();
   const [apartmentNumberError, setApartmentNumberError] = useState('');
   const [phoneNumberError, setPhoneNumberError] = useState('');
   const navigate = useNavigate();
+
+  const handleBuildingChange = (e) => {
+    setBuildingName(e.target.value); // Update the selected building
+  };
 
   const handlePhoneNumberChange = (e) => {
     let input = e.target.value.replace(/\D/g, ""); // Remove non-digit characters
@@ -35,21 +41,11 @@ function DeliveryPage() {
     setPhoneNumber(input);
   };
 
-  const handleApartmentNumberChange = (e) => setUnitNumber(e.target.value);
-
   const handleSubmit = () => {
     console.log(acceptingOrders, phoneNumber, deliverySlot, unitNumber)
     //return
     //console.log('delivery slot', deliverySlot);
     let isValid = true;
-
-    // Validate apartment number
-    if (!unitNumber || unitNumber.length !== 3 || unitNumber < 201 || unitNumber > 558) {
-      setApartmentNumberError('Apartment number should be 3 digits between 201 and 558.');
-      isValid = false;
-    } else {
-      setApartmentNumberError('');
-    }
 
     // Validate phone number
     const phonePattern = /^\d{3}-\d{3}-\d{4}$/;
@@ -62,10 +58,8 @@ function DeliveryPage() {
 
     // Save to sessionStorage if valid
     if (isValid) {
-      sessionStorage.setItem('phoneNumber', phoneNumber);
-      sessionStorage.setItem('unitNumber', unitNumber);
 
-      if (deliverySlot && deliveryDate) {
+      if (deliverySlot && deliveryDate && buildingName) {
         navigate('/payment');
       } else {
         console.warn('Missing delivery slot or date.');
@@ -82,15 +76,27 @@ function DeliveryPage() {
         </div>
 
         <div className={styles.flexRow}>
-          <label htmlFor="apartmentNumber">Apartment:</label>
+          <label htmlFor="building">Apartment:</label>
+          <select value={buildingName} onChange={handleBuildingChange}>
+            <option value="">Select a building</option>
+            <option value="One500">One500</option>
+            <option value="Terrace Circle">Terrace Circle</option>
+            <option value="Teaneck Square">Teaneck Square</option>
+            <option value="The Castle">The Castle</option>
+            <option value="Ayers Court">Ayers Court</option>
+            <option value="Walraven">Walraven</option>
+            {/* <option value="Avalon">Avalon (Windsor rd)</option> */}
+          </select>
+        </div>
+
+        <div className={styles.flexRow}>
+          <label htmlFor="apartmentNumber">Unit/Address:</label>
           <input
             type="number"
             id="apartmentNumber"
             value={unitNumber}
-            onChange={handleApartmentNumberChange}
-            min={201}
-            max={558}
-            placeholder="e.g., 305"
+            onChange={(e) => setUnitNumber(e.target.value)}
+            placeholder="e.g. 200"
           />
         </div>
 
@@ -112,12 +118,13 @@ function DeliveryPage() {
         {deliveryDate && (
           <>
             <AvailableTimeslots autoSelectEarliest={true} />
-            {!acceptingOrders && <>
-              <p className={styles.centered}>We're not taking orders at the moment.</p></>}
+            {!acceptingOrders && (
+              <p className={styles.centered}>We're not taking orders at the moment.</p>
+            )}
             <button
               className={styles.wideBtn}
               onClick={handleSubmit}
-              disabled={!acceptingOrders || !phoneNumber || !deliverySlot || !unitNumber}
+              disabled={!acceptingOrders || !phoneNumber || !deliverySlot || !unitNumber || !buildingName}
             >
               Proceed to Checkout
             </button>
@@ -127,5 +134,6 @@ function DeliveryPage() {
     </>
   );
 }
+
 
 export default DeliveryPage;

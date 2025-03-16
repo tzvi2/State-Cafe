@@ -17,6 +17,7 @@ const OrderConfirmation = () => {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    // uses payment intent id to retrieve order details from backend
     const fetchOrder = async () => {
       const urlParams = new URLSearchParams(window.location.search);
       const clientSecret = urlParams.get("payment_intent_client_secret");
@@ -50,23 +51,27 @@ const OrderConfirmation = () => {
     return <div className={styles.error}>{message}</div>;
   }
 
+  // destructure order response
   const {
     orderedAt,
     dueDate,
     items,
     totalPrice,
     paymentDetails: { cardBrand, lastFour },
-    customerDetails: { unitNumber },
+    customerDetails: { unitNumber, buildingName },
   } = orderDetails;
+
+  console.log('order detauls', orderDetails)
+
 
   return (
     <div className={styles.confirmationCard}>
       <h2>Thank you, your order is complete.</h2>
       <div className={styles.rows}>
-        {/* <OrderDetailsRow label="Ordered" value={formatIsoToTime(orderedAt)} /> */}
+        {/* Updated Delivery Details */}
         <OrderDetailsRow
           label="Delivery"
-          value={`Unit ${unitNumber} at ${convertIsoTo12HourTime(dueDate)}`}
+          value={`${convertIsoTo12HourTime(dueDate)} | Unit ${unitNumber} in ${buildingName}`}
         />
         <OrderDetailsRow
           label="Payment Method"
