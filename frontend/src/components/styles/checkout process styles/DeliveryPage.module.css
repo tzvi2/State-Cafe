@@ -33,6 +33,11 @@
 	justify-content: end;
 }
 
+.errorRow:empty {
+	display: none;
+}
+
+
 .error {
 	color: red;
 	margin: 0;
@@ -78,8 +83,11 @@
 }
 
 
-.flexRow input {
+.flexRow input,
+.flexRow select {
 	text-align: center;
+	width: 50%;
+	margin: 0;
 }
 
 

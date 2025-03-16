@@ -92,7 +92,7 @@ function DeliveryPage() {
         <div className={styles.flexRow}>
           <label htmlFor="apartmentNumber">Unit/Address:</label>
           <input
-            type="number"
+            type="text"
             id="apartmentNumber"
             value={unitNumber}
             onChange={(e) => setUnitNumber(e.target.value)}

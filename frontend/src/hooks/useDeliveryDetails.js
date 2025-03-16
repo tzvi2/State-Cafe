@@ -47,7 +47,7 @@ export default function DeliverySlotProvider({ children }) {
     setUnitNumber("");
     setDeliveryDate(todayFormatted);
     setPhoneNumber("");
-    setBuildingName(""); // Clear building name
+    setBuildingName("");
     sessionStorage.clear();
   };
 

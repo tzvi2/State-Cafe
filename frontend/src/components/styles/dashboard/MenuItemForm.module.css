@@ -4,19 +4,23 @@
   flex-direction: column;
 }
 
-input, textarea {
+.form input,
+.form textarea {
   margin: 5px 0;
   padding: 10px;
   width: 100%;
-  box-sizing: border-box; /* Ensures padding and border are included in the element's width */
+  box-sizing: border-box;
+  /* Ensures padding and border are included in the element's width */
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
 
 textarea {
-  resize: vertical; /* Allows vertical resizing, but prevents horizontal resizing */
-  height: 100px; /* Adjust the height as needed */
+  resize: vertical;
+  /* Allows vertical resizing, but prevents horizontal resizing */
+  height: 100px;
+  /* Adjust the height as needed */
 }
 
 .form button {
@@ -29,4 +33,3 @@ textarea {
   background-color: #007BFF;
   color: white;
 }
-
